@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from backend.models.job import Job
 from backend.src.api.jobs import get_jobs_api_response
 
 app = FastAPI()
@@ -10,7 +11,7 @@ def read_root():
 
 
 @app.get("/jobs")
-def read_jobs(city: str, country_code: str, country: str, job_title: str, recruiters: str):
+def get_jobs(city: str, country_code: str, country: str, job_title: str, recruiters: str) -> list[Job]:
     # some validation
     if not city:
         return {"error": "city is required"}
