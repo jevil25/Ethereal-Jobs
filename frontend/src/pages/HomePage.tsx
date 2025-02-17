@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import SearchBar from './SearchBar';
-import JobFilters from './JobFilters';
-import JobList from './JobList';
+import SearchBar from '../components/SearchBar';
+import JobFilters from '../components/JobFilters';
+import JobList from '../components/JobList';
 import { JobData } from '../types/api';
 import { constructServerUrlFromPath, toaster } from '../utils/helper';
 import axios from 'axios';

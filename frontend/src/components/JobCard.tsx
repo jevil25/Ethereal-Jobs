@@ -1,11 +1,12 @@
 import React from 'react';
 import { JobData } from '../types/api';
-
+import { useNavigate } from 'react-router-dom';
 interface JobCardProps {
   job: JobData;
 }
 
 const JobCard: React.FC<JobCardProps> = ({ job }) => {
+  const Navigate = useNavigate();
   const formatSalary = () => {
     if (!job.min_amount && !job.max_amount) return 'Salary not specified';
     
@@ -26,6 +27,13 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
     }
   };
 
+  const redirectToJobPage = (e: React.MouseEvent) => {
+    e.preventDefault();
+    console.log('Redirecting to job page');
+    return Navigate(`/job/${job.id}`);
+  }
+
+
   const truncateDescription = (text: string, maxLength: number = 200) => {
     if (!text) return '';
     if (text.length <= maxLength) return text;
@@ -33,7 +41,7 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition duration-200">
+    <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition duration-200" onClick={redirectToJobPage}>
       <div className="flex justify-between items-start">
         <div>
           <h2 className="text-xl font-semibold mb-1">{job.title}</h2>
@@ -78,10 +86,10 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
           Posted: {new Date(job.date_posted).toLocaleDateString()}
         </span>
         <a
-          href={job.job_url}
+          onClick={(e) => redirectToJobPage(e)}
           target="_blank"
           rel="noopener noreferrer"
-          className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded transition duration-200"
+          className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded transition duration-200 hover:cursor-pointer"
         >
           Apply Now
         </a>

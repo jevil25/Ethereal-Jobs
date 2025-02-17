@@ -27,4 +27,5 @@ export interface JobData {
     company_num_employees: string;
     company_revenue: string;
     company_description: string;
+    linkedin_profile: string | null;
   }
