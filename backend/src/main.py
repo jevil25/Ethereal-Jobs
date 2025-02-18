@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 from src.api.linkedin_profiles import get_linkedin_profiles_api_response
 from src.api.jobs import get_jobs_api_response
+from src.api.generate_linkedin_message import generate_message_api_response
 from src.logger import logger
 from src.db.mongo import get_database
 from bson import ObjectId
@@ -138,5 +139,29 @@ async def update_resume(resume_id: str, resume: dict) -> dict:
         return HTTPException(status_code=404, detail="Resume not found")
     return JSONResponse(
         content={"resume_id": resume_id},
+        media_type="application/json",
+    )
+
+@app.get("/generate/linkedin/message/{resume_id}")
+async def generate_linkedin_message(resume_id: str, company: str, position: str) -> dict:
+    logger.info(f"Generating linkedin message for resume {resume_id} and company {company} and position {position}")
+    db = get_database()
+    resume = db["resumes"].find_one({"_id": ObjectId(resume_id)})
+    if not resume:
+        return HTTPException(status_code=404, detail="Resume not found")
+    linkedin_messages_collection = db["linkedin_messages"]
+    linkedin_message = linkedin_messages_collection.find_one({"resumeId": resume_id, "company": company, "position": position})
+    if not linkedin_message:
+        message_dict = generate_message_api_response(resume, company, position)
+        message_dict["resumeId"] = resume_id
+        message_dict["company"] = company
+        message_dict["position"] = position
+        linkedin_messages_collection.insert_one(message_dict)
+        linkedin_message = message_dict
+    linkedin_message.pop("_id")
+    linkedin_message.pop("metadata")
+    linkedin_message.pop("status")
+    return JSONResponse(
+        content=linkedin_message,
         media_type="application/json",
     )
