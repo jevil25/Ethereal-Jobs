@@ -1,13 +1,14 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import {
   useDispatch,
   useSelector,
   type TypedUseSelectorHook,
 } from "react-redux";
-import { store, type RootState, type AppDispatch } from "../../lib/redux/store";
+import { debounce } from "lodash";
+import { type RootState, type AppDispatch } from "../../lib/redux/store";
 import {
-  loadStateFromLocalStorage,
-  saveStateToLocalStorage,
+  loadStateFromDatabase,
+  saveStateToDatabase
 } from "../../lib/redux/local-storage";
 import { initialResumeState, setResume } from "../../lib/redux/resumeSlice";
 import {
@@ -24,36 +25,53 @@ export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 /**
  * Hook to save store to local storage on store change
  */
-export const useSaveStateToLocalStorageOnChange = () => {
+export const useSaveStateToDatabaseOnChange = () => {
+  const state = useAppSelector((state) => state);
+  const prevStateRef = useRef(state);
+  
   useEffect(() => {
-    const unsubscribe = store.subscribe(() => {
-      saveStateToLocalStorage(store.getState());
-    });
-    return unsubscribe;
-  }, []);
+    const hasStateChanged = JSON.stringify(prevStateRef.current) !== JSON.stringify(state);
+    
+    if (!hasStateChanged) return;
+    
+    const debouncedSave = debounce(async () => {
+      await saveStateToDatabase(state);
+      prevStateRef.current = state;
+    }, 2000);
+    debouncedSave();
+
+    return () => {
+      debouncedSave.cancel();
+    };
+  }, [state]);
 };
 
-export const useSetInitialStore = () => {
+export const useSetInitialStore = (setIsLoading: (isLoading: boolean) => void) => {
   const dispatch = useAppDispatch();
   useEffect(() => {
-    const state = loadStateFromLocalStorage();
-    if (!state) return;
-    if (state.resume) {
-      // We merge the initial state with the stored state to ensure
-      // backward compatibility, since new fields might be added to
-      // the initial state over time.
-      const mergedResumeState = deepMerge(
-        initialResumeState,
-        state.resume
-      ) as Resume;
-      dispatch(setResume(mergedResumeState));
-    }
-    if (state.settings) {
-      const mergedSettingsState = deepMerge(
-        initialSettings,
-        state.settings
-      ) as Settings;
-      dispatch(setSettings(mergedSettingsState));
-    }
+    const setInitialStore = async () => {
+      setIsLoading(true);
+      const state = await loadStateFromDatabase();
+      if (!state) return setIsLoading(false);
+      if (state.resume) {
+        // We merge the initial state with the stored state to ensure
+        // backward compatibility, since new fields might be added to
+        // the initial state over time.
+        const mergedResumeState = deepMerge(
+          initialResumeState,
+          state.resume
+        ) as Resume;
+        dispatch(setResume(mergedResumeState));
+      }
+      if (state.settings) {
+        const mergedSettingsState = deepMerge(
+          initialSettings,
+          state.settings
+        ) as Settings;
+        dispatch(setSettings(mergedSettingsState));
+      }
+      setIsLoading(false);
+    };
+    setInitialStore();
   }, []);
 };

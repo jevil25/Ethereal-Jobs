@@ -7,6 +7,7 @@ from src.api.linkedin_profiles import get_linkedin_profiles_api_response
 from src.api.jobs import get_jobs_api_response
 from src.logger import logger
 from src.db.mongo import get_database
+from bson import ObjectId
 
 class CustomJSONEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -69,28 +70,73 @@ def get_jobs(city: str, country_code: str, country: str, job_title: str, recruit
 
 @app.get("/job/{job_id}/linkedin/profile")
 async def get_linkedin_profile(job_id: str) -> dict:
+    job_id.lower()
     logger.info(f"Getting linkedin profile for job {job_id}")
     db = get_database()
     jobs_collection = db["jobs"]
     job = jobs_collection.find_one({"id": job_id})
     if not job:
         return HTTPException(status_code=404, detail="Job not found")
-    if not job.get("linkedin_profiles"):
-        company = job.get("company")
-        location = job.get("location")
+    company = job.get("company").lower()
+    location = job.get("location").lower()
+    linkedin_profiles_db = db["company_linkedin_profiles"]
+    linkedin_profiles = linkedin_profiles_db.find_one({"company": company, "location": location})
+    if not linkedin_profiles or not linkedin_profiles.get("profiles") or len(linkedin_profiles.get("profiles")) == 0:
         logger.info(f"Getting linkedin profiles for {company} in {location}")
         if not company:
             return HTTPException(status_code=400, detail="company is required")
         if not location:
             return HTTPException(status_code=400, detail="location is required")
         profiles = get_linkedin_profiles_api_response(company, location)
-        job["linkedin_profiles"] = profiles
-        jobs_collection.update_one({"id": job_id}, {"$set": {"linkedin_profiles": profiles}})
+        db_company_linkedin_profiles = db["company_linkedin_profiles"]
+        db_company_linkedin_profiles.update_one(
+            {"company": company, "location": location},
+            {"$set": {"profiles": profiles}},
+            upsert=True
+        )
+    else:
+        profiles = linkedin_profiles.get("profiles")
     job.pop("_id")
+    job["linkedin_profiles"] = profiles
     return JSONResponse(
         content=job,
         media_type="application/json",
     )
 
-    
+@app.post("/resume/save")
+async def save_resume(resume: dict) -> dict:
+    logger.info(f"Saving resume")
+    db = get_database()
+    resumes_collection = db["resumes"]
+    resume_id = resumes_collection.insert_one(resume).inserted_id
+    return JSONResponse(
+        content={"resume_id": str(resume_id)},
+        media_type="application/json",
+    ) 
 
+@app.get("/resume/{resume_id}")
+async def get_resume(resume_id: str) -> dict:
+    logger.info(f"Getting resume {resume_id}")
+    db = get_database()
+    resumes_collection = db["resumes"]
+    resume = resumes_collection.find_one({"_id": ObjectId(resume_id)})
+    if not resume:
+        return HTTPException(status_code=404, detail="Resume not found")
+    resume.pop("_id")
+    return JSONResponse(
+        content=resume,
+        media_type="application/json",
+    )
+
+@app.put("/resume/{resume_id}")
+async def update_resume(resume_id: str, resume: dict) -> dict:
+    logger.info(f"Updating resume {resume_id}")
+    db = get_database()
+    resumes_collection = db["resumes"]
+    updated_resume = resumes_collection.update_one({"_id": ObjectId(resume_id)}, {"$set": resume})
+    if not updated_resume:
+        return HTTPException(status_code=404, detail="Resume not found")
+    return JSONResponse(
+        content={"resume_id": resume_id},
+        media_type="application/json",
+    )

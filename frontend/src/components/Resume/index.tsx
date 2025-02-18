@@ -17,7 +17,11 @@ import {
 } from "../../fonts/hooks";
 import { NonEnglishFontsCSSLazyLoader } from "../../fonts/NonEnglishFontsCSSLoader";
 
-export const Resume = () => {
+interface ResumeProps {
+  isLoading: boolean;
+}
+
+export const Resume = ({ isLoading }: ResumeProps) => {
   const [scale, setScale] = useState(0.8);
   const resume = useAppSelector(selectResume);
   const settings = useAppSelector(selectSettings);
@@ -28,6 +32,10 @@ export const Resume = () => {
 
   useRegisterReactPDFFont();
   useRegisterReactPDFHyphenationCallback(settings.fontFamily);
+
+  if (isLoading) {
+    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  }
 
   return (
     <>

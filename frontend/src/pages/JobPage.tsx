@@ -1,13 +1,36 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { constructServerUrlFromPath } from '../utils/helper';
 import Markdown from 'react-markdown';
+import { JobData } from '../types/api';
+import { useAppSelector, useSaveStateToDatabaseOnChange, useSetInitialStore } from "../lib/redux/hooks";
+import { selectResume } from "../lib/redux/resumeSlice";
+import { selectSettings } from "../lib/redux/settingsSlice";
+import { ResumePDF } from '../components/Resume/ResumePDF';
+import { ResumeControlBarCSR } from '../components/Resume/ResumeControlBar';
+import {
+  useRegisterReactPDFFont,
+  useRegisterReactPDFHyphenationCallback,
+} from "../fonts/hooks";
 
 const JobPage: React.FC = () => {
   const navigate = useNavigate();
-  const [job, setJob] = useState<any>();
+  const [job, setJob] = useState<JobData>();
   const [loading, setLoading] = useState<boolean>(true);
+  const [scale, setScale] = useState(0.8);
+
+  const resume = useAppSelector(selectResume);
+  const settings = useAppSelector(selectSettings);
+  const document = useMemo(
+    () => <ResumePDF resume={resume} settings={settings} isPDF={true} />,
+    [resume, settings]
+  );
+
+  useRegisterReactPDFFont();
+  useRegisterReactPDFHyphenationCallback(settings.fontFamily);
+  useSetInitialStore(setLoading);
+  useSaveStateToDatabaseOnChange();
 
   useEffect(() => {
     async function fetchJobData() {
@@ -89,7 +112,7 @@ const JobPage: React.FC = () => {
               </span>
             )}
             <span className="px-3 py-1 border border-gray-300 text-gray-700 rounded-full text-sm">
-              Posted: {new Date(job?.date_posted).toLocaleDateString()}
+              Posted: {new Date(job?.date_posted as string).toLocaleDateString()}
             </span>
             {job?.min_amount && job?.max_amount && (
               <span className="px-3 py-1 border border-gray-300 text-gray-700 rounded-full text-sm">
@@ -102,7 +125,44 @@ const JobPage: React.FC = () => {
         {/* Hiring Managers Section */}
         {job?.linkedin_profiles && job.linkedin_profiles.length > 0 && (
           <div className="border-b bg-gradient-to-r from-blue-50 to-indigo-50 p-6">
-            <h2 className="text-lg font-semibold mb-4">Contact Hiring Managers</h2>
+            <div className="flex items-center mb-4 bg-white p-4 rounded-lg border border-blue-300 shadow-md transition-all w-fit">
+              <div className="flex-shrink-0">
+                <svg
+                  className="w-6 h-6 text-yellow-500"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.18c.969 0 1.371 1.24.588 1.81l-3.392 2.46a1 1 0 00-.364 1.118l1.286 3.97c.3.921-.755 1.688-1.54 1.118l-3.392-2.46a1 1 0 00-1.176 0l-3.392 2.46c-.784.57-1.838-.197-1.54-1.118l1.286-3.97a1 1 0 00-.364-1.118L2.045 9.397c-.783-.57-.38-1.81.588-1.81h4.18a1 1 0 00.95-.69l1.286-3.97z" />
+                </svg>
+              </div>
+              <div className="ml-2 text-gray-600 font-semibold">
+                Jobify has gathered these for you!
+              </div>
+            </div>
+            {/* 2 buttons one to download resume and one to get customized message */}
+            <div className="flex items-center gap-4 mb-4">
+              <ResumeControlBarCSR
+                scale={scale}
+                setScale={setScale}
+                documentSize={settings.documentSize}
+                document={document}
+                fileName={resume.profile.name + " - Resume"}
+                showScale={false}
+              />
+              <button
+                className="bg-white text-blue-500 px-4 py-2 rounded-lg border border-blue-500 hover:bg-blue-50 cursor-pointer"
+              >
+                Get Customized Message
+              </button>
+            </div>
+            <h2 className="text-lg font-semibold mb-4">Contact Hiring Managers from {job.company}</h2>
+            <p className="text-sm text-gray-600">
+              Our backend system has found LinkedIn profiles of hiring managers from {job.company}.
+            </p>
+            <p className="text-sm text-gray-600 mb-4">
+              Note: We do not verify the hiring managers. Please be cautious while contacting them.
+            </p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {job.linkedin_profiles.map((profile: any, index: number) => (
                 <a
@@ -110,10 +170,15 @@ const JobPage: React.FC = () => {
                   href={profile.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-white p-4 rounded-lg border border-blue-100 hover:border-blue-300 hover:shadow-md transition-all flex flex-col"
+                  className="bg-white p-4 rounded-lg border border-blue-100 hover:border-blue-300 hover:shadow-md transition-all flex flex-row"
                 >
-                  <div className="font-medium text-blue-600 mb-2">{profile.title}</div>
-                  <div className="text-sm text-gray-600">Click to view LinkedIn Profile</div>
+                  <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
+                    <path fill="#0078d4" d="M42,37c0,2.762-2.238,5-5,5H11c-2.761,0-5-2.238-5-5V11c0-2.762,2.239-5,5-5h26c2.762,0,5,2.238,5,5	V37z"></path><path d="M30,37V26.901c0-1.689-0.819-2.698-2.192-2.698c-0.815,0-1.414,0.459-1.779,1.364	c-0.017,0.064-0.041,0.325-0.031,1.114L26,37h-7V18h7v1.061C27.022,18.356,28.275,18,29.738,18c4.547,0,7.261,3.093,7.261,8.274	L37,37H30z M11,37V18h3.457C12.454,18,11,16.528,11,14.499C11,12.472,12.478,11,14.514,11c2.012,0,3.445,1.431,3.486,3.479	C18,16.523,16.521,18,14.485,18H18v19H11z" opacity=".05"></path><path d="M30.5,36.5v-9.599c0-1.973-1.031-3.198-2.692-3.198c-1.295,0-1.935,0.912-2.243,1.677	c-0.082,0.199-0.071,0.989-0.067,1.326L25.5,36.5h-6v-18h6v1.638c0.795-0.823,2.075-1.638,4.238-1.638	c4.233,0,6.761,2.906,6.761,7.774L36.5,36.5H30.5z M11.5,36.5v-18h6v18H11.5z M14.457,17.5c-1.713,0-2.957-1.262-2.957-3.001	c0-1.738,1.268-2.999,3.014-2.999c1.724,0,2.951,1.229,2.986,2.989c0,1.749-1.268,3.011-3.015,3.011H14.457z" opacity=".07"></path><path fill="#fff" d="M12,19h5v17h-5V19z M14.485,17h-0.028C12.965,17,12,15.888,12,14.499C12,13.08,12.995,12,14.514,12	c1.521,0,2.458,1.08,2.486,2.499C17,15.887,16.035,17,14.485,17z M36,36h-5v-9.099c0-2.198-1.225-3.698-3.192-3.698	c-1.501,0-2.313,1.012-2.707,1.99C24.957,25.543,25,26.511,25,27v9h-5V19h5v2.616C25.721,20.5,26.85,19,29.738,19	c3.578,0,6.261,2.25,6.261,7.274L36,36L36,36z"></path>
+                  </svg>
+                  <div className="flex flex-col">
+                    <div className="font-medium text-blue-600 mb-2">{profile.title}</div>
+                    <div className="text-xs text-gray-600">Click to view LinkedIn Profile</div>
+                  </div>
                 </a>
               ))}
             </div>

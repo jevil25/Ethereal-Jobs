@@ -6,6 +6,7 @@ import {
   ArrowDownTrayIcon,
 } from "@heroicons/react/24/outline";
 import { usePDF } from "@react-pdf/renderer";
+import { Button } from "../Button";
 
 
 const ResumeControlBar = ({
@@ -14,12 +15,14 @@ const ResumeControlBar = ({
   documentSize,
   document,
   fileName,
+  showScale = true,
 }: {
   scale: number;
   setScale: (scale: number) => void;
   documentSize: string;
   document: JSX.Element;
   fileName: string;
+  showScale?: boolean;
 }) => {
   const { scaleOnResize, setScaleOnResize } = useSetDefaultScale({
     setScale,
@@ -27,13 +30,16 @@ const ResumeControlBar = ({
   });
 
   const [instance, update] = usePDF({ document });
+  console.log('PDF instance:', instance);
 
   // Hook to update pdf when document changes
   useEffect(() => {
-    update(document);
+    if (document){
+      update(document);
+    }
   }, [update, document]);
 
-  return (
+  return showScale ? (<>
     <div className="sticky bottom-0 left-0 right-0 flex h-[var(--resume-control-bar-height)] items-center justify-center px-[var(--resume-padding)] text-gray-600 lg:justify-between">
       <div className="flex items-center gap-2">
         <MagnifyingGlassIcon className="h-5 w-5" aria-hidden="true" />
@@ -60,15 +66,24 @@ const ResumeControlBar = ({
         </label>
       </div>
       <a
-        className="ml-1 flex items-center gap-1 rounded-md border border-gray-300 px-3 py-0.5 hover:bg-gray-100 lg:ml-8"
+        className="ml-1 flex items-center gap-1 rounded-md border border-gray-300 hover:bg-blue-700 text-white bg-blue-600 px-4 py-2 lg:ml-8 cursor-pointer"
         href={instance.url!}
         download={fileName}
       >
-        <ArrowDownTrayIcon className="h-4 w-4" />
-        <span className="whitespace-nowrap">Download Resume</span>
+        <ArrowDownTrayIcon className="h-4 w-4 cursor-pointer" />
+        <Button className="whitespace-nowrap cursor-pointer">Download Resume</Button>
       </a>
     </div>
-  );
+  </>) : <>
+    <a
+      className="flex items-center gap-1 rounded-md border border-gray-300 hover:bg-blue-700 text-white bg-blue-600 px-4 py-2 cursor-pointer"
+      href={instance.url!}
+      download={fileName}
+    >
+      <ArrowDownTrayIcon className="h-4 w-4 cursor-pointer" />
+      <Button className="whitespace-nowrap cursor-pointer">Download Resume</Button>
+    </a>
+  </>;
 };
 
 /**

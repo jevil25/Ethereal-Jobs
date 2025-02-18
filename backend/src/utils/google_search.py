@@ -66,7 +66,11 @@ def google_search(company_name: str, location: str, results_wanted: int = 10) ->
             }
             for item in data["items"]
         ]
-            
+    
+    except requests.exceptions.HTTPError as e:
+        status_code = e.response.status_code
+        if status_code == 429:
+            return []
     except requests.exceptions.RequestException as e:
         raise GoogleSearchError(f"Search request failed: {str(e)}") from e
     except (KeyError, ValueError) as e:

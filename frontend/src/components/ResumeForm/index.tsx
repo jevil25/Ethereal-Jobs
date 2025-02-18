@@ -1,7 +1,7 @@
 import { JSX, useState } from "react";
 import {
   useAppSelector,
-  useSaveStateToLocalStorageOnChange,
+  useSaveStateToDatabaseOnChange,
   useSetInitialStore,
 } from "../../lib/redux/hooks";
 import { ShowForm, selectFormsOrder } from "../../lib/redux/settingsSlice";
@@ -23,12 +23,27 @@ const formTypeToComponent: { [type in ShowForm]: () => JSX.Element } = {
   custom: CustomForm,
 };
 
-export const ResumeForm = () => {
-  useSetInitialStore();
-  useSaveStateToLocalStorageOnChange();
+interface ResumeFormProps {
+  isLoading: boolean;
+  setIsLoading: (isLoading: boolean) => void;
+}
+
+export const ResumeForm = ({ isLoading, setIsLoading }: ResumeFormProps) => {
+  const [isHover, setIsHover] = useState(false);
+
+  useSetInitialStore(setIsLoading);
+  useSaveStateToDatabaseOnChange();
 
   const formsOrder = useAppSelector(selectFormsOrder);
-  const [isHover, setIsHover] = useState(false);
+
+  if (isLoading) {
+    return (
+    <div>
+        <div className="flex justify-center items-center h-screen">Loading...</div>
+        <FlexboxSpacer maxWidth={50} className="hidden md:block" />
+    </div>
+    )
+  }
 
   return (
     <div

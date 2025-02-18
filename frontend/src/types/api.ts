@@ -1,3 +1,9 @@
+interface LinkedInProfile {
+  title: string;
+  link: string;
+  vanity_name: string;
+}
+
 export interface JobData {
     id: string;
     site: string;
@@ -27,5 +33,5 @@ export interface JobData {
     company_num_employees: string;
     company_revenue: string;
     company_description: string;
-    linkedin_profile: string | null;
+    linkedin_profiles: LinkedInProfile[];
   }
