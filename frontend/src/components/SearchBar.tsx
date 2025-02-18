@@ -57,6 +57,8 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
             value={country}
             list={countries}
             onChange={setCountry}
+            selectionText="Select a country"
+            noSelectionText='No Country Selected'
           />
         </div>
         

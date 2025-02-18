@@ -13,12 +13,18 @@ import {
   useRegisterReactPDFFont,
   useRegisterReactPDFHyphenationCallback,
 } from "../fonts/hooks";
+import Dropdown from '../components/DropDown';
 
 const JobPage: React.FC = () => {
   const navigate = useNavigate();
   const [job, setJob] = useState<JobData>();
   const [loading, setLoading] = useState<boolean>(true);
   const [scale, setScale] = useState(0.8);
+  const [generatedMessage, setGeneratedMessage] = useState<string>('');
+  const [generatingMessage, setGeneratingMessage] = useState<boolean>(false);
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [copyMessage, setCopyMessage] = useState<string>('Copy Message');
+  const [linkedinName, setLinkedinName] = useState<string>('');
 
   const resume = useAppSelector(selectResume);
   const settings = useAppSelector(selectSettings);
@@ -68,6 +74,30 @@ const JobPage: React.FC = () => {
     });
     return `${formatter.format(min)} - ${formatter.format(max)}`;
   };
+
+  const handleMessageGeneration = async () => {
+    setLinkedinName(job?.linkedin_profiles[0].title || "");
+    setGeneratingMessage(true);
+    setModalOpen(true);
+    const resumeId = localStorage.getItem("resumeId");
+    if (!resumeId) {
+      return () => {
+        navigate('/resume');
+      };
+    }
+    const params = {
+      "company": job?.company,
+      "position": job?.title,
+    }
+    const response = await axios.get(constructServerUrlFromPath(`/generate/linkedin/message/${resumeId}`), { params });
+    if (response.data.message) {
+      const message: string = response.data.message;
+      setGeneratedMessage(message);
+    }else{
+      setGeneratedMessage('Error generating message. Please try again later.');
+    }
+    setGeneratingMessage(false);
+  }
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
@@ -152,6 +182,7 @@ const JobPage: React.FC = () => {
               />
               <button
                 className="bg-white text-blue-500 px-4 py-2 rounded-lg border border-blue-500 hover:bg-blue-50 cursor-pointer"
+                onClick={() => handleMessageGeneration()}
               >
                 Get Customized Message
               </button>
@@ -193,8 +224,78 @@ const JobPage: React.FC = () => {
             </div>
         </div>
       </div>
+      {modalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="bg-white rounded-lg p-6 w-full md:w-1/2 shadow-lg">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold">Customized Message</h2>
+              <button onClick={() => setModalOpen(false)}>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6 text-gray-600 hover:text-gray-800"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+            <div className="prose max-w-none">
+              {generatingMessage ? (
+                <div className="flex justify-center items-center h-32">
+                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+                  <div className="ml-4">Our backend is generating your message, It might take a few seconds please wait....</div>
+                </div>
+              ) : (
+                <div className='flex flex-col gap-4'>
+                  <div className="mb-4">
+                    <p className="text-sm text-gray-600">
+                      Use the below message to contact the hiring managers from {job?.company} on LinkedIn.
+                    </p>
+                  </div>
+                  <Dropdown
+                    value={linkedinName}
+                    list={job?.linkedin_profiles.map((profile) => profile.title) as string[]}
+                    onChange={setLinkedinName}
+                    selectionText='Select LinkedIn Name'
+                    noSelectionText='No Such LinkedIn Name Found'
+                  />
+                  <div className="mb-4 bg-white p-4 rounded-lg border border-blue-300 shadow-md transition-all w-fit">
+                    <Markdown>{generatedMessage.replace("[LinkedIn User Name]", linkedinName)}</Markdown>
+                    <button
+                      className=" text-gray-400 hover:text-gray-600 mt-2 px-0.5 py-1 text-xs rounded-lg border-gray-400 border hover:border-gray-600 cursor-pointer"
+                      onClick={() => {
+                        navigator.clipboard.writeText(generatedMessage.replace("[LinkedIn User Name]", linkedinName));
+                        setCopyMessage('Copied!');
+                        setTimeout(() => {
+                          setCopyMessage('Copy Message');
+                        }, 1000);
+                      }}
+                    >
+                      {copyMessage}
+                    </button>
+                  </div>
+                  <a 
+                    href={job?.linkedin_profiles[0].link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-blue-600 text-white px-4 py-2 rounded-lg text-center"
+                  >
+                    Visit {linkedinName}'s LinkedIn Profile
+                  </a>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
-  );
-};
+)};
 
 export default JobPage;
