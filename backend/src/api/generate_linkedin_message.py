@@ -1,7 +1,6 @@
 import os
 from typing import Dict, List
 from src.logger import logger
-import torch
 from transformers import pipeline, set_seed, AutoModelForCausalLM, AutoTokenizer
 import json
 from google import genai
