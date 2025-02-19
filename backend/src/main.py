@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 import json
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -54,15 +54,36 @@ def get_jobs(city: str, country_code: str, country: str, job_title: str, recruit
         return HTTPException(status_code=400, detail="job_title is required")
     if not recruiters:
         recruiters = ""
+    city = city.lower()
+    country_code = country_code.lower()
+    country = country.lower()
+    job_title = job_title.lower()
+    yesterday = date.today() - timedelta(days=1)
+    db = get_database()
+    jobs_collection = db["jobs"]
+    jobs = jobs_collection.find(
+        {"query.city": city, "query.country_code": country_code, "query.country": country, "query.job_title": job_title, "date_posted": {"$gte": str(yesterday)}}
+    ).to_list()
+    if len(jobs) > 0 and len(jobs) > 10:
+        response_jobs = [{k: v for k, v in job.items() if k != '_id'} for job in jobs]
+        return JSONResponse(
+            content=response_jobs,
+            media_type="application/json",
+        )
     recruiters_list = recruiters.split(",")
     recruiters_list.remove("")
     jobs = get_jobs_api_response(city, country_code, country, job_title, recruiters_list)
     logger.info(f"Returning {len(jobs)} jobs")
     serialized_jobs = serialize_dates(jobs)
     serialized_jobs_copy = serialized_jobs.copy()
-    db = get_database()
-    jobs_collection = db["jobs"]
-    jobs_collection.insert_many(serialized_jobs_copy)
+    for job in serialized_jobs_copy:
+        job["query"] = {"city": city, "country_code": country_code, "country": country, "job_title": job_title}
+    for job in serialized_jobs:
+        jobs_collection.update_one(
+            {"id": job["id"]},
+            {"$set": job},
+            upsert=True
+        )
     response_jobs = [{k: v for k, v in job.items() if k != '_id'} for job in serialized_jobs]
     return JSONResponse(
         content=response_jobs,

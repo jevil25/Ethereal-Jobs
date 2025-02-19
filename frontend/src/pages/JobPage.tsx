@@ -99,6 +99,8 @@ const JobPage: React.FC = () => {
     setGeneratingMessage(false);
   }
 
+  const reg = new RegExp('\\[[^\\]]*\\]|\\{\\{[^}]*\\}\\}|\\{[^}]*\\}', 'g');
+
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <button 
@@ -267,11 +269,11 @@ const JobPage: React.FC = () => {
                     noSelectionText='No Such LinkedIn Name Found'
                   />
                   <div className="mb-4 bg-white p-4 rounded-lg border border-blue-300 shadow-md transition-all w-fit">
-                    <Markdown>{generatedMessage.replace("[LinkedIn User Name]", linkedinName)}</Markdown>
+                    <Markdown>{generatedMessage.replace(reg, linkedinName)}</Markdown>
                     <button
                       className=" text-gray-400 hover:text-gray-600 mt-2 px-0.5 py-1 text-xs rounded-lg border-gray-400 border hover:border-gray-600 cursor-pointer"
                       onClick={() => {
-                        navigator.clipboard.writeText(generatedMessage.replace("[LinkedIn User Name]", linkedinName));
+                        navigator.clipboard.writeText(generatedMessage.replace(reg, linkedinName));
                         setCopyMessage('Copied!');
                         setTimeout(() => {
                           setCopyMessage('Copy Message');
@@ -282,7 +284,7 @@ const JobPage: React.FC = () => {
                     </button>
                   </div>
                   <a 
-                    href={job?.linkedin_profiles[0].link}
+                    href={job?.linkedin_profiles.find((profile) => profile.title === linkedinName)?.link}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="bg-blue-600 text-white px-4 py-2 rounded-lg text-center"

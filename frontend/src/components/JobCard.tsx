@@ -1,6 +1,7 @@
 import React from 'react';
 import { JobData } from '../types/api';
 import { useNavigate } from 'react-router-dom';
+import Markdown from 'react-markdown';
 interface JobCardProps {
   job: JobData;
 }
@@ -60,7 +61,7 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
       <p className="text-blue-600 font-medium mb-3">{formatSalary()}</p>
       
       <div className="mb-4">
-        <p className="text-gray-700">{truncateDescription(job.description)}</p>
+        <p className="text-gray-700"><Markdown>{truncateDescription(job.description)}</Markdown></p>
       </div>
       
       <div className="flex flex-wrap gap-2 mb-4">

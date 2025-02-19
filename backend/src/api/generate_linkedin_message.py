@@ -1,7 +1,7 @@
 import os
 from typing import Dict, List
 from src.logger import logger
-from transformers import pipeline, set_seed, AutoModelForCausalLM, AutoTokenizer
+# from transformers import pipeline, set_seed, AutoModelForCausalLM, AutoTokenizer
 import json
 from google import genai
 import dotenv

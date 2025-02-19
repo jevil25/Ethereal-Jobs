@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { getCode, getNames } from 'country-list';
 import Dropdown from './DropDown';
 
@@ -31,6 +31,19 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
       recruiters,
     });
   };
+
+  useEffect(() => {
+    const countryCode = getCode(country.toLowerCase());
+    const recruiters = '';
+    onSearch({
+      city,
+      country_code: countryCode? countryCode : 'IN',
+      country,
+      job_title: jobTitle,
+      recruiters,
+    });
+  }
+  , []);
 
   return (
     <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md">
