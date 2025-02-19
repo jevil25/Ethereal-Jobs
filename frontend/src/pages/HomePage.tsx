@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import SearchBar from '../components/SearchBar';
 import JobFilters from '../components/JobFilters';
 import JobList from '../components/JobList';
-import { JobData } from '../types/api';
-import { constructServerUrlFromPath, toaster } from '../utils/helper';
-import axios from 'axios';
+import { JobData } from '../types/data';
+import { getJobs } from '../api/jobs';
+import { toaster } from '../utils/helper';
 
 const HomePage: React.FC = () => {
   const [jobs, setJobs] = useState<JobData[]>([]);
@@ -26,8 +26,7 @@ const HomePage: React.FC = () => {
   }) => {
     setLoading(true);
     try {
-      const response = await axios.get(constructServerUrlFromPath('/jobs'), { params });
-      const data = response.data as JobData[];
+      const data = await getJobs(params);
       setJobs(data);
       const jobsFiltered = data.filter(job => {
         return (

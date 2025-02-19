@@ -1,9 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { constructServerUrlFromPath } from '../utils/helper';
 import Markdown from 'react-markdown';
-import { JobData } from '../types/api';
+import { JobData } from '../types/data';
 import { useAppSelector, useSaveStateToDatabaseOnChange, useSetInitialStore } from "../lib/redux/hooks";
 import { selectResume } from "../lib/redux/resumeSlice";
 import { selectSettings } from "../lib/redux/settingsSlice";
@@ -14,6 +12,7 @@ import {
   useRegisterReactPDFHyphenationCallback,
 } from "../fonts/hooks";
 import Dropdown from '../components/DropDown';
+import { generateLinkedInMessage, getLinkedInProfilesForJob } from '../api/jobs';
 
 const JobPage: React.FC = () => {
   const navigate = useNavigate();
@@ -43,12 +42,11 @@ const JobPage: React.FC = () => {
         const path = window.location.pathname;
         const id = path.split('/').pop();
         if (!id) {
-            navigate('/');
+          return navigate('/');
         } 
         try {
-            const jobRequestPath = constructServerUrlFromPath(`/job/${id}/linkedin/profile`);
-            const jobResponse = await axios.get(jobRequestPath);
-            setJob(jobResponse.data);
+            const data = await getLinkedInProfilesForJob(id);
+            setJob(data);
         } catch (error) {
             console.error('Error fetching data:', error);
         } finally {
@@ -86,12 +84,13 @@ const JobPage: React.FC = () => {
       };
     }
     const params = {
-      "company": job?.company,
-      "position": job?.title,
+      "resumeId": resumeId,
+      "company": job?.company || "",
+      "position": job?.title || ""
     }
-    const response = await axios.get(constructServerUrlFromPath(`/generate/linkedin/message/${resumeId}`), { params });
-    if (response.data.message) {
-      const message: string = response.data.message;
+    const data = await generateLinkedInMessage(params);
+    if (data.message) {
+      const message = data.message;
       setGeneratedMessage(message);
     }else{
       setGeneratedMessage('Error generating message. Please try again later.');

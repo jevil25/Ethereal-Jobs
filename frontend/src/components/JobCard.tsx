@@ -1,5 +1,5 @@
 import React from 'react';
-import { JobData } from '../types/api';
+import { JobData } from '../types/data';
 import { useNavigate } from 'react-router-dom';
 import Markdown from 'react-markdown';
 interface JobCardProps {

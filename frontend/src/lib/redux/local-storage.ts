@@ -1,6 +1,5 @@
 import type { RootState } from "../../lib/redux/store";
-import axios from "axios";
-import { constructServerUrlFromPath } from "../../utils/helper";
+import { saveResumeDetails, updateResumeDetails, getResumeDetails } from "../../api/resume";
 
 // Reference: https://dev.to/igorovic/simplest-way-to-persist-redux-state-to-localstorage-e67
 
@@ -29,12 +28,11 @@ export const saveStateToDatabase = async (state: RootState) => {
   try {
     const existingResumeId = localStorage.getItem("resumeId");
     if (!existingResumeId) {  
-      const response = await axios.post(constructServerUrlFromPath("/resume/save"), state);
-      console.log(`Saved state to database: ${response.data}`);
-      const resumeId = response.data.resume_id;
-      return localStorage.setItem("resumeId", resumeId);
+      const resumeId = await saveResumeDetails({ state });
+      if (!resumeId.resumeId) return;
+      return localStorage.setItem("resumeId", resumeId.resumeId);
     }
-    await axios.put(constructServerUrlFromPath(`/resume/${existingResumeId}`), state);
+    await updateResumeDetails({ state }, existingResumeId);
   } catch (e) {
     console.log(`Error saving state to database: ${e}`)
   }
@@ -44,8 +42,8 @@ export const loadStateFromDatabase = async () => {
   try {
     const resumeId = localStorage.getItem("resumeId");
     if (!resumeId) return;
-    const response = await axios.get(constructServerUrlFromPath(`/resume/${resumeId}`));
-    return response.data as RootState;
+    const response = await getResumeDetails(resumeId);
+    return response;
   } catch (e) {
     console.log(`Error loading state from database: ${e}`);
     return undefined;
