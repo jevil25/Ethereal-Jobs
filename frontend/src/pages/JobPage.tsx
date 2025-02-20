@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Markdown from 'react-markdown';
 import { JobData } from '../types/data';
-import { useAppSelector, useSaveStateToDatabaseOnChange, useSetInitialStore } from "../lib/redux/hooks";
+import { useAppSelector, useSetInitialStore } from "../lib/redux/hooks";
 import { selectResume } from "../lib/redux/resumeSlice";
 import { selectSettings } from "../lib/redux/settingsSlice";
 import { ResumePDF } from '../components/Resume/ResumePDF';
@@ -35,7 +35,6 @@ const JobPage: React.FC = () => {
   useRegisterReactPDFFont();
   useRegisterReactPDFHyphenationCallback(settings.fontFamily);
   useSetInitialStore(setLoading);
-  useSaveStateToDatabaseOnChange();
 
   useEffect(() => {
     async function fetchJobData() {
