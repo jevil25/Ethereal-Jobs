@@ -9,10 +9,17 @@ interface SearchBarProps {
     country: string;
     job_title: string;
     recruiters: string;
+    job_type: string;
   }) => void;
+  filters: {  
+    is_remote: boolean;
+    job_type: string;
+    salary_min: number;
+    salary_max: number;
+  };
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
+const SearchBar: React.FC<SearchBarProps> = ({ onSearch, filters }) => {
   const countries = getNames();
 
   const [city, setCity] = useState('Bengaluru');
@@ -29,6 +36,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
       country,
       job_title: jobTitle,
       recruiters,
+      job_type: filters.job_type,
     });
   };
 
@@ -41,9 +49,10 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
       country,
       job_title: jobTitle,
       recruiters,
+      job_type: filters.job_type,
     });
   }
-  , []);
+  , [filters]);
 
   return (
     <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md">

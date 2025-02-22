@@ -1,10 +1,11 @@
 from datetime import date, datetime, timedelta
 import json
-from typing import List, Dict
-from fastapi import FastAPI, HTTPException
+from typing import List, Dict, Optional
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 from bson import ObjectId
+from jobspy import JobType
 
 from src.api.linkedin_profiles import get_linkedin_profiles_api_response
 from src.api.jobs import get_jobs_api_response
@@ -54,18 +55,35 @@ def get_jobs(
     country_code: str,
     country: str,
     job_title: str,
-    recruiters: str = ""
+    recruiters: str = "",
+    results_wanted: int = Query(default=20, ge=1, le=200),
+    job_type: Optional[str] = None,
+    is_remote: Optional[bool] = None,
+    distance: Optional[int] = Query(default=None, ge=0, le=100)
 ) -> List[Dict]:
     # Validate input parameters
     if not all([city, country_code, country, job_title]):
         raise HTTPException(status_code=400, detail="Missing required parameters")
 
+    jobTypesFrontend = ['Full-time', 'Part-time', 'Internship']
+    if job_type and job_type not in jobTypesFrontend:
+        raise HTTPException(status_code=400, detail="Invalid job type")
+    if job_type == 'Full-time':
+        job_type = JobType.FULL_TIME.value[0]
+    elif job_type == 'Part-time':
+        job_type = JobType.PART_TIME.value[0]
+    elif job_type == 'Internship':
+        job_type = JobType.INTERNSHIP.value[0]
     # Normalize input parameters
     query_params = {
         "city": city.lower(),
         "country_code": country_code.lower(),
         "country": country.lower(),
-        "job_title": job_title.lower()
+        "job_title": job_title.lower(),
+        "results_wanted": results_wanted,
+        "job_type": job_type,
+        "is_remote": is_remote,
+        "distance": distance
     }
 
     # Check for cached jobs from yesterday onwards
@@ -85,7 +103,11 @@ def get_jobs(
         query_params["country_code"],
         query_params["country"],
         query_params["job_title"],
-        recruiters_list
+        recruiters_list,
+        query_params["results_wanted"],
+        query_params["job_type"],
+        query_params["is_remote"],
+        query_params["distance"]
     )
 
     # Process and store jobs
@@ -166,9 +188,7 @@ async def update_resume(resume_id: str, resume: Dict) -> Dict:
     )
 
 @app.get("/generate/linkedin/message/{resume_id}")
-async def generate_linkedin_message(resume_id: str, company: str, position: str) -> Dict:
-    logger.info(f"Generating linkedin message for resume {resume_id}, company {company}, position {position}")
-    
+async def generate_linkedin_message(resume_id: str, company: str, position: str, newMessage:bool) -> Dict:    
     # Get resume
     resume = db_ops.db["resumes"].find_one({"_id": ObjectId(resume_id)})
     if not resume:
@@ -182,7 +202,7 @@ async def generate_linkedin_message(resume_id: str, company: str, position: str)
         "position": position
     })
 
-    if not linkedin_message:
+    if not linkedin_message or newMessage:
         message_dict = generate_message_api_response(resume, company, position)
         message_dict.update({
             "resumeId": resume_id,

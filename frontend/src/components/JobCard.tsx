@@ -1,7 +1,6 @@
 import React from 'react';
 import { JobData } from '../types/data';
 import { useNavigate } from 'react-router-dom';
-import Markdown from 'react-markdown';
 interface JobCardProps {
   job: JobData;
 }
@@ -35,10 +34,58 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
   }
 
 
-  const truncateDescription = (text: string, maxLength: number = 200) => {
-    if (!text) return '';
-    if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength) + '...';
+  const truncateDescriptionHtml = (html: string, maxLength: number = 200): string => {
+    // Create a temporary div
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const text = doc.body.textContent || '';
+  
+    // If text is already shorter than maxLength, return original HTML
+    if (text.length <= maxLength) {
+      return html;
+    }
+  
+    let truncated = '';
+    let currentLength = 0;
+    let inTag = false;
+    
+    // Iterate through the HTML string character by character
+    for (let i = 0; i < html.length; i++) {
+      const char = html[i];
+      
+      // Keep track of HTML tags
+      if (char === '<') {
+        inTag = true;
+      }
+      
+      // Add character to truncated string
+      truncated += char;
+      
+      // Only count length when not inside a tag
+      if (!inTag) {
+        currentLength++;
+        
+        // Check if we've reached maxLength
+        if (currentLength >= maxLength) {
+          // Find the next closing tag if we're in the middle of one
+          let remainingHtml = html.slice(i + 1);
+          const nextClosingTag = remainingHtml.match(/<\/[^>]+>/);
+          
+          if (nextClosingTag) {
+            truncated += '...' + nextClosingTag[0];
+          } else {
+            truncated += '...';
+          }
+          break;
+        }
+      }
+      
+      if (char === '>') {
+        inTag = false;
+      }
+    }
+    
+    return truncated;
   };
 
   return (
@@ -61,7 +108,7 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
       <p className="text-blue-600 font-medium mb-3">{formatSalary()}</p>
       
       <div className="mb-4">
-        <p className="text-gray-700"><Markdown>{truncateDescription(job.description)}</Markdown></p>
+        <p dangerouslySetInnerHTML={{ __html: truncateDescriptionHtml(job.description) }}></p>
       </div>
       
       <div className="flex flex-wrap gap-2 mb-4">

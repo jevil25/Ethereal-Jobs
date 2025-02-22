@@ -34,6 +34,10 @@ class DatabaseOperations:
             "query.country_code": query_params["country_code"],
             "query.country": query_params["country"],
             "query.job_title": query_params["job_title"],
+            "query.results_wanted": query_params["results_wanted"],
+            "query.job_type": query_params["job_type"],
+            "query.is_remote": query_params["is_remote"],
+            "query.distance": query_params["distance"],
             "date_posted": {"$gte": date_posted}
         }).to_list()
 

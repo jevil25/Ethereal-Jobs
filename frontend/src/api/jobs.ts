@@ -1,11 +1,22 @@
 import { JobData } from "../types/data";
 import { GetJobsRequest, LinkedInGenerateMessageResponse, LinkedInGenerateMessageRequest } from "./types";
-import axios from 'axios';
 import { constructServerUrlFromPath } from "../utils/helper";
+import axios, { CancelTokenSource } from 'axios';
 
 // get /jobs
+let cancelTokenSource: CancelTokenSource | null = null;
+
 export const getJobs = async (params: GetJobsRequest): Promise<JobData[]> => {
-  const response = await axios.get(constructServerUrlFromPath('/jobs'), { params });
+  if (cancelTokenSource) {
+    cancelTokenSource.cancel('Operation canceled due to new request.');
+  }
+  cancelTokenSource = axios.CancelToken.source();
+
+  const response = await axios.get(constructServerUrlFromPath('/jobs'), {
+    params,
+    cancelToken: cancelTokenSource.token,
+  });
+
   return response.data as JobData[];
 }
 

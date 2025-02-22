@@ -38,6 +38,7 @@ const JobPage: React.FC = () => {
 
   useEffect(() => {
     async function fetchJobData() {
+        setLoading(true);
         const path = window.location.pathname;
         const id = path.split('/').pop();
         if (!id) {
@@ -55,14 +56,6 @@ const JobPage: React.FC = () => {
     fetchJobData();
   }, [navigate]);
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
-  }
-
   const formatSalary = (min: number, max: number, currency: string) => {
     const formatter = new Intl.NumberFormat('en-IN', {
       style: 'currency',
@@ -72,7 +65,7 @@ const JobPage: React.FC = () => {
     return `${formatter.format(min)} - ${formatter.format(max)}`;
   };
 
-  const handleMessageGeneration = async () => {
+  const handleMessageGeneration = async (newMessage:boolean = false) => {
     setLinkedinName(job?.linkedin_profiles[0].title || "");
     setGeneratingMessage(true);
     setModalOpen(true);
@@ -85,7 +78,8 @@ const JobPage: React.FC = () => {
     const params = {
       "resumeId": resumeId,
       "company": job?.company || "",
-      "position": job?.title || ""
+      "position": job?.title || "",
+      "newMessage": newMessage
     }
     const data = await generateLinkedInMessage(params);
     if (data.message) {
@@ -98,6 +92,14 @@ const JobPage: React.FC = () => {
   }
 
   const reg = new RegExp('\\[[^\\]]*\\]|\\{\\{[^}]*\\}\\}|\\{[^}]*\\}', 'g');
+
+  if (loading || !job) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
@@ -220,7 +222,7 @@ const JobPage: React.FC = () => {
         <div className="p-6">
             <div className="prose max-w-none">
                 <h2 className="text-xl font-semibold mb-4">Job Description</h2>
-                <Markdown>{job?.description}</Markdown>
+                <div dangerouslySetInnerHTML={{ __html: job?.description || "" }}></div>
             </div>
         </div>
       </div>
@@ -259,13 +261,6 @@ const JobPage: React.FC = () => {
                       Use the below message to contact the hiring managers from {job?.company} on LinkedIn.
                     </p>
                   </div>
-                  <Dropdown
-                    value={linkedinName}
-                    list={job?.linkedin_profiles.map((profile) => profile.title) as string[]}
-                    onChange={setLinkedinName}
-                    selectionText='Select LinkedIn Name'
-                    noSelectionText='No Such LinkedIn Name Found'
-                  />
                   <div className="mb-4 bg-white p-4 rounded-lg border border-blue-300 shadow-md transition-all w-fit">
                     <Markdown>{generatedMessage.replace(reg, linkedinName)}</Markdown>
                     <button
@@ -281,11 +276,29 @@ const JobPage: React.FC = () => {
                       {copyMessage}
                     </button>
                   </div>
+                  <button
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-center w-fit"
+                    onClick={() => handleMessageGeneration(true)}
+                  >
+                    Regenerate Message
+                  </button>
+                  <div>
+                    <label htmlFor="linkedinName" className="block text-sm font-medium text-gray-700">
+                      Select LinkedIn Name
+                    </label>
+                  </div>
+                  <Dropdown
+                    value={linkedinName}
+                    list={job?.linkedin_profiles.map((profile) => profile.title) as string[]}
+                    onChange={setLinkedinName}
+                    selectionText='Select LinkedIn Name'
+                    noSelectionText='No Such LinkedIn Name Found'
+                  />
                   <a 
                     href={job?.linkedin_profiles.find((profile) => profile.title === linkedinName)?.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg text-center"
+                    className="bg-blue-600 text-white px-4 py-2 rounded-lg text-center w-fit"
                   >
                     Visit {linkedinName}'s LinkedIn Profile
                   </a>

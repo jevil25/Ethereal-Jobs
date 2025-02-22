@@ -8,11 +8,10 @@ interface FiltersProps {
     salary_max: number;
   };
   onChange: (filters: any) => void;
+  jobTypes: string[];
 }
 
-const JobFilters: React.FC<FiltersProps> = ({ filters, onChange }) => {
-  const jobTypes = ['Full-time', 'Part-time', 'Contract', 'Internship', 'Temporary'];
-
+const JobFilters: React.FC<FiltersProps> = ({ filters, onChange, jobTypes }) => {
   return (
     <div className="bg-white p-4 rounded-lg shadow-md">
       <h2 className="text-lg font-semibold mb-4">Filters</h2>
