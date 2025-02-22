@@ -85,7 +85,6 @@ class EnhancedLinkedInMessageGenerator:
     def generate_message(self, params: Dict, company: str, position: str) -> str:
         """Generate a personalized message using resume data"""
         resume = params['resume']
-        logger.info(f"Generating message for resume: {json.dumps(resume)}")
         recipient = params.get('recipient', {})
         
         try:
@@ -145,7 +144,6 @@ class EnhancedLinkedInMessageGenerator:
         
     def generate_message_using_gemini(self, params: Dict, company: str, position: str) -> str:
         resume = params['resume']
-        logger.info(f"Generating message for resume: {json.dumps(resume)}")
         recipient = params.get('recipient', {})
         
         try:

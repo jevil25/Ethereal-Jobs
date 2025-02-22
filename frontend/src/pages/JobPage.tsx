@@ -39,7 +39,7 @@ const JobPage: React.FC = () => {
   useEffect(() => {
     async function fetchJobData() {
         setLoading(true);
-        const path = window.location.pathname;
+        const path = decodeURI(window.location.pathname);
         const id = path.split('/').pop();
         if (!id) {
           return navigate('/');

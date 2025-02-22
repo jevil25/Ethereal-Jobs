@@ -30,9 +30,10 @@ interface ResumeFormProps {
 
 export const ResumeForm = ({ isLoading, setIsLoading }: ResumeFormProps) => {
   const [isHover, setIsHover] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   useSetInitialStore(setIsLoading);
-  useSaveStateToDatabaseOnChange();
+  useSaveStateToDatabaseOnChange(setIsSaving);
 
   const formsOrder = useAppSelector(selectFormsOrder);
 
@@ -54,6 +55,12 @@ export const ResumeForm = ({ isLoading, setIsLoading }: ResumeFormProps) => {
       onMouseOver={() => setIsHover(true)}
       onMouseLeave={() => setIsHover(false)}
     >
+      {isSaving && (
+        <div className="fixed bottom-4 right-4 bg-white bg-opacity-70 p-2 rounded-md shadow-md flex flex-row justify-center items-center gap-2">
+          <div className="w-4 h-4 border-2 border-t-[transparent] border-blue-500 rounded-full animate-spin"></div>
+          Saving...
+        </div>
+      )}
       <section className="flex max-w-2xl flex-col gap-8 p-[var(--resume-padding)] pt-10">
         <ProfileForm />
         {formsOrder.map((form) => {

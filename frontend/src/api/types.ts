@@ -29,10 +29,44 @@ interface LinkedInGenerateMessageResponse {
     message: string;
 }
 
+interface AutoSuggestionsRequest {
+    query: string;
+}
+
+interface Suggestions {
+    score: number;
+    suggestion: string;
+}
+
+interface AutoSuggestionsResponse {
+    suggestions: Suggestions[];
+}
+
+interface AutoSuggestionsRequestLocation {
+    query: string;
+    country: string;
+}
+interface locationSuggestion {
+    latitude: number;
+    locationType: string;
+    longitude: number;
+    popularity: number;
+    population: number;
+    suggestion: string;
+}
+
+interface AutoSuggestionsLocationResponse {
+    suggestions: locationSuggestion[];
+}
+
 export type {
     ResumeSaveRequest,
     ResumeSaveResponse,
     GetJobsRequest,
     LinkedInGenerateMessageRequest,
-    LinkedInGenerateMessageResponse
+    LinkedInGenerateMessageResponse,
+    AutoSuggestionsRequest,
+    AutoSuggestionsResponse,
+    AutoSuggestionsRequestLocation,
+    AutoSuggestionsLocationResponse,
 }

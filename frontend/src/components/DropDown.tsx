@@ -71,7 +71,7 @@ const Dropdown: FC<DropdownProps> = ({ value, list, onChange, selectionText, noS
           <div className="p-2 sticky top-0 bg-white border-b">
             <input
               type="text"
-              placeholder="Search countries..."
+              placeholder="Search..."
               className="w-full p-2 border border-gray-300 rounded-md"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}

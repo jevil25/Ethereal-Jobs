@@ -25,18 +25,20 @@ export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 /**
  * Hook to save store to local storage on store change
  */
-export const useSaveStateToDatabaseOnChange = () => {
+export const useSaveStateToDatabaseOnChange = (setIsLoading: (isLoading: boolean) => void) => {
   const state = useAppSelector((state) => state);
   const prevStateRef = useRef(state);
   
   useEffect(() => {
+    setIsLoading(true);
     const hasStateChanged = JSON.stringify(prevStateRef.current) !== JSON.stringify(state);
     
-    if (!hasStateChanged) return;
+    if (!hasStateChanged) return setIsLoading(false);;
     
     const debouncedSave = debounce(async () => {
       await saveStateToDatabase(state);
       prevStateRef.current = state;
+      setIsLoading(false);
     }, 2000);
     debouncedSave();
 

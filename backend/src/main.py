@@ -6,6 +6,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 from bson import ObjectId
 from jobspy import JobType
+import requests
+import urllib.parse
 
 from src.api.linkedin_profiles import get_linkedin_profiles_api_response
 from src.api.jobs import get_jobs_api_response
@@ -122,7 +124,6 @@ def get_jobs(
 
 @app.get("/job/{job_id}/linkedin/profile")
 async def get_linkedin_profile(job_id: str) -> Dict:
-    job_id = job_id.lower()
     logger.info(f"Getting linkedin profile for job {job_id}")
 
     # Get job details
@@ -218,3 +219,50 @@ async def generate_linkedin_message(resume_id: str, company: str, position: str,
     linkedin_message.pop("status", None)
 
     return JSONResponse(content=linkedin_message, media_type="application/json")
+
+@app.get("/search/suggestions/job_title")
+async def get_search_suggestions(query: str) -> Dict:
+    autocomplete_url = "https://autocomplete.indeed.com/api/v0/suggestions/what"
+    params = {
+        "country": "IN",
+        "language": "en",
+        "count": 10,
+        "formatted": 0,
+        "query": query,
+        "useEachWord": False,
+        "seqId": 1,
+        "page": "serp",
+        "accountKey": "",
+        "showAlternateSuggestions": True,
+        "rich": True,
+    }
+    suggestions = requests.get(autocomplete_url, params=params).json()
+    response = {
+        "suggestions": suggestions,
+    }
+    return JSONResponse(content=response, media_type="application/json")
+
+@app.get("/search/suggestions/location")
+async def get_search_suggestions(query: str, country: Optional[str]) -> Dict:
+    autocomplete_url = "https://autocomplete.indeed.com/api/v0/suggestions/location/"
+    if not country or country == "":
+        country = "IN"
+    params = {
+        "country": country,
+        "language": "en",
+        "count": 10,
+        "formatted": 0,
+        "query": query,
+        "useEachWord": False,
+        "seqId": 1,
+        "page": "serp",
+        "accountKey": "",
+        "showAlternateSuggestions": True,
+        "rich": True,
+    }
+    logger.info(f"Getting location suggestions for {autocomplete_url}?{urllib.parse.urlencode(params)}")
+    suggestions = requests.get(autocomplete_url, params=params).json()
+    response = {
+        "suggestions": suggestions,
+    }
+    return JSONResponse(content=response, media_type="application/json")

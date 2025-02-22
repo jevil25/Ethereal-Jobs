@@ -28,6 +28,20 @@ const HomePage: React.FC = () => {
     recruiters: string;
     job_type: string;
   }) => {
+    if (!params.job_title) {
+      toaster.error('Please enter a job title');
+      return;
+    }
+    setSearchParams((oldParams) => {
+      const newParams = new URLSearchParams(oldParams);
+      newParams.set('city', params.city);
+      newParams.set('country_code', params.country_code);
+      newParams.set('country', params.country);
+      newParams.set('job_title', params.job_title);
+      newParams.set('recruiters', params.recruiters);
+      newParams.set('job_type', params.job_type);
+      return newParams.toString();
+    });
     try {
       setLoading(true);
       const data = await getJobs(params);
