@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { getCode, getNames } from 'country-list';
-import Dropdown from './DropDown';
+import Dropdown from '../DropDown';
 import { useSearchParams } from 'react-router-dom';
-import { getSearchSuggestions, getLocationSuggestions } from '../api/jobs';
+import { getSearchSuggestions, getLocationSuggestions } from '../../api/jobs';
 import { SuggestionsBox } from './suggestionsBox';
 
 interface SearchBarProps {
@@ -156,36 +156,6 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, filters }) => {
             <SuggestionsBox suggestions={locationSuggestions} setSuggestion={setCity} />
           )}
         </div>
-        
-        {/* <div>
-          <label htmlFor="countryCode" className="block text-sm font-medium text-gray-700 mb-1">
-            Country Code
-          </label>
-          <input
-            id="countryCode"
-            type="text"
-            value={countryCode}
-            onChange={(e) => setCountryCode(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-            placeholder="e.g. IN"
-            maxLength={2}
-          />
-        </div> */}
-        
-        {/* <div>
-          <label htmlFor="recruiters" className="block text-sm font-medium text-gray-700 mb-1">
-            Recruiters
-          </label>
-          <input
-            id="recruiters"
-            type="text"
-            value={recruiters}
-            onChange={(e) => setRecruiters(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-            placeholder="e.g. BuziBrains"
-          />
-        </div> */}
-        
         <div className="flex items-end">
           <button
             type="submit"

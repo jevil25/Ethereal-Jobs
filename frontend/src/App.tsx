@@ -1,9 +1,11 @@
 import './App.css';
 import NavBar from './components/Navbar';
-import HomePage from "./pages/HomePage";
+import JobSearch from "./pages/JobSearch";
 import JobPage from "./pages/JobPage";
 import ResumeBuilder from './pages/ResumeBuilder';
-import { BrowserRouter as Router, Route,  Routes} from 'react-router-dom';
+import NotFoundPage from './pages/404';
+import HomePage from './pages/HomePage';
+import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import { Provider } from "react-redux";
 import { store } from "./lib/redux/store";
 
@@ -14,13 +16,7 @@ function App() {
         <main className='bg-gray-50'>
           <Provider store={store}>
             <Router>
-              <NavBar />
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/job/:id" element={<JobPage />} />
-                <Route path="/resume" element={<ResumeBuilder />} />
-                <Route path="*" element={<h1>Not Found</h1>} />
-              </Routes>
+              <AppContent />
             </Router>
           </Provider>
         </main>
@@ -29,4 +25,22 @@ function App() {
   )
 }
 
-export default App
+function AppContent() {
+  const location = useLocation();
+  const isHomePage = location.pathname === '/';
+
+  return (
+    <>
+      {!isHomePage && <NavBar />}
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/jobs" element={<JobSearch />} />
+        <Route path="/job/:id" element={<JobPage />} />
+        <Route path="/resume" element={<ResumeBuilder />} />
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </>
+  );
+}
+
+export default App;
