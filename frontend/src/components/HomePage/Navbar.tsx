@@ -32,7 +32,7 @@ const Navbar = () => {
                     ? 'bg-white shadow-md' 
                     : 'bg-transparent'}`}
         >
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 hover:cursor-pointer" onClick={(e) => scrollToSection(e, "hero")}>
                 <img src={logo} alt="Jobify Logo" className="w-10 h-10 md:w-14 md:h-14" />
                 <span className={`text-lg md:text-xl font-bold ${isScrolled ? 'text-gray-800' : 'text-gray-900'}`}>
                     Jobify

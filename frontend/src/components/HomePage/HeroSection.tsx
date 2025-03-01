@@ -6,7 +6,7 @@ interface HeroSectionProps {
 
 const HeroSection = ({ navigate }: HeroSectionProps) => {
     return (
-      <main className="container mx-auto px-4 pt-24 text-center flex flex-col items-center justify-center min-h-screen">
+      <main className="container mx-auto px-4 pt-24 text-center flex flex-col items-center justify-center min-h-screen" id="hero">
         <div className="max-w-4xl mx-auto">
           <div className="inline-flex items-center bg-yellow-50 border border-yellow-200 rounded-full px-4 py-2 mb-8">
             <span className="flex h-2 w-2 mr-2">

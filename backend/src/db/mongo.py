@@ -1,7 +1,8 @@
 from pymongo import MongoClient
 from dotenv import load_dotenv
 import os
-from typing import Dict, List, Optional
+from typing import List, Optional
+from src.db.model import JobQuery, JobModel, LinkedInProfile
 
 # Load the dotenv file
 load_dotenv()
@@ -27,42 +28,62 @@ class DatabaseOperations:
     def __init__(self):
         self.db = get_database()
 
-    def get_jobs_from_db(self, query_params: Dict, date_posted: str) -> List[Dict]:
+    def get_jobs_from_db(self, query_params: JobQuery, date_posted: str) -> List[JobModel]:
         """Retrieve jobs from database based on query parameters."""
-        return self.db["jobs"].find({
-            "query.city": query_params["city"],
-            "query.country_code": query_params["country_code"],
-            "query.country": query_params["country"],
-            "query.job_title": query_params["job_title"],
-            "query.results_wanted": query_params["results_wanted"],
-            "query.job_type": query_params["job_type"],
-            "query.is_remote": query_params["is_remote"],
-            "query.distance": query_params["distance"],
+        jobs_cursor = self.db["jobs"].find({
+            "query.city": query_params.city,
+            "query.country_code": query_params.country_code,
+            "query.country": query_params.country,
+            "query.job_title": query_params.job_title,
+            "query.results_wanted": query_params.results_wanted,
+            "query.job_type": query_params.job_type,
+            "query.is_remote": query_params.is_remote,
+            "query.distance": query_params.distance,
             "date_posted": {"$gte": date_posted}
-        }).to_list()
+        })
+        return [JobModel(**job) for job in jobs_cursor]
 
-    def update_jobs(self, jobs: List[Dict], query_params: Dict):
+    def update_jobs(self, jobs: List[JobModel], query_params: JobQuery):
         """Update jobs in database with query parameters."""
         jobs_collection = self.db["jobs"]
         for job in jobs:
-            job["query"] = query_params
+            job_dict = job.dict()
+            job_dict["query"] = query_params.dict()
             jobs_collection.update_one(
-                {"id": job["id"]},
-                {"$set": job},
+                {"id": job.id},
+                {"$set": job_dict},
                 upsert=True
             )
 
-    def get_linkedin_profiles(self, company: str, location: str) -> Optional[Dict]:
+    def get_linkedin_profiles(self, company: str, location: str) -> Optional[LinkedInProfile]:
         """Get LinkedIn profiles for a company and location."""
-        return self.db["company_linkedin_profiles"].find_one({
+        profile_data = self.db["company_linkedin_profiles"].find_one({
             "company": company,
             "city": location
         })
+        return LinkedInProfile(**profile_data) if profile_data else None
 
-    def update_linkedin_profiles(self, company: str, location: str, profiles: List[Dict]):
+    def update_linkedin_profiles(self, company: str, location: str, profiles: List[LinkedInProfile]):
         """Update LinkedIn profiles in database."""
+        profiles_dict = [profile.dict() for profile in profiles]
         self.db["company_linkedin_profiles"].update_one(
             {"company": company, "city": location},
-            {"$set": {"profiles": profiles}},
+            {"$set": {"profiles": profiles_dict}},
             upsert=True
         )
+
+    def insert_user(self, user: dict):
+        """Insert a new user into the database."""
+        return self.db["user"].insert_one(user).inserted_id
+    
+    def get_user(self, username_or_email: str):
+        """Get a user from the database."""
+        return self.db["user"].find_one({"$or": [{"username": username_or_email}, {"email": username_or_email}]})
+    
+    def add_refresh_token(self, user_id: str, refresh_token: str):
+        """Add a refresh token to the database."""
+        return self.db["refresh_token"].insert_one({"user_id": user_id, "refresh_token": refresh_token}).inserted_id
+    
+    def check_refresh_token(self, refresh_token: str):
+        """Check if a refresh token exists in the database."""
+        return self.db["refresh_token"].find_one({"refresh_token": refresh_token})
