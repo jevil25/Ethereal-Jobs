@@ -36,7 +36,12 @@ async def update_resume(resume_id: str, resume: Dict) -> Dict:
     )
     
     if not result.modified_count:
-        raise HTTPException(status_code=304, detail="Resume not found")
+        resume_id = db_ops.db["resumes"].insert_one(resume).inserted_id
+        return JSONResponse(
+            content={"resume_id": str(resume_id)},
+            media_type="application/json",
+            status_code=201
+        )
     
     return JSONResponse(
         content={"resume_id": resume_id},

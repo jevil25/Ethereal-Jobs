@@ -24,7 +24,7 @@ class JobModel(BaseModel):
 
 class LinkedInProfile(BaseModel):
     name: str
-    title: str
+    vanity_name: str
     profile_url: str
 
 class CompanyLinkedInProfiles(BaseModel):

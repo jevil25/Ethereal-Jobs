@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 from typing import List, Dict, Optional
 from datetime import date, timedelta
 from jobspy import JobType
+from src.db.model import JobModel, JobQuery
 from src.api.jobs import get_jobs_api_response
 from src.db.mongo import DatabaseOperations
 from src.utils.helpers import serialize_dates
@@ -37,16 +38,16 @@ def get_jobs(
     elif job_type == 'Internship':
         job_type = JobType.INTERNSHIP.value[0]
     # Normalize input parameters
-    query_params = {
-        "city": city.lower(),
-        "country_code": country_code.lower(),
-        "country": country.lower(),
-        "job_title": job_title.lower(),
-        "results_wanted": results_wanted,
-        "job_type": job_type,
-        "is_remote": is_remote,
-        "distance": distance
-    }
+    query_params = JobQuery(
+        city=city.lower(),
+        country_code=country_code.lower(),
+        country=country.lower(),
+        job_title=job_title.lower(),
+        results_wanted=results_wanted,
+        job_type=job_type,
+        is_remote=is_remote if is_remote is not None else False,
+        distance=distance if distance is not None else 25
+    )
 
     # Check for cached jobs from yesterday onwards
     yesterday = str(date.today() - timedelta(days=1))
@@ -54,27 +55,38 @@ def get_jobs(
 
     if len(cached_jobs) > 10:
         return JSONResponse(
-            content=[{k: v for k, v in job.items() if k != '_id'} for job in cached_jobs],
+            content=[job.model_dump() for job in cached_jobs],
             media_type="application/json"
         )
 
     # Get new jobs from API
     recruiters_list = [r for r in recruiters.split(",") if r]
     jobs = get_jobs_api_response(
-        query_params["city"],
-        query_params["country_code"],
-        query_params["country"],
-        query_params["job_title"],
+        query_params.city,
+        query_params.country_code,
+        query_params.country,
+        query_params.job_title,
         recruiters_list,
-        query_params["results_wanted"],
-        query_params["job_type"],
-        query_params["is_remote"],
-        query_params["distance"]
+        query_params.results_wanted,
+        query_params.job_type,
+        query_params.is_remote,
+        query_params.distance
     )
 
     # Process and store jobs
     serialized_jobs = serialize_dates(jobs)
-    db_ops.update_jobs(serialized_jobs, query_params)
+    job_models = [JobModel(
+        company=job.get("company") if job.get("company") else "",
+        id=job.get("id") if job.get("id") else "",
+        title=job.get("title") if job.get("title") else "",
+        location=job.get("location") if job.get("location") else "",
+        date_posted=job.get("date_posted") if job.get("date_posted") else "",
+        query=query_params,
+        description=job.get("description") if job.get("description") else "",
+        url=job.get("url") if job.get("url") else "",
+        salary=job.get("salary") if job.get("salary") else "",
+    ) for job in serialized_jobs]
+    db_ops.update_jobs(job_models, query_params)
     
     logger.info(f"Returning {len(jobs)} jobs")
     return JSONResponse(
@@ -100,15 +112,15 @@ async def get_linkedin_profile(job_id: str) -> Dict:
     # Get or fetch LinkedIn profiles
     linkedin_profiles = db_ops.get_linkedin_profiles(company, city)
     
-    if not linkedin_profiles or not linkedin_profiles.get("profiles"):
+    if not linkedin_profiles or not linkedin_profiles:
         logger.info(f"Getting linkedin profiles for {company} in {city}")
         profiles = get_linkedin_profiles_api_response(company, city)
         db_ops.update_linkedin_profiles(company, city, profiles)
     else:
-        profiles = linkedin_profiles.get("profiles")
+        profiles = linkedin_profiles
 
     # Prepare response
     job.pop("_id")
-    job["linkedin_profiles"] = profiles
+    job["linkedin_profiles"] = [profile.model_dump() for profile in profiles]
     
     return JSONResponse(content=job, media_type="application/json")

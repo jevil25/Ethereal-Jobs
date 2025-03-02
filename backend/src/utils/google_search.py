@@ -76,8 +76,8 @@ def google_search(company_name: str, location: str, results_wanted: int = 10) ->
     except (KeyError, ValueError) as e:
         raise GoogleSearchError(f"Failed to parse search results: {str(e)}") from e
     
-def get_linkedin_profiles(company, location):
-    # Ashish Chopra (He/Him) - Google | LinkedIn, Ashwin Kumar - Google | LinkedIn these are titles
+def get_linkedin_profiles(company, location) -> List[Dict]:
+    """ Ashish Chopra (He/Him) - Google | LinkedIn, Ashwin Kumar - Google | LinkedIn these are titles """
     results = google_search(company, location)
     profiles = []
     for result in results:
