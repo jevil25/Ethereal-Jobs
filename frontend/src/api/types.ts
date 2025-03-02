@@ -59,6 +59,30 @@ interface AutoSuggestionsLocationResponse {
     suggestions: locationSuggestion[];
 }
 
+interface UserSignupRequest {
+    email: string;
+    password: string;
+    name: string;
+}
+
+interface UserSignupResponse {
+    message: string;
+    is_created: boolean;
+    is_exists: boolean;
+    user_id: string | undefined;
+}
+
+interface UserSigninRequest {
+    email: string;
+    password: string;
+}
+
+interface UserSigninResponse {
+    message: string;
+    is_exists: boolean;
+    is_valid: boolean;
+}
+
 export type {
     ResumeSaveRequest,
     ResumeSaveResponse,
@@ -69,4 +93,8 @@ export type {
     AutoSuggestionsResponse,
     AutoSuggestionsRequestLocation,
     AutoSuggestionsLocationResponse,
+    UserSignupRequest,
+    UserSignupResponse,
+    UserSigninRequest,
+    UserSigninResponse
 }

@@ -1,4 +1,4 @@
-interface LinkedInProfile {
+export interface LinkedInProfile {
   name: string;
   profile_url: string;
   vanity_name: string;
@@ -35,3 +35,8 @@ export interface JobData {
     company_description: string;
     linkedin_profiles: LinkedInProfile[];
   }
+
+export interface User {
+    email: string;
+    name: string;
+}

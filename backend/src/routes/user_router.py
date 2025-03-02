@@ -31,9 +31,9 @@ def create_user(request:User):
 def login(request:UserLogin):
     user = db_ops.get_user(request.email)
     if not user:
-        return JSONResponse(content={"message": "User does not exist", "is_exists": False, "is_valid": False}, status_code=status.HTTP_404_NOT_FOUND)
+        return JSONResponse(content={"message": "User does not exist", "is_exists": False, "is_valid": False})
     if not Hash.verify(user.password, request.password):
-        return JSONResponse(content={"message": "Invalid credentials", "is_exists": True, "is_valid": False}, status_code=status.HTTP_401_UNAUTHORIZED)
+        return JSONResponse(content={"message": "Invalid credentials", "is_exists": True, "is_valid": False})
     access_token = create_access_token(data={"email": request.email})
     refresh_token = create_refresh_token()
     db_ops.add_refresh_token(request.email, refresh_token)
@@ -46,13 +46,8 @@ def login(request:UserLogin):
 @is_user_logged_in
 async def me(request: Request):
     user: User = request.state.user
-    if not user:
-        return JSONResponse(
-            content={"message": "User not found"}, 
-            status_code=status.HTTP_404_NOT_FOUND
-        )
     return JSONResponse(
-        content=user.model_dump(), 
+        content={"detail":"user logged in", "user":user.model_dump()}, 
         status_code=status.HTTP_200_OK
     )
 
@@ -68,7 +63,8 @@ def refresh(request: Request):
     if token_data.is_expired:
         return JSONResponse(content={"message": "Token expired"}, status_code=status.HTTP_401_UNAUTHORIZED)
     access_token = create_access_token(data={"email": token.user_email})
-    response = JSONResponse(content={"message": "Token refreshed"})
+    user = db_ops.get_user(token.user_email)
+    response = JSONResponse(content={"message": "Token refreshed", "is_valid": True, "is_exists": True, "user": user.model_dump()})
     response.set_cookie(key="access_token", value=access_token, httponly=False if is_https else True, secure=is_https)
     return response
 
