@@ -95,7 +95,7 @@ def get_jobs(
     )
 
 @app.get("/job/{job_id}/linkedin/profile")
-async def get_linkedin_profile(job_id: str) -> Dict:
+def get_linkedin_profile(job_id: str) -> Dict:
     logger.info(f"Getting linkedin profile for job {job_id}")
 
     # Get job details

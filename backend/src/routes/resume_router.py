@@ -5,11 +5,11 @@ from typing import List, Dict
 from src.db.mongo import DatabaseOperations
 from src.logger import logger
 
-app = APIRouter()
+app = APIRouter(prefix="/resume")
 db_ops = DatabaseOperations()
 
-@app.post("/resume/save")
-async def save_resume(resume: Dict) -> Dict:
+@app.post("/save")
+def save_resume(resume: Dict) -> Dict:
     logger.info("Saving resume")
     resume_id = db_ops.db["resumes"].insert_one(resume).inserted_id
     return JSONResponse(
@@ -17,8 +17,8 @@ async def save_resume(resume: Dict) -> Dict:
         media_type="application/json"
     )
 
-@app.get("/resume/{resume_id}")
-async def get_resume(resume_id: str) -> Dict:
+@app.get("/{resume_id}")
+def get_resume(resume_id: str) -> Dict:
     logger.info(f"Getting resume {resume_id}")
     resume = db_ops.db["resumes"].find_one({"_id": ObjectId(resume_id)})
     if not resume:
@@ -27,8 +27,8 @@ async def get_resume(resume_id: str) -> Dict:
     resume.pop("_id")
     return JSONResponse(content=resume, media_type="application/json")
 
-@app.put("/resume/{resume_id}")
-async def update_resume(resume_id: str, resume: Dict) -> Dict:
+@app.put("/{resume_id}")
+def update_resume(resume_id: str, resume: Dict) -> Dict:
     logger.info(f"Updating resume {resume_id}")
     result = db_ops.db["resumes"].update_one(
         {"_id": ObjectId(resume_id)},

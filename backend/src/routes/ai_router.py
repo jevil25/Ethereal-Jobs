@@ -13,7 +13,7 @@ db_ops = DatabaseOperations()
 
 
 @app.get("/generate/linkedin/message/{resume_id}")
-async def generate_linkedin_message(resume_id: str, company: str, position: str, newMessage:bool) -> Dict:    
+def generate_linkedin_message(resume_id: str, company: str, position: str, newMessage:bool) -> Dict:    
     # Get resume
     resume = db_ops.db["resumes"].find_one({"_id": ObjectId(resume_id)})
     if not resume:
@@ -45,7 +45,7 @@ async def generate_linkedin_message(resume_id: str, company: str, position: str,
     return JSONResponse(content=linkedin_message, media_type="application/json")
 
 @app.get("/search/suggestions/job_title")
-async def get_search_suggestions(query: str) -> Dict:
+def get_search_suggestions(query: str) -> Dict:
     autocomplete_url = "https://autocomplete.indeed.com/api/v0/suggestions/what"
     params = {
         "country": "IN",
@@ -67,7 +67,7 @@ async def get_search_suggestions(query: str) -> Dict:
     return JSONResponse(content=response, media_type="application/json")
 
 @app.get("/search/suggestions/location")
-async def get_search_suggestions(query: str, country: Optional[str]) -> Dict:
+def get_search_suggestions(query: str, country: Optional[str]) -> Dict:
     autocomplete_url = "https://autocomplete.indeed.com/api/v0/suggestions/location/"
     if not country or country == "":
         country = "IN"

@@ -2,7 +2,7 @@ from pymongo import MongoClient
 from dotenv import load_dotenv
 import os
 from typing import List, Optional
-from src.db.model import JobQuery, JobModel, LinkedInProfile
+from src.db.model import JobQuery, JobModel, LinkedInProfile, RefreshToken, User
 
 # Load the dotenv file
 load_dotenv()
@@ -84,14 +84,16 @@ class DatabaseOperations:
         """Insert a new user into the database."""
         return self.db["user"].insert_one(user).inserted_id
     
-    def get_user(self, username_or_email: str):
+    def get_user(self, email: str):
         """Get a user from the database."""
-        return self.db["user"].find_one({"$or": [{"username": username_or_email}, {"email": username_or_email}]})
+        user = self.db["user"].find_one({"email": email})
+        return User(**user) if user else None
     
-    def add_refresh_token(self, user_id: str, refresh_token: str):
+    def add_refresh_token(self, user_email: str, refresh_token: str):
         """Add a refresh token to the database."""
-        return self.db["refresh_token"].insert_one({"user_id": user_id, "refresh_token": refresh_token}).inserted_id
+        return self.db["refresh_token"].insert_one({"user_email": user_email, "refresh_token": refresh_token}).inserted_id
     
     def check_refresh_token(self, refresh_token: str):
         """Check if a refresh token exists in the database."""
-        return self.db["refresh_token"].find_one({"refresh_token": refresh_token})
+        res = self.db["refresh_token"].find_one({"refresh_token": refresh_token})
+        return RefreshToken(**res) if res else None
