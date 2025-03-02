@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { userSignin, userSignup } from '../../api/user';
-import { useNavigate } from 'react-router-dom'; // Import for redirection
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../providers/AuthProvider';
 
 interface AuthFormsProps {
     isSignIn: boolean;
@@ -18,6 +19,7 @@ const AuthForms: React.FC<AuthFormsProps> = ({ isSignIn, setIsSignIn, onClose })
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const { refreshUser } = useAuth();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -42,6 +44,7 @@ const AuthForms: React.FC<AuthFormsProps> = ({ isSignIn, setIsSignIn, onClose })
         });  
         if (response.is_valid) {
           setSuccessMessage('Sign in successful! Redirecting...');
+          refreshUser();
           // Redirect to homepage after successful login
           setTimeout(() => {
             onClose();

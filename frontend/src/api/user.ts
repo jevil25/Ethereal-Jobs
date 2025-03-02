@@ -12,7 +12,6 @@ export const userSignup = async (params: UserSignupRequest): Promise<UserSignupR
 // post /user/login
 export const userSignin = async (params: UserSigninRequest): Promise<UserSigninResponse> => {
     const response = await axios.post(constructServerUrlFromPath('/user/login'), params);
-    console.log(response);
     return response.data as UserSigninResponse;
 }
 

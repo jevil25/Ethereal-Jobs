@@ -2,18 +2,16 @@ import { useState, useEffect } from 'react';
 import logo from "../../assets/logo.png";
 import AuthForms from '../Auth/AuthForms';
 import { useAuth } from '../../providers/AuthProvider';
-import { useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isSignIn, setIsSignIn] = useState(true);
-    const { user, isAuthenticated, logout } = useAuth();
+    const { user, isAuthenticated, logout, refreshUser } = useAuth();
     const [showAuthModal, setShowAuthModal] = useState(false);
-    const navigate = useNavigate();
 
     const handleLogout = () => {
         logout();
-        navigate('/');
+        refreshUser();
     };
 
     useEffect(() => {
