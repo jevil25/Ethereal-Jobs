@@ -56,11 +56,12 @@ class DatabaseOperations:
                 upsert=True
             )
 
-    def get_linkedin_profiles(self, company: str, location: str) -> Optional[List[LinkedInProfile]]:
+    def get_linkedin_profiles(self, company: str, location: str, title:str) -> Optional[List[LinkedInProfile]]:
         """Get LinkedIn profiles for a company and location."""
         profile_data = self.db["company_linkedin_profiles"].find_one({
             "company": company,
-            "city": location
+            "city": location,
+            "title": title
         })
         profiles = profile_data.get("profiles") if profile_data else []
         if len(profiles) == 0:
@@ -71,11 +72,11 @@ class DatabaseOperations:
             profile_url=profile.get("profile_url") if profile.get("profile_url") else "",
         ) for profile in profiles]
 
-    def update_linkedin_profiles(self, company: str, location: str, profiles: List[LinkedInProfile]):
+    def update_linkedin_profiles(self, company: str, location: str, title:str, profiles: List[LinkedInProfile]):
         """Update LinkedIn profiles in database."""
         profiles_dict = [profile.dict() for profile in profiles]
         self.db["company_linkedin_profiles"].update_one(
-            {"company": company, "city": location},
+            {"company": company, "city": location, "title": title},
             {"$set": {"profiles": profiles_dict}},
             upsert=True
         )

@@ -2,12 +2,15 @@ import { useState, useEffect } from 'react';
 import logo from "../../assets/logo.png";
 import AuthForms from '../Auth/AuthForms';
 import { useAuth } from '../../providers/AuthProvider';
+import { useSearchParams } from 'react-router-dom';
 
 const Navbar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isSignIn, setIsSignIn] = useState(true);
     const { user, isAuthenticated, logout, refreshUser } = useAuth();
     const [showAuthModal, setShowAuthModal] = useState(false);
+    const [searchParams] = useSearchParams();
+    const [showPleaseLogin, setShowPleaseLogin] = useState(false);
 
     const handleLogout = () => {
         logout();
@@ -19,6 +22,12 @@ const Navbar = () => {
             const scrollPosition = window.scrollY;
             setIsScrolled(scrollPosition > 50); // Change background after 50px scroll
         };
+
+        const login = searchParams.get('login');
+        if (login === 'true') {
+            handleAuthClick(true);
+            setShowPleaseLogin(true);
+        }
 
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
@@ -36,6 +45,7 @@ const Navbar = () => {
     };
 
     const handleAuthClick = (signIn: boolean) => {
+        setShowPleaseLogin(false);
         setIsSignIn(signIn);
         setShowAuthModal(true);
     };
@@ -120,11 +130,12 @@ const Navbar = () => {
             </nav>
 
             {/* Render auth forms modal when showAuthForms is true */}
-            {showAuthModal && (
+            {(showAuthModal && !isAuthenticated)&& (
                 <AuthForms 
                     isSignIn={isSignIn} 
                     setIsSignIn={setIsSignIn}
                     onClose={() => setShowAuthModal(false)}
+                    showPleaseLogin={showPleaseLogin}
                 />
             )}
         </>

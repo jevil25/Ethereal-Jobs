@@ -21,6 +21,21 @@ class JobModel(BaseModel):
     salary: Optional[str] = None
     date_posted: str
     query: JobQuery
+    company_logo: Optional[str] = None
+    company_url: Optional[str] = None
+    company_description: Optional[str] = None
+    company_num_employees: Optional[str] = None
+    company_revenue: Optional[str] = None
+    company_industry: Optional[str] = None
+    company_addresses: Optional[str] = None
+    company_url_direct: Optional[str] = None
+    job_level: Optional[str] = None
+    job_function: Optional[str] = None
+    listing_type: Optional[str] = None
+    emails: Optional[str] = None
+    min_amount: Optional[str] = None
+    max_amount: Optional[str] = None
+    currency: Optional[str] = None
 
 class LinkedInProfile(BaseModel):
     name: str

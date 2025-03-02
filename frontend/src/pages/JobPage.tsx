@@ -123,11 +123,11 @@ const JobPage: React.FC = () => {
                 <span>{job?.location}</span>
               </div>
             </div>
-            {job?.company_logo && (
+            {job.company_logo && (
               <img 
                 src={job.company_logo} 
-                alt={`${job.company} logo`} 
-                className="w-16 h-16 object-contain"
+                alt={`${job.company} logo`}
+                className="h-16 w-16 object-contain"
               />
             )}
           </div>
@@ -151,6 +151,15 @@ const JobPage: React.FC = () => {
                 {formatSalary(job.min_amount, job.max_amount, job.currency)}
               </span>
             )}
+            {/* apply button */}
+            <a 
+              href={job.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg text-center w-fit hover:bg-blue-700 hover:cursor-pointer"
+            >
+              Apply Now
+            </a>
           </div>
         </div>
 

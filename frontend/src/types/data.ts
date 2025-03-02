@@ -7,7 +7,7 @@ export interface LinkedInProfile {
 export interface JobData {
     id: string;
     site: string;
-    job_url: string;
+    url: string;
     job_url_direct: string;
     title: string;
     company: string;

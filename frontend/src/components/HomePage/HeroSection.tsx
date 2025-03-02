@@ -1,4 +1,5 @@
 import { NavigateFunction } from "react-router-dom";
+import Button from "./Button";
 
 interface HeroSectionProps {
     navigate: NavigateFunction;
@@ -28,12 +29,7 @@ const HeroSection = ({ navigate }: HeroSectionProps) => {
             Land interviews faster with personalized job matches, AI-crafted resumes, and warm introductions to industry insiders - all in under 60 seconds.
           </p>
           <div className="flex flex-col gap-4 justify-center items-center">
-            <button 
-              onClick={() => navigate("/jobs")} 
-              className="bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 md:py-4 px-6 md:px-8 rounded-full text-base md:text-lg flex items-center justify-center gap-2"
-            >
-              Launch Your Career
-            </button>
+            <Button onClick={() => navigate('/jobs')} text="Launch Your Career" />
             <p className="text-sm text-gray-600">
               Join thousands of successful job seekers
             </p>

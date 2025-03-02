@@ -12,7 +12,7 @@ SEARCH_URL="https://customsearch.googleapis.com/customsearch/v1"
 class GoogleSearchError(Exception):
     pass
 
-def google_search(company_name: str, location: str, results_wanted: int = 10) -> List[Dict]:
+def google_search(company_name: str, location: str, title:str, results_wanted: int = 10) -> List[Dict]:
     """
     Perform a Google Custom Search for HR/Recruiting contacts at a specific company and location.
     
@@ -36,7 +36,7 @@ def google_search(company_name: str, location: str, results_wanted: int = 10) ->
         'site:linkedin.com/in/',
         f'"{company_name}"',
         f'"{location_query}"',
-        '("Human Resources" OR "HR" OR "People Operations" OR "Talent Acquisition")',
+        f'("Human Resources" OR "HR" OR "People Operations" OR "Talent Acquisition" OR "{title})',
         f'intitle:{company_name}',  # Target profiles with "current" in title
     ]
     
@@ -76,9 +76,9 @@ def google_search(company_name: str, location: str, results_wanted: int = 10) ->
     except (KeyError, ValueError) as e:
         raise GoogleSearchError(f"Failed to parse search results: {str(e)}") from e
     
-def get_linkedin_profiles(company, location) -> List[Dict]:
+def get_linkedin_profiles(company, location, title) -> List[Dict]:
     """ Ashish Chopra (He/Him) - Google | LinkedIn, Ashwin Kumar - Google | LinkedIn these are titles """
-    results = google_search(company, location)
+    results = google_search(company, location, title)
     profiles = []
     for result in results:
         if "linkedin.com/in/" in result["link"]:

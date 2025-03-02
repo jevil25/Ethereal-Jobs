@@ -53,6 +53,9 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, filters }) => {
   useEffect(() => {
     const countryCode = getCode(country.toLowerCase());
     const recruiters = '';
+    if (!city && !country && !jobTitle) {
+      return;
+    }
     onSearch({
       city,
       country_code: countryCode? countryCode : 'IN',

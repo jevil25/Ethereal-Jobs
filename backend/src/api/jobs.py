@@ -1,3 +1,4 @@
+import pprint
 from typing import Optional
 from jobspy import scrape_jobs, JobType
 import pandas as pd
@@ -21,6 +22,7 @@ def validate_indeed_country(country: str):
 def get_jobs(city: str, country_code: str, country: str, job_title: str, recruiters: list = [], 
              results_wanted: int = 20, job_type: Optional[JobType] = None, 
              is_remote: Optional[bool] = None, distance: Optional[int] = None):
+    # TODO: add bayt in future if improved
     supported_recruiters = ["indeed", "linkedin", "zip_recruiter", "glassdoor", "google"]
     if len(recruiters) > 0:
         for recruiter in recruiters:

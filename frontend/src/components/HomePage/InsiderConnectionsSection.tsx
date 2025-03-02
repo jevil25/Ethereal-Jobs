@@ -1,6 +1,9 @@
 import { Users, MessageSquare, Building, CheckCircle } from 'lucide-react';
+import Button from './Button';
+import { useNavigate } from 'react-router-dom';
 
 const InsiderConnectionsSection = () => {
+  const Navigate = useNavigate();
   return (
     <section className="py-24 bg-white" id="insider-connections">
       <div className="container mx-auto px-4">
@@ -77,7 +80,7 @@ const InsiderConnectionsSection = () => {
               </div>
 
               <div className="flex justify-end">
-                <button className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-full text-sm font-medium flex items-center gap-2">
+                <button className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-full text-sm font-medium flex items-center gap-2 hover:cursor-pointer">
                   <MessageSquare className="w-4 h-4" />
                   Send Message
                 </button>
@@ -86,9 +89,7 @@ const InsiderConnectionsSection = () => {
           </div>
 
           <div className="text-center">
-            <button className="bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 px-8 rounded-full text-lg inline-flex items-center gap-2">
-              Find Your Connections
-            </button>
+            <Button text='Find Your Connections' onClick={() => Navigate("/jobs")} />
           </div>
         </div>
       </div>

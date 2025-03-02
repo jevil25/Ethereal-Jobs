@@ -7,9 +7,10 @@ interface AuthFormsProps {
     isSignIn: boolean;
     setIsSignIn: React.Dispatch<React.SetStateAction<boolean>>;
     onClose: () => void;
+    showPleaseLogin?: boolean;
 }
 
-const AuthForms: React.FC<AuthFormsProps> = ({ isSignIn, setIsSignIn, onClose }) => {
+const AuthForms: React.FC<AuthFormsProps> = ({ isSignIn, setIsSignIn, onClose, showPleaseLogin }) => {
   const navigate = useNavigate(); // Hook for navigation
   const [formData, setFormData] = useState({
     email: '',
@@ -116,6 +117,12 @@ const AuthForms: React.FC<AuthFormsProps> = ({ isSignIn, setIsSignIn, onClose })
         {successMessage && (
           <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded">
             {successMessage}
+          </div>
+        )}
+
+        {showPleaseLogin && (
+          <div className="mb-4 p-3 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded">
+            Please sign in/sign up to access this feature.
           </div>
         )}
         

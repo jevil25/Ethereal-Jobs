@@ -1,6 +1,9 @@
 import { CheckCircle, FileText } from 'lucide-react';
+import Button from './Button';
+import { useNavigate } from 'react-router-dom';
 
 const ResumeSection = () => {
+    const navigate = useNavigate();
     const benefits = [
         "Customized for each job application",
         "Keyword-optimized for ATS systems",
@@ -40,9 +43,7 @@ const ResumeSection = () => {
                             ))}
                         </div>
 
-                        <button className="bg-gradient-to-r from-indigo-600 to-blue-500 hover:from-indigo-500 hover:to-blue-400 text-white font-semibold py-4 px-8 rounded-full text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                            Create Your Resume Now
-                        </button>
+                        <Button text='Create Your Resume Now' onClick={() => {navigate("/resume")}} />
                     </div>
 
                     {/* Resume Preview Card */}

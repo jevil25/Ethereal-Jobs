@@ -11,7 +11,7 @@ const JobSearch: React.FC = () => {
   const [_, setSearchParams] = useSearchParams();
   const [jobs, setJobs] = useState<JobData[]>([]);
   const [filteredJobs, setFilteredJobs] = useState<JobData[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
   const [filters, setFilters] = useState({
     is_remote: false,
     job_type: '',

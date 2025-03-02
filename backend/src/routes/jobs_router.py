@@ -83,8 +83,21 @@ def get_jobs(
         date_posted=job.get("date_posted") if job.get("date_posted") else "",
         query=query_params,
         description=job.get("description") if job.get("description") else "",
-        url=job.get("url") if job.get("url") else "",
+        url=job.get("job_url_direct") if job.get("job_url_direct") else job.get("job_url", ""),
         salary=job.get("salary") if job.get("salary") else "",
+        company_logo=job.get("company_logo") if job.get("company_logo") else "",
+        min_amount=str(job.get("min_amount")) if job.get("min_amount") else "",
+        max_amount=str(job.get("max_amount")) if job.get("max_amount") else "",
+        company_url=job.get("company_url") if job.get("company_url") else "",
+        company_description=job.get("company_description") if job.get("company_description") else "",
+        company_num_employees=job.get("company_num_employees") if job.get("company_num_employees") else "",
+        company_revenue=job.get("company_revenue") if job.get("company_revenue") else "",
+        company_industry=job.get("company_industry") if job.get("company_industry") else "",
+        company_addresses=job.get("company_addresses") if job.get("company_addresses") else "",
+        company_url_direct=job.get("company_url_direct") if job.get("company_url_direct") else "",
+        job_level=job.get("job_level") if job.get("job_level") else "",
+        job_function=job.get("job_function") if job.get("job_function") else "",
+        currency=job.get("currency") if job.get("currency") else "",
     ) for job in serialized_jobs]
     db_ops.update_jobs(job_models, query_params)
     
@@ -105,17 +118,20 @@ def get_linkedin_profile(job_id: str) -> Dict:
 
     company = job.get("company", "").lower()
     city = job["query"].get("city", "").lower()
+    # TODO: Add title to query if needed
+    # title = job["title"] if job.get("title") else ""
+    title = ""
 
     if not company or not city:
         raise HTTPException(status_code=400, detail="Company and city are required")
 
     # Get or fetch LinkedIn profiles
-    linkedin_profiles = db_ops.get_linkedin_profiles(company, city)
+    linkedin_profiles = db_ops.get_linkedin_profiles(company, city, title)
     
     if not linkedin_profiles or not linkedin_profiles:
         logger.info(f"Getting linkedin profiles for {company} in {city}")
-        profiles = get_linkedin_profiles_api_response(company, city)
-        db_ops.update_linkedin_profiles(company, city, profiles)
+        profiles = get_linkedin_profiles_api_response(company, city, title)
+        db_ops.update_linkedin_profiles(company, city, title, profiles)
     else:
         profiles = linkedin_profiles
 
