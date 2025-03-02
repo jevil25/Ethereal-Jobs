@@ -99,6 +99,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, filters }) => {
     const closeSuggestions = (e: MouseEvent) => {
       if (!(e.target as HTMLElement).closest('#jobTitle')) {
         setShowSuggestions(false);
+        setShowLocationSuggestions(false);
       }
     };
     document.addEventListener('click', closeSuggestions);

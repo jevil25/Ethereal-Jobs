@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import SearchBar from '../components/jobs/SearchBar';
 import JobFilters from '../components/jobs/JobFilters';
 import JobList from '../components/jobs/JobList';
@@ -11,7 +11,7 @@ const JobSearch: React.FC = () => {
   const [_, setSearchParams] = useSearchParams();
   const [jobs, setJobs] = useState<JobData[]>([]);
   const [filteredJobs, setFilteredJobs] = useState<JobData[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const [filters, setFilters] = useState({
     is_remote: false,
     job_type: '',
@@ -19,6 +19,8 @@ const JobSearch: React.FC = () => {
     salary_max: 0,
   });
   const jobTypes = ['Full-time', 'Part-time', 'Internship'];
+
+  const searchTimeout = useRef<number>(null);
 
   const handleSearch = async (params: {
     city: string;
@@ -32,33 +34,40 @@ const JobSearch: React.FC = () => {
       toaster.error('Please enter a job title');
       return;
     }
-    setSearchParams((oldParams) => {
-      const newParams = new URLSearchParams(oldParams);
-      newParams.set('city', params.city);
-      newParams.set('country_code', params.country_code);
-      newParams.set('country', params.country);
-      newParams.set('job_title', params.job_title);
-      newParams.set('recruiters', params.recruiters);
-      newParams.set('job_type', params.job_type);
-      return newParams.toString();
-    });
-    try {
-      setLoading(true);
-      const data = await getJobs(params);
-      setJobs(data);
-      const jobsFiltered = data.filter(job => {
-        return (
+
+    if (searchTimeout.current) {
+      clearTimeout(searchTimeout.current);
+    }
+
+    searchTimeout.current = setTimeout(async () => {
+      setSearchParams((oldParams) => {
+        const newParams = new URLSearchParams(oldParams);
+        newParams.set('city', params.city);
+        newParams.set('country_code', params.country_code);
+        newParams.set('country', params.country);
+        newParams.set('job_title', params.job_title);
+        newParams.set('recruiters', params.recruiters);
+        newParams.set('job_type', params.job_type);
+        return newParams.toString();
+      });
+
+      try {
+        setLoading(true);
+        const data = await getJobs(params);
+        setJobs(data);
+        const jobsFiltered = data.filter(job => 
           (!filters.salary_min || job.min_amount >= filters.salary_min) &&
           (!filters.salary_max || job.max_amount <= filters.salary_max)
         );
-      });
-      setFilteredJobs(jobsFiltered);
-    } catch (error) {
-      toaster.error('Error fetching jobs. Please try again later.');
-    } finally {
-      setLoading(false);
-      toaster.success('Jobs fetched successfully');
-    }
+        setFilteredJobs(jobsFiltered);
+        setLoading(false);
+      } catch (error) {
+        setLoading(false);
+        toaster.error('Error fetching jobs. Please try again later.');
+      } finally {
+        toaster.success('Jobs fetched successfully');
+      }
+    }, 300);
   };
 
   const handleFilterChange = (newFilters: any) => {

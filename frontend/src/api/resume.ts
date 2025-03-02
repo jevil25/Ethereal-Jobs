@@ -15,7 +15,11 @@ const saveResumeDetails = async (data: ResumeSaveRequest): Promise<ResumeSaveRes
 
 // put /resume/:existingResumeId
 const updateResumeDetails = async (data: ResumeSaveRequest, existingResumeId: string): Promise<void> => {
-    await axios.put(constructServerUrlFromPath(`/resume/${existingResumeId}`), data.state);
+    const response = await axios.put(constructServerUrlFromPath(`/resume/${existingResumeId}`), data.state);
+    if (response.status == 201){
+        localStorage.setItem('resumeId', response.data.resume_id);
+        return console.log(`Created new state in database: ${existingResumeId}`);
+    }
     console.log(`Updated state to database: ${existingResumeId}`);
 }
 

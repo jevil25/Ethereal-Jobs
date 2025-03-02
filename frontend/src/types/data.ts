@@ -1,6 +1,6 @@
 interface LinkedInProfile {
-  title: string;
-  link: string;
+  name: string;
+  profile_url: string;
   vanity_name: string;
 }
 
