@@ -23,7 +23,7 @@ def create_user(request:User):
         return JSONResponse(content={"message": "User already exists", "is_created": False, "is_exists": True}, status_code=status.HTTP_200_OK)
     hashed_pass = Hash.bcrypt(request.password)
     user_object = dict(request)
-    user_object["password"] = hashed_pass
+    user_object["password"] = hashed_pass if request.provider == "custom" else ""
     user_id = db_ops.insert_user(user_object)
     return JSONResponse(content={"message": "User created successfully", "is_created": True, "is_exists": True, "user_id": str(user_id)}, status_code=status.HTTP_201_CREATED)
 
@@ -32,7 +32,7 @@ def login(request:UserLogin):
     user = db_ops.get_user(request.email)
     if not user:
         return JSONResponse(content={"message": "User does not exist", "is_exists": False, "is_valid": False})
-    if not Hash.verify(user.password, request.password):
+    if request.provider == "custom" and not Hash.verify(user.password, request.password):
         return JSONResponse(content={"message": "Invalid credentials", "is_exists": True, "is_valid": False})
     access_token = create_access_token(data={"email": request.email})
     refresh_token = create_refresh_token()
@@ -45,7 +45,8 @@ def login(request:UserLogin):
 @app.get('/me')
 @is_user_logged_in
 async def me(request: Request):
-    user: User = request.state.user
+    user = request.state.user
+    print(user)
     return JSONResponse(
         content={"detail":"user logged in", "user":user.model_dump()}, 
         status_code=status.HTTP_200_OK

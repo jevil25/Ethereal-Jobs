@@ -59,10 +59,15 @@ interface AutoSuggestionsLocationResponse {
     suggestions: locationSuggestion[];
 }
 
+enum Provider {
+    Google = 'google',
+    Custom = 'custom'
+}
 interface UserSignupRequest {
     email: string;
     password: string;
     name: string;
+    provider: Provider;
 }
 
 interface UserSignupResponse {
@@ -75,6 +80,7 @@ interface UserSignupResponse {
 interface UserSigninRequest {
     email: string;
     password: string;
+    provider: Provider;
 }
 
 interface UserSigninResponse {
@@ -96,5 +102,9 @@ export type {
     UserSignupRequest,
     UserSignupResponse,
     UserSigninRequest,
-    UserSigninResponse
+    UserSigninResponse,
+}
+
+export {
+    Provider
 }

@@ -38,7 +38,7 @@ const NavBar = () => {
                         </Link>
                     </li>
                     <li>
-                        <Link to="/" className="block px-4 py-2 md:p-0 hover:underline transition-all duration-300 ease-in">
+                        <Link to="/jobs" className="block px-4 py-2 md:p-0 hover:underline transition-all duration-300 ease-in">
                             Search Jobs
                         </Link>
                     </li>

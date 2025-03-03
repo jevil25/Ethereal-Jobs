@@ -7,14 +7,13 @@ import { useSearchParams } from 'react-router-dom';
 const Navbar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isSignIn, setIsSignIn] = useState(true);
-    const { user, isAuthenticated, logout, refreshUser } = useAuth();
+    const { user, isAuthenticated, logout } = useAuth();
     const [showAuthModal, setShowAuthModal] = useState(false);
     const [searchParams] = useSearchParams();
     const [showPleaseLogin, setShowPleaseLogin] = useState(false);
 
     const handleLogout = () => {
         logout();
-        refreshUser();
     };
 
     useEffect(() => {
@@ -103,7 +102,7 @@ const Navbar = () => {
                     <div className="relative">
                         <button
                         type="button"
-                        className="bg-black text-white px-4 py-2 rounded-full text-sm font-medium"
+                        className="bg-black text-white px-4 py-2 rounded-full text-sm font-medium hover:cursor-pointer"
                         onClick={handleLogout}
                         >
                         Logout

@@ -3,7 +3,7 @@ import { ReactNode } from 'react';
 import NavBar from './components/Navbar';
 import JobSearch from "./pages/JobSearch";
 import JobPage from "./pages/JobPage";
-import ResumeBuilder from './pages/ResumeBuilder';
+import ResumeBuilder from './pages/ResumeBuilderv2';
 import NotFoundPage from './pages/404';
 import HomePage from './pages/HomePage';
 import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from 'react-router-dom';

@@ -1,7 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { userSignin, userSignup } from '../../api/user';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../providers/AuthProvider';
+import { onAuthStateChanged } from "firebase/auth";
+import { signInWithGoogle, auth, getUserLogout  } from '../../utils/auth';
+import toast from 'react-hot-toast';
+import { Provider } from '../../api/types';
 
 interface AuthFormsProps {
     isSignIn: boolean;
@@ -41,7 +45,8 @@ const AuthForms: React.FC<AuthFormsProps> = ({ isSignIn, setIsSignIn, onClose, s
       if (isSignIn) {
         const response = await userSignin({
           email: formData.email,
-          password: formData.password
+          password: formData.password,
+          provider: Provider.Custom
         });  
         if (response.is_valid) {
           setSuccessMessage('Sign in successful! Redirecting...');
@@ -62,7 +67,8 @@ const AuthForms: React.FC<AuthFormsProps> = ({ isSignIn, setIsSignIn, onClose, s
         const response = await userSignup({
           email: formData.email,
           password: formData.password,
-          name: formData.name
+          name: formData.name,
+          provider: Provider.Custom
         });
         
         console.log(response);
@@ -92,6 +98,80 @@ const AuthForms: React.FC<AuthFormsProps> = ({ isSignIn, setIsSignIn, onClose, s
     setIsSignIn(!isSignIn);
     setError(null);
     setSuccessMessage(null);
+  };
+
+  const isSignInRef = useRef(isSignIn);
+
+  useEffect(() => {
+    isSignInRef.current = isSignIn; // Update ref whenever state changes
+  }, [isSignIn]);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      console.log("isSignIn", isSignInRef.current); // Now it always gets the latest value!
+      console.log("user", user);
+      if (isSignInRef.current) {
+        if (user) {
+          const response = await userSignin({
+            email: user.email as string,
+            password: '',
+            provider: Provider.Google
+          });
+          if (response.is_valid) {
+            setSuccessMessage('Sign in successful! Redirecting...');
+            await getUserLogout();
+            // Redirect to homepage after successful login
+            setTimeout(() => {
+              onClose();
+              navigate('/');
+            }, 1500);
+            refreshUser();
+          } else {
+            if (!response.is_exists) {
+              setError('User does not exist. Please check your email or sign up.');
+            } else {
+              setError('Invalid credentials. Please check your email and password.');
+            }
+          }
+        }
+      }else{
+        if (user) {
+          console.log("sending request");
+          const response = await userSignup({
+            email: user.email as string,
+            password: '',
+            name: user.displayName as string,
+            provider: Provider.Google
+          });
+          if (response.is_created) {
+            setSuccessMessage('Account created successfully! You can now sign in.');
+            // Switch to sign in form after successful signup
+            setTimeout(() => {
+              setIsSignIn(true);
+              setSuccessMessage(null);
+            }, 2000);
+          }else if (response.is_exists) {
+            setError('User with this email already exists. Please sign in instead.');
+          } else {
+            setError('Failed to create account. Please try again.');
+          }
+        }
+      }
+      await getUserLogout();
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }
+  , []);
+
+  const handleSignInWithGoogle = async () => {
+    try {
+      await signInWithGoogle();
+    } catch (error) {
+      toast("Something went wrong");
+    }
   };
 
   return (
@@ -127,6 +207,14 @@ const AuthForms: React.FC<AuthFormsProps> = ({ isSignIn, setIsSignIn, onClose, s
         )}
         
         <form onSubmit={handleSubmit}>
+          <button
+            type="button"
+            className="w-full bg-white text-gray-500 text-sm border-[1px] border-gray-500 relative p-2.5 rounded-full text-poppins flex justify-center items-center text-center gap-2 mb-2 hover:bg-gray-100 transition-colors hover:cursor-pointer"
+            onClick={handleSignInWithGoogle}
+          >
+            <div><i className="fa-brands fa-google text-lg"></i></div>
+            <div className='text-sm'>Continue with google</div>
+          </button>
           {!isSignIn && (
             <div className="mb-4">
               <label htmlFor="name" className="block text-gray-700 mb-2">Name</label>

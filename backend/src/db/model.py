@@ -1,3 +1,4 @@
+import enum
 from pydantic import BaseModel, Field
 from typing import List, Optional
 
@@ -51,10 +52,12 @@ class User(BaseModel):
     name: str
     email: str
     password: str
+    provider: str
 
 class UserLogin(BaseModel):
     email: str
     password: str
+    provider: str
 
 class UserAuth(BaseModel):
     username: str
