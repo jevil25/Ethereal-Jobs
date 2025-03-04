@@ -1,8 +1,9 @@
+from datetime import datetime
 from pymongo import MongoClient
 from dotenv import load_dotenv
 import os
 from typing import List, Optional
-from src.db.model import JobQuery, JobModel, LinkedInProfile, RefreshToken, User
+from src.db.model import CheckToken, JobQuery, JobModel, LinkedInProfile, RefreshToken, User
 
 # Load the dotenv file
 load_dotenv()
@@ -90,11 +91,54 @@ class DatabaseOperations:
         user = self.db["user"].find_one({"email": email})
         return User(**user) if user else None
     
-    def add_refresh_token(self, user_email: str, refresh_token: str):
+    def add_refresh_token(self, user_email: str, refresh_token: str, expire: str):
         """Add a refresh token to the database."""
-        return self.db["refresh_token"].insert_one({"user_email": user_email, "refresh_token": refresh_token}).inserted_id
+        return self.db["refresh_token"].insert_one({"user_email": user_email, "refresh_token": refresh_token, "revoked": False, "expire": expire}).inserted_id
     
     def check_refresh_token(self, refresh_token: str):
         """Check if a refresh token exists in the database."""
         res = self.db["refresh_token"].find_one({"refresh_token": refresh_token})
+        if res and res.get("revoked"):
+            return None
+        datatime_str = res.get("expire")
+        if res and datetime.strptime(datatime_str, "%Y-%m-%d %H:%M:%S") < datetime.now():
+            return None
         return RefreshToken(**res) if res else None
+    
+    def revoke_refresh_token(self, refresh_token: str):
+        """Revoke a refresh token in the database."""
+        return self.db["refresh_token"].update_one({"refresh_token": refresh_token}, {"$set": {"revoked": True}})
+    
+    def add_reset_password_token(self, email: str, token: str, expire: str):
+        """Add a reset password token to the database."""
+        return self.db["reset_password_token"].insert_one({"email": email, "token": token, "expire": expire, "revoked": False}).inserted_id
+    
+    def check_reset_password_token(self, token: str):
+        """Check if a reset password token exists in the database."""
+        res = self.db["reset_password_token"].find_one({"token": token})
+        if not res:
+            return CheckToken(is_valid=False, is_expired=False)
+        if res and res.get("revoked"):
+            return CheckToken(is_valid=False, is_expired=False)
+        datatime_str = res.get("expire")
+        if res and datetime.strptime(datatime_str, "%Y-%m-%d %H:%M:%S") < datetime.now():
+            return CheckToken(is_valid=False, is_expired=True)
+        return CheckToken(is_valid=True, is_expired=False)
+    
+    def get_user_by_reset_password_token(self, token: str):
+        """Get a user by reset password token."""
+        res = self.db["reset_password_token"].find_one({"token": token})
+        return res.get("email") if res else None
+    
+    def revoke_reset_password_token(self, token: str):
+        """Revoke a reset password token in the database."""
+        return self.db["reset_password_token"].update_one({"token": token}, {"$set": {"revoked": True}})
+    
+    def update_user_password(self, email: str, password: str, token: str):
+        """Update a user's password in the database."""
+        token_data = self.check_reset_password_token(token)
+        if not token_data.is_valid:
+            return False
+        self.db["user"].update_one({"email": email}, {"$set": {"password": password}})
+        self.revoke_reset_password_token(token)
+        return True

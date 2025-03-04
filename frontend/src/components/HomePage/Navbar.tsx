@@ -34,6 +34,11 @@ const Navbar = () => {
 
     const scrollToSection = (event: any, id: string) => {
         event.preventDefault();
+        // check if home page
+        if (window.location.pathname !== '/') {
+            window.location.href = `/#${id}`;
+            return;
+        }
         const element = document.getElementById(id);
         if (element) {
             element.scrollIntoView({ 

@@ -5,13 +5,14 @@ import {
   signInWithPopup,
   signOut,
 } from "firebase/auth";
+import.meta.env;
 
 // Firebase configuration
 // Get these values from your Firebase Console -> Project Settings -> General
 const firebaseConfig = {
-    apiKey: "AIzaSyAtV8F0rsD4V7rSxAmhR2QjK6I8Oim5YfY",
-    authDomain: "fiverr-51e0e.firebaseapp.com",
-    projectId: "fiverr-51e0e",
+    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
 };
 
 const app = initializeApp(firebaseConfig);
@@ -25,4 +26,25 @@ export const signInWithGoogle = () => {
 export const getUserLogout = () => {
   signOut(auth);
 };
+
+export interface CheckPasswordConditions {
+  meetsLength: boolean;
+  hasDigit: boolean;
+  hasLowercase: boolean;
+  hasUppercase: boolean;
+  hasSymbol: boolean;
+  isValid: boolean;
+  passwordMatch?: boolean;
+}
+
+export const checkPasswordConditions = (password: string): CheckPasswordConditions => {
+  return {
+      meetsLength: password.length >= 8,
+      hasDigit: /(?=.*\d)/.test(password),
+      hasLowercase: /(?=.*[a-z])/.test(password),
+      hasUppercase: /(?=.*[A-Z])/.test(password),
+      hasSymbol: /(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/.test(password),
+      isValid: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/.test(password)
+  };
+}
 

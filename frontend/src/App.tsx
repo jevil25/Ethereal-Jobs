@@ -6,6 +6,7 @@ import JobPage from "./pages/JobPage";
 import ResumeBuilder from './pages/ResumeBuilderv2';
 import NotFoundPage from './pages/404';
 import HomePage from './pages/HomePage';
+import ResetPasswordPage from './pages/ResetPassword';
 import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from 'react-router-dom';
 import { Provider } from "react-redux";
 import { store } from "./lib/redux/store";
@@ -47,13 +48,14 @@ function RequireAuth({ children }: { children: ReactNode }) {
 
 function AppContent() {
   const location = useLocation();
-  const isHomePage = location.pathname === '/';
+  const isHomePage = location.pathname === '/' || location.pathname === '/reset-password';
 
   return (
     <>
       {!isHomePage && <NavBar />}
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/jobs" element={
           <RequireAuth>
             <JobSearch />

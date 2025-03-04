@@ -89,6 +89,37 @@ interface UserSigninResponse {
     is_valid: boolean;
 }
 
+interface ResetPasswordRequest {
+    email: string;
+}
+
+interface ResetPasswordResponse {
+    message: string;    
+    is_exists: boolean;
+    is_valid: boolean;
+}
+
+interface ResetPasswordCheckRequest {
+    token: string;
+}
+
+interface ResetPasswordCheckResponse {
+    message: string;
+    is_valid: boolean;
+    is_expired: boolean;
+}
+
+interface ResetPasswordUpdateRequest {
+    token: string;
+    password: string;
+}
+
+interface ResetPasswordUpdateResponse {
+    message: string;
+    is_valid: boolean;
+    is_expired: boolean;
+}
+
 export type {
     ResumeSaveRequest,
     ResumeSaveResponse,
@@ -103,6 +134,12 @@ export type {
     UserSignupResponse,
     UserSigninRequest,
     UserSigninResponse,
+    ResetPasswordRequest,
+    ResetPasswordResponse,
+    ResetPasswordCheckRequest,
+    ResetPasswordCheckResponse,
+    ResetPasswordUpdateRequest,
+    ResetPasswordUpdateResponse
 }
 
 export {

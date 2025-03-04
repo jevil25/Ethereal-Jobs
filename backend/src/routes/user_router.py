@@ -1,9 +1,10 @@
+from datetime import datetime, timedelta
 from fastapi import Request
 from starlette.responses import JSONResponse
 from dotenv import load_dotenv
 import os
 
-from src.db.model import User, UserLogin
+from src.db.model import User, UserLogin, ResetPassword, UserUpdatePassword
 from src.utils.jwttoken import create_access_token, create_refresh_token, verify_token
 from src.utils.hashing import Hash
 from fastapi import status, APIRouter
@@ -35,8 +36,8 @@ def login(request:UserLogin):
     if request.provider == "custom" and not Hash.verify(user.password, request.password):
         return JSONResponse(content={"message": "Invalid credentials", "is_exists": True, "is_valid": False})
     access_token = create_access_token(data={"email": request.email})
-    refresh_token = create_refresh_token()
-    db_ops.add_refresh_token(request.email, refresh_token)
+    refresh_token, expire = create_refresh_token()
+    db_ops.add_refresh_token(request.email, refresh_token, expire.strftime("%Y-%m-%d %H:%M:%S"))
     response = JSONResponse(content={"message": "Login successful", "is_exists": True, "is_valid": True})
     response.set_cookie(key="access_token", value=access_token, httponly=False if is_https else True, secure=is_https)
     response.set_cookie(key="refresh_token", value=refresh_token, httponly=False if is_https else True, secure=is_https)
@@ -76,3 +77,34 @@ def logout():
     response.delete_cookie(key="access_token")
     response.delete_cookie(key="refresh_token")
     return response
+
+@app.post('/reset-password')
+def reset_password(request:ResetPassword):
+    user = db_ops.get_user(request.email)
+    if not user:
+        return JSONResponse(content={"message": "User does not exist", "is_exists": False, "is_valid": False})
+    random_uuid = Hash.generate_random_unique_string()
+    db_ops.add_reset_password_token(request.email, random_uuid, (datetime.now() + timedelta(minutes=30)).strftime("%Y-%m-%d %H:%M:%S"))
+    # TODO: Send email with reset password link
+    return JSONResponse(content={"message": "Password reset link sent to your email", "is_exists": True, "is_valid": True})
+
+@app.post('/reset-password/{token}/check')
+def reset_password_with_token(token:str):
+    reset_token = db_ops.check_reset_password_token(token)
+    print(reset_token)
+    if not reset_token.is_valid:
+        if reset_token.is_expired:
+            return JSONResponse(content={"message": "Token expired", "is_valid": False, "is_expired": True})
+        return JSONResponse(content={"message": "Invalid token", "is_valid": False, "is_expired": False})
+    return JSONResponse(content={"message": "Valid token", "is_valid": True, "is_expired": False})
+
+@app.post('/reset-password/{token}/update')
+def update_password(token:str, request:UserUpdatePassword):
+    email = db_ops.get_user_by_reset_password_token(token)
+    if not email:
+        return JSONResponse(content={"message": "Invalid token", "is_valid": False, "is_expired": False})
+    hashed_pass = Hash.bcrypt(request.password)
+    success = db_ops.update_user_password(email, hashed_pass, token)
+    if not success:
+        return JSONResponse(content={"message": "Invalid token", "is_valid": False, "is_expired": False})
+    return JSONResponse(content={"message": "Password updated successfully", "is_valid": True, "is_expired": False})

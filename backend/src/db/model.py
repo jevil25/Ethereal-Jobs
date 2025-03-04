@@ -59,6 +59,12 @@ class UserLogin(BaseModel):
     password: str
     provider: str
 
+class ResetPassword(BaseModel):
+    email: str
+
+class UserUpdatePassword(BaseModel):
+    password: str
+
 class UserAuth(BaseModel):
     username: str
     email: str
@@ -82,4 +88,9 @@ class TokenData(BaseModel):
 class RefreshToken(BaseModel):
     user_email: str
     refresh_token: str
+    revoked: bool
+
+class CheckToken(BaseModel):
+    is_expired: bool
+    is_valid: bool
 

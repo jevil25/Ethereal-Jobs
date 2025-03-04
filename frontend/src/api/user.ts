@@ -1,4 +1,4 @@
-import { UserSigninRequest, UserSigninResponse, UserSignupRequest, UserSignupResponse } from "./types";
+import { UserSigninRequest, UserSigninResponse, UserSignupRequest, UserSignupResponse, ResetPasswordRequest, ResetPasswordResponse, ResetPasswordCheckRequest, ResetPasswordCheckResponse, ResetPasswordUpdateRequest, ResetPasswordUpdateResponse } from "./types";
 import { constructServerUrlFromPath } from "../utils/helper";
 import axios from 'axios';
 import { User } from "../types/data";
@@ -52,4 +52,20 @@ export const userMe = async () => {
 // post /user/refresh
 export const userRefresh = async () => {
     return await axios.post(constructServerUrlFromPath('/user/refresh'));
+}
+
+// post /reset-password
+export const sendPasswordResetEmail = async (params: ResetPasswordRequest): Promise<ResetPasswordResponse> => {
+    const response = await axios.post(constructServerUrlFromPath('/user/reset-password'), params);
+    return response.data as ResetPasswordResponse;
+}
+
+export const checkIfResetPasswordTokenIsValid = async (params: ResetPasswordCheckRequest): Promise<ResetPasswordCheckResponse> => {
+    const response = await axios.post(constructServerUrlFromPath(`/user/reset-password/${params.token}/check`));
+    return response.data as ResetPasswordCheckResponse;
+}
+
+export const updatePasswordWithToken = async (params: ResetPasswordUpdateRequest): Promise<ResetPasswordUpdateResponse> => {
+    const response = await axios.post(constructServerUrlFromPath(`/user/reset-password/${params.token}/update`), params);
+    return response.data as ResetPasswordUpdateResponse;
 }
