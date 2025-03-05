@@ -3,7 +3,7 @@ import { ReactNode } from 'react';
 import NavBar from './components/Navbar';
 import JobSearch from "./pages/JobSearch";
 import JobPage from "./pages/JobPage";
-import ResumeBuilder from './pages/ResumeBuilderv2';
+import ResumeBuilder from './pages/ResumeBuilder';
 import NotFoundPage from './pages/404';
 import HomePage from './pages/HomePage';
 import ResetPasswordPage from './pages/ResetPassword';
