@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { userSignin, userSignup, sendPasswordResetEmail, resendVerificationEmail } from '../../api/user';
+import { userSignin, userSignup, sendPasswordResetEmail } from '../../api/user';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../providers/AuthProvider';
 import { onAuthStateChanged } from "firebase/auth";
@@ -7,6 +7,7 @@ import { signInWithGoogle, auth, getUserLogout, checkPasswordConditions } from '
 import toast from 'react-hot-toast';
 import { Provider } from '../../api/types';
 import PasswordConditions from './PasswordConditions';
+import ResendVerification from './ResendVerification';
 
 interface AuthFormsProps {
     isSignIn: boolean;
@@ -248,21 +249,6 @@ const AuthForms: React.FC<AuthFormsProps> = ({ isSignIn, setIsSignIn, onClose, s
     }
   };
 
-  const handleResendVerification = async () => {
-    try {
-      const response = await resendVerificationEmail({ email: resendEmail });
-      if (response.is_valid) {
-        setError(null);
-        setSuccessMessage('Verification email resent. Please check your inbox.');
-      }
-      else
-        setError(response.message || 'Failed to resend verification email. Please try again.');
-    } catch (err) {
-      console.error('Verification resend error:', err);
-      setError('Failed to resend verification email. Please try again later.');
-    }
-  }
-
   return (
     <div className="fixed inset-0 flex items-center justify-center z-20">
       <div 
@@ -284,26 +270,17 @@ const AuthForms: React.FC<AuthFormsProps> = ({ isSignIn, setIsSignIn, onClose, s
             {error}
           </div>
         )}
-        {
-          showResendVerification && (
-            <p className="text-gray-600 flex flex-row gap-2 mb-4">
-              Verification email not received?
-              <button
-                onClick={handleResendVerification}
-                className="text-black font-medium hover:underline focus:outline-none hover:cursor-pointer"
-              >
-                Resend
-              </button>
-            </p>
-          )
-        }
         
         {/* Success message */}
         {successMessage && (
-          <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded">
+          <div className={`${showResendVerification ? "" : "mb-4"} p-3 bg-green-100 border border-green-400 text-green-700 rounded`}>
             {successMessage}
           </div>
         )}
+
+        {
+          showResendVerification && <ResendVerification resendEmail={resendEmail} />
+        } 
 
         {showPleaseLogin && (
           <div className="mb-4 p-3 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded">

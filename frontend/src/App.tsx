@@ -13,6 +13,7 @@ import { store } from "./lib/redux/store";
 import { AuthProvider } from './providers/AuthProvider';
 import axios from 'axios';
 import { useAuth } from './providers/AuthProvider';
+import VerifyEmailPage from './pages/verify-email';
 
 // needed for axios to send cookies
 axios.defaults.withCredentials = true;
@@ -40,7 +41,7 @@ function RequireAuth({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   
   if (!user) {
-    return <Navigate to="/?login=true" replace />;
+    return <Navigate to="/?login=true&feature-box=true" replace />;
   }
   
   return <>{children}</>;
@@ -48,7 +49,7 @@ function RequireAuth({ children }: { children: ReactNode }) {
 
 function AppContent() {
   const location = useLocation();
-  const isHomePage = location.pathname === '/' || location.pathname === '/reset-password';
+  const isHomePage = location.pathname === '/' || location.pathname === '/reset-password' || location.pathname === '/verify-email';
 
   return (
     <>
@@ -56,6 +57,7 @@ function AppContent() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path='/verify-email' element={<VerifyEmailPage />} />
         <Route path="/jobs" element={
           <RequireAuth>
             <JobSearch />

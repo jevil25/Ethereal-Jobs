@@ -139,6 +139,7 @@ interface verifyEmailResponse {
     message: string;
     is_valid: boolean;
     is_expired: boolean;
+    email?: string;
 }
 
 

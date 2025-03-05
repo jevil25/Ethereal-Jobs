@@ -30,7 +30,7 @@ async def create_user(request:User):
         user_object["is_verified"] = False
         token = Hash.generate_random_unique_string()
         send_verification_email(request.email, token, request.name)
-        await db_ops.add_verification_token(request.email, token, (datetime.now() + timedelta(minutes=60)).strftime("%Y-%m-%d %H:%M:%S"))
+        await db_ops.add_verification_token(request.email, token, (datetime.now() + timedelta(hours=24)).strftime("%Y-%m-%d %H:%M:%S"))
     else:   
         user_object["is_verified"] = True
     user_id = await db_ops.insert_user(user_object)
@@ -46,16 +46,16 @@ async def resend_verification(email:str):
     await db_ops.revoke_verification_token(email)
     token = Hash.generate_random_unique_string()
     send_verification_email(email, token, user.name)
-    await db_ops.add_verification_token(email, token, (datetime.now() + timedelta(minutes=60)).strftime("%Y-%m-%d %H:%M:%S"))
+    await db_ops.add_verification_token(email, token, (datetime.now() + timedelta(hours=24)).strftime("%Y-%m-%d %H:%M:%S"))
     return JSONResponse(content={"message": "Verification email sent", "is_exists": True, "is_valid": True, "is_verified": False})
 
 @app.post('/verify-email/{token}')
 async def verify_email(token:str):
-    result, expired = await db_ops.verify_user_token(token)
+    result, expired, email = await db_ops.verify_user_token(token)
     if not result:
         return JSONResponse(content={"message": "Invalid token", "is_valid": False, "is_expired": False})
     if expired:
-        return JSONResponse(content={"message": "Token expired", "is_valid": False, "is_expired": True})
+        return JSONResponse(content={"message": "Token expired", "is_valid": False, "is_expired": True, "email": email})
     return JSONResponse(content={"message": "Email verified", "is_valid": True, "is_expired": False})
 
 @app.post('/login')

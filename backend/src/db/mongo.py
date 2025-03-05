@@ -189,7 +189,7 @@ class DatabaseOperations:
         Returns:
             Optional[str]: User email or None
         """
-        verification_token = await VerificationToken.find_one({"token": token})
+        verification_token = await VerificationToken.find_one({"token": token, "revoked": False})
         return verification_token.email if verification_token else None
     
     async def revoke_verification_token(self, token: str):
@@ -233,13 +233,15 @@ class DatabaseOperations:
         """
         user_email = await self.get_user_by_verification_token(token)
         if not user_email:
-            return False, False
+            return False, False, ""
         expired = await self.check_if_token_expired(token)
         if expired:
-            return True, False
-        await User.update(User.email == user_email, {"$set": {"is_verified": True}})
+            return True, True, user_email
+        user = await self.get_user(user_email)
+        user.is_verified = True
+        await user.save()
         await self.revoke_verification_token(token)
-        return True, True
+        return True, False, ""
     
     async def add_refresh_token(self, user_email: str, refresh_token: str, expire: str):
         """

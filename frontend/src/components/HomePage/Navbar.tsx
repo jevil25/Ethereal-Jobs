@@ -24,9 +24,11 @@ const Navbar = () => {
         };
 
         const login = searchParams.get('login');
+        const featureBox = searchParams.get('feature-box');
         if (login === 'true') {
             handleAuthClick(true);
-            setShowPleaseLogin(true);
+            if (featureBox === 'true')        
+                setShowPleaseLogin(true);
         }
 
         window.addEventListener('scroll', handleScroll);
