@@ -1,7 +1,6 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from fastapi.responses import JSONResponse
-from bson import ObjectId
-from typing import List, Dict
+from typing import Dict
 from src.db.mongo import DatabaseOperations
 from src.logger import logger
 
