@@ -57,8 +57,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // Clear user data
     userSignout();
     setUser(null);
-
-    window.location.href = '/';
   };
 
   // Effect to check authentication status on mount

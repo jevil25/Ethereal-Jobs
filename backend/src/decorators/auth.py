@@ -22,7 +22,7 @@ def is_user_logged_in(func):
         if not token_data.is_valid:
             raise HTTPException(status_code=200, detail="Invalid token")
         
-        user = db_ops.get_user(token_data.email)
+        user = await db_ops.get_user(token_data.email)
         if not user:
             raise HTTPException(status_code=200, detail="User does not exist")
         user.password = None

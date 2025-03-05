@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from src.db.mongo import DatabaseOperations
 from src.routes.user_router import app as user_router
 from src.routes.jobs_router import app as jobs_router
 from src.routes.resume_router import app as resume_router
@@ -13,17 +14,22 @@ frontend_url = os.getenv("FRONTEND_URL")
 # Initialize FastAPI app
 app = FastAPI()
 
-origins = [
-    frontend_url,
-]
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=[frontend_url],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.on_event("startup")
+async def startup_event():
+    """
+    Async startup event to initialize database
+    This runs when the FastAPI application starts
+    """
+    await DatabaseOperations().init_database()
 
 @app.get("/")
 def read_root():

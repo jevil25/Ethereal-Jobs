@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { userSignin, userSignup, sendPasswordResetEmail } from '../../api/user';
+import { userSignin, userSignup, sendPasswordResetEmail, resendVerificationEmail } from '../../api/user';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../providers/AuthProvider';
 import { onAuthStateChanged } from "firebase/auth";
@@ -26,6 +26,9 @@ const AuthForms: React.FC<AuthFormsProps> = ({ isSignIn, setIsSignIn, onClose, s
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const [showResendVerification, setShowResendVerification] = useState(false);
+  const [resendEmail, setResendEmail] = useState('');
+
   const { refreshUser } = useAuth();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -78,16 +81,21 @@ const AuthForms: React.FC<AuthFormsProps> = ({ isSignIn, setIsSignIn, onClose, s
       return handleForgetPassword(e);
     }
 
+    if (!formData.email) {
+      setError('Please enter your email address');
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setError('Please enter a valid email address');
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
 
     const checkPassword = checkPasswordConditions(formData.password);
-
-    if (!checkPassword.isValid) {
-      setError('Password does not meet the criteria');
-      setIsLoading(false);
-      return;
-    }
     
     try {
       if (isSignIn) {
@@ -97,20 +105,34 @@ const AuthForms: React.FC<AuthFormsProps> = ({ isSignIn, setIsSignIn, onClose, s
           provider: Provider.Custom
         });  
         if (response.is_valid) {
-          setSuccessMessage('Sign in successful! Redirecting...');
+          setSuccessMessage('Sign in successful!');
           refreshUser();
           setTimeout(() => {
             onClose();
-            navigate('/');
+            setFormData({
+              email: '',
+              password: '',
+              name: ''
+            });
           }, 1500);
         } else {
           if (!response.is_exists) {
             setError('User does not exist. Please check your email or sign up.');
-          } else {
+          } else if (!response.is_verified) {
+            setShowResendVerification(true);
+            setResendEmail(formData.email);
+            setError('Please verify your email before signing in. Check your inbox for the verification link.');
+          } 
+          else {
             setError('Invalid credentials. Please check your email and password.');
           }
         }
       } else {
+        if (!checkPassword.isValid) {
+          setError('Password does not meet the criteria');
+          setIsLoading(false);
+          return;
+        }
         const response = await userSignup({
           email: formData.email,
           password: formData.password,
@@ -119,11 +141,12 @@ const AuthForms: React.FC<AuthFormsProps> = ({ isSignIn, setIsSignIn, onClose, s
         });
         
         if (response.is_created) {
-          setSuccessMessage('Account created successfully! You can now sign in.');
-          setTimeout(() => {
-            setIsSignIn(true);
-            setSuccessMessage(null);
-          }, 2000);
+          setSuccessMessage('Account created successfully! We have sent you a verification email. Please check your inbox.');
+          setFormData({
+            email: '',
+            password: '',
+            name: ''
+          });
         } else if (response.is_exists) {
           setError('User with this email already exists. Please sign in instead.');
         } else {
@@ -225,6 +248,21 @@ const AuthForms: React.FC<AuthFormsProps> = ({ isSignIn, setIsSignIn, onClose, s
     }
   };
 
+  const handleResendVerification = async () => {
+    try {
+      const response = await resendVerificationEmail({ email: resendEmail });
+      if (response.is_valid) {
+        setError(null);
+        setSuccessMessage('Verification email resent. Please check your inbox.');
+      }
+      else
+        setError(response.message || 'Failed to resend verification email. Please try again.');
+    } catch (err) {
+      console.error('Verification resend error:', err);
+      setError('Failed to resend verification email. Please try again later.');
+    }
+  }
+
   return (
     <div className="fixed inset-0 flex items-center justify-center z-20">
       <div 
@@ -242,10 +280,23 @@ const AuthForms: React.FC<AuthFormsProps> = ({ isSignIn, setIsSignIn, onClose, s
         
         {/* Error message */}
         {error && (
-          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+          <div className={`${showResendVerification ? "" : "mb-4"} p-3 bg-red-100 border border-red-400 text-red-700 rounded`}>
             {error}
           </div>
         )}
+        {
+          showResendVerification && (
+            <p className="text-gray-600 flex flex-row gap-2 mb-4">
+              Verification email not received?
+              <button
+                onClick={handleResendVerification}
+                className="text-black font-medium hover:underline focus:outline-none hover:cursor-pointer"
+              >
+                Resend
+              </button>
+            </p>
+          )
+        }
         
         {/* Success message */}
         {successMessage && (

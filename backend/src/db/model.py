@@ -1,6 +1,7 @@
-import enum
-from pydantic import BaseModel, Field
+from datetime import datetime, timedelta
 from typing import List, Optional
+from beanie import Document, Indexed, before_event, Insert
+from pydantic import BaseModel, Field
 
 class JobQuery(BaseModel):
     city: str
@@ -12,10 +13,10 @@ class JobQuery(BaseModel):
     is_remote: bool
     distance: int
 
-class JobModel(BaseModel):
-    id: str  # Assuming unique job ID
+class JobModel(Document):
+    id: str = Field(alias="_id")
     title: str
-    company: str
+    company: Indexed(str) # type: ignore
     location: str
     description: str
     url: str
@@ -37,22 +38,126 @@ class JobModel(BaseModel):
     min_amount: Optional[str] = None
     max_amount: Optional[str] = None
     currency: Optional[str] = None
+    
+    # Timestamp fields
+    createdAt: datetime = Field(default_factory=datetime.utcnow)
+    updatedAt: datetime = Field(default_factory=datetime.utcnow)
+
+    class Settings:
+        name = "jobs"
+        indexes = [
+            [("company", 1)],
+            [("location", 1)],
+            [("job_title", 1)],
+            [("date_posted", -1)],
+        ]
+        use_cache = True
+        cache_expiration_time = timedelta(minutes=5)
+        cache_capacity = 100
 
 class LinkedInProfile(BaseModel):
     name: str
     vanity_name: str
     profile_url: str
 
-class CompanyLinkedInProfiles(BaseModel):
-    company: str
-    city: str
+class CompanyLinkedInProfiles(Document):
+    company: Indexed(str) # type: ignore
+    city: Indexed(str) # type: ignore
+    title: Indexed(str) # type: ignore
     profiles: List[LinkedInProfile]
+    
+    # Timestamp fields
+    createdAt: datetime = Field(default_factory=datetime.utcnow)
+    updatedAt: datetime = Field(default_factory=datetime.utcnow)
 
-class User(BaseModel):
+    class Settings:
+        name = "company_linkedin_profiles"
+        indexes = [
+            [("company", 1), ("city", 1), ("title", 1)],
+        ]
+        use_cache = True
+        cache_expiration_time = timedelta(minutes=5)
+        cache_capacity = 100
+
+class User(Document):
     name: str
-    email: str
+    email: Indexed(str, unique=True) # type: ignore
     password: str
     provider: str
+    is_verified: bool = False
+    
+    # Timestamp fields
+    createdAt: datetime = Field(default_factory=datetime.utcnow)
+    updatedAt: datetime = Field(default_factory=datetime.utcnow)
+
+    @before_event(Insert)
+    def capitalize_name(self):
+        self.name = self.name.capitalize()
+
+    class Settings:
+        name = "users"
+        indexes = [
+            [("email", 1)],
+            [("provider", 1)],
+        ]
+        # use_cache = True
+        cache_expiration_time = timedelta(minutes=5)
+        cache_capacity = 100
+        
+
+class RefreshToken(Document):
+    user_email: Indexed(str) # type: ignore
+    refresh_token: Indexed(str, unique=True) # type: ignore
+    revoked: bool = False
+    expire: datetime
+    
+    # Timestamp fields
+    createdAt: datetime = Field(default_factory=datetime.utcnow)
+    updatedAt: datetime = Field(default_factory=datetime.utcnow)
+
+    class Settings:
+        name = "refresh_tokens"
+        indexes = [
+            [("user_email", 1)],
+            [("refresh_token", 1)],
+            [("expire", -1)],
+        ]
+
+class ResetPasswordToken(Document):
+    email: Indexed(str) # type: ignore
+    token: Indexed(str, unique=True) # type: ignore
+    expire: datetime
+    revoked: bool = False
+    
+    # Timestamp fields
+    createdAt: datetime = Field(default_factory=datetime.utcnow)
+    updatedAt: datetime = Field(default_factory=datetime.utcnow)
+
+    class Settings:
+        name = "reset_password_tokens"
+        indexes = [
+            [("email", 1)],
+            [("token", 1)],
+            [("expire", -1)],
+        ]
+
+class VerificationToken(Document):
+    email: Indexed(str) # type: ignore
+    token: Indexed(str, unique=True) # type: ignore
+    expire: datetime
+    revoked: bool = False
+    
+    # Timestamp fields
+    createdAt: datetime = Field(default_factory=datetime.utcnow)
+    updatedAt: datetime = Field(default_factory=datetime.utcnow)
+
+    class Settings:
+        name = "verification_tokens"
+        indexes = [
+            [("email", 1)],
+            [("token", 1)],
+            [("expire", -1)],
+        ]
 
 class UserLogin(BaseModel):
     email: str
@@ -73,8 +178,8 @@ class UserAuth(BaseModel):
     revoked: bool
 
 class Login(BaseModel):
-	username: str
-	password: str
+    username: str
+    password: str
      
 class Token(BaseModel):
     access_token: str
@@ -85,12 +190,7 @@ class TokenData(BaseModel):
     is_valid: bool = False
     is_expired: bool = False
 
-class RefreshToken(BaseModel):
-    user_email: str
-    refresh_token: str
-    revoked: bool
-
 class CheckToken(BaseModel):
     is_expired: bool
     is_valid: bool
-
+    

@@ -13,6 +13,7 @@ const Navbar = () => {
     const [showPleaseLogin, setShowPleaseLogin] = useState(false);
 
     const handleLogout = () => {
+        setShowPleaseLogin(false);
         logout();
     };
 
@@ -103,7 +104,7 @@ const Navbar = () => {
                 <div className="flex items-center space-x-2 md:space-x-4">
                 {isAuthenticated ? (
                     <div className="flex items-center space-x-4">
-                    <span className="text-sm text-gray-700">Hello, {user?.name}</span>
+                    <span className="text-sm text-gray-700">Hello, {user?.name.split(" ")[0]}</span>
                     <div className="relative">
                         <button
                         type="button"
