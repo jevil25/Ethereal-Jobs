@@ -13,7 +13,7 @@ interface ResumeSaveRequest {
 }
 
 interface ResumeSaveResponse {
-    resumeId?: string;
+    email?: string;
 }
 
 interface LinkedInGenerateMessageRequest {
@@ -27,6 +27,7 @@ interface LinkedInGenerateMessageResponse {
     company: string;
     resumeId: string;
     message: string;
+    no_resume_found?: boolean;
 }
 
 interface AutoSuggestionsRequest {

@@ -29,8 +29,8 @@ export const saveStateToDatabase = async (state: RootState) => {
     const existingResumeId = localStorage.getItem("resumeId");
     if (!existingResumeId) {  
       const resumeId = await saveResumeDetails({ state });
-      if (!resumeId.resumeId) return;
-      return localStorage.setItem("resumeId", resumeId.resumeId);
+      if (!resumeId.email) return;
+      return localStorage.setItem("resumeId", resumeId.email);
     }
     await updateResumeDetails({ state }, existingResumeId);
   } catch (e) {

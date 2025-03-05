@@ -24,6 +24,7 @@ const JobPage: React.FC = () => {
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [copyMessage, setCopyMessage] = useState<string>('Copy Message');
   const [linkedinName, setLinkedinName] = useState<string>('');
+  const [noResumeFound, setNoResumeFound] = useState<boolean>(false);
 
   const resume = useAppSelector(selectResume);
   const settings = useAppSelector(selectSettings);
@@ -82,6 +83,13 @@ const JobPage: React.FC = () => {
       "newMessage": newMessage
     }
     const data = await generateLinkedInMessage(params);
+    if (data.no_resume_found) {
+      setGeneratedMessage('No resume found. Please create a resume first.');
+      setNoResumeFound(true);
+      setGeneratingMessage(false);
+      return;
+    }
+    setNoResumeFound(false);
     if (data.message) {
       const message = data.message;
       setGeneratedMessage(message);
@@ -263,54 +271,65 @@ const JobPage: React.FC = () => {
                   <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
                   <div className="ml-4">Our backend is generating your message, It might take a few seconds please wait....</div>
                 </div>
-              ) : (
+              ) : 
+                !noResumeFound ? (  
                 <div className='flex flex-col gap-4'>
-                  <div className="mb-4">
-                    <p className="text-sm text-gray-600">
-                      Use the below message to contact the hiring managers from {job?.company} on LinkedIn.
-                    </p>
-                  </div>
-                  <div className="mb-4 bg-white p-4 rounded-lg border border-blue-300 shadow-md transition-all w-fit">
-                    <Markdown>{generatedMessage.replace(reg, linkedinName)}</Markdown>
+                    <div className="mb-4">
+                      <p className="text-sm text-gray-600">
+                        Use the below message to contact the hiring managers from {job?.company} on LinkedIn.
+                      </p>
+                    </div>
+                    <div className="mb-4 bg-white p-4 rounded-lg border border-blue-300 shadow-md transition-all w-fit">
+                      <Markdown>{generatedMessage.replace(reg, linkedinName)}</Markdown>
+                      <button
+                        className=" text-gray-400 hover:text-gray-600 mt-2 px-0.5 py-1 text-xs rounded-lg border-gray-400 border hover:border-gray-600 cursor-pointer"
+                        onClick={() => {
+                          navigator.clipboard.writeText(generatedMessage.replace(reg, linkedinName));
+                          setCopyMessage('Copied!');
+                          setTimeout(() => {
+                            setCopyMessage('Copy Message');
+                          }, 1000);
+                        }}
+                      >
+                        {copyMessage}
+                      </button>
+                    </div>
                     <button
-                      className=" text-gray-400 hover:text-gray-600 mt-2 px-0.5 py-1 text-xs rounded-lg border-gray-400 border hover:border-gray-600 cursor-pointer"
-                      onClick={() => {
-                        navigator.clipboard.writeText(generatedMessage.replace(reg, linkedinName));
-                        setCopyMessage('Copied!');
-                        setTimeout(() => {
-                          setCopyMessage('Copy Message');
-                        }, 1000);
-                      }}
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-center w-fit"
+                      onClick={() => handleMessageGeneration(true)}
                     >
-                      {copyMessage}
+                      Regenerate Message
                     </button>
+                    <div>
+                      <label htmlFor="linkedinName" className="block text-sm font-medium text-gray-700">
+                        Select LinkedIn Name
+                      </label>
+                    </div>
+                    <Dropdown
+                      value={linkedinName}
+                      list={job?.linkedin_profiles.map((profile) => profile.name) as string[]}
+                      onChange={setLinkedinName}
+                      selectionText='Select LinkedIn Name'
+                      noSelectionText='No Such LinkedIn Name Found'
+                    />
+                    <a 
+                      href={job?.linkedin_profiles.find((profile) => profile.name === linkedinName)?.profile_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-blue-600 text-white px-4 py-2 rounded-lg text-center w-fit"
+                    >
+                      Visit {linkedinName}'s LinkedIn Profile
+                    </a>
                   </div>
+              ) : (
+                <div className="flex flex-col items-center border border-black p-6 rounded-lg shadow-md">
+                  <p className="text-red-500 font-semibold mb-4">No resume found. Please create a resume first.</p>
                   <button
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-center w-fit"
-                    onClick={() => handleMessageGeneration(true)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2 rounded-lg transition duration-200"
+                    onClick={() => navigate('/resume')}
                   >
-                    Regenerate Message
+                    Create Resume
                   </button>
-                  <div>
-                    <label htmlFor="linkedinName" className="block text-sm font-medium text-gray-700">
-                      Select LinkedIn Name
-                    </label>
-                  </div>
-                  <Dropdown
-                    value={linkedinName}
-                    list={job?.linkedin_profiles.map((profile) => profile.name) as string[]}
-                    onChange={setLinkedinName}
-                    selectionText='Select LinkedIn Name'
-                    noSelectionText='No Such LinkedIn Name Found'
-                  />
-                  <a 
-                    href={job?.linkedin_profiles.find((profile) => profile.name === linkedinName)?.profile_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg text-center w-fit"
-                  >
-                    Visit {linkedinName}'s LinkedIn Profile
-                  </a>
                 </div>
               )}
             </div>

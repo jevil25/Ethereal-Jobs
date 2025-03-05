@@ -10,7 +10,9 @@ from src.db.model import (
     ResetPasswordToken, 
     CheckToken,
     CompanyLinkedInProfiles,
-    VerificationToken
+    VerificationToken,
+    Resume,
+    LinkedMessages,
 )
 
 from beanie import init_beanie
@@ -50,7 +52,9 @@ class DatabaseOperations:
                 User, 
                 RefreshToken, 
                 ResetPasswordToken,
-                VerificationToken
+                VerificationToken,
+                Resume,
+                LinkedMessages,
             ]
         )
 
@@ -399,4 +403,102 @@ class DatabaseOperations:
         await self.revoke_reset_password_token(token)
         
         return True
+    
+    async def get_resume(self, email: str):
+        """
+        Get a resume from the database.
+        
+        Args:
+            resume_id (str): Resume ID
+        
+        Returns:
+            Optional[dict]: Resume data or None
+        """
+        result =  await Resume.find_one({"user_email": email})
+        return result if result else None
+    
+    async def save_resume(self, email: str, resume: dict):
+        """
+        Save a resume to the database.
+        
+        Args:
+            email (str): User email
+            resume (dict): Resume data
+        
+        Returns:
+            str: Inserted resume ID
+        """
+        new_resume = Resume(user_email=email, resume=resume)
+        await new_resume.save()
+        return str(new_resume.id)
+    
+    async def update_resume(self, email: str, resume: dict):
+        """
+        Update a resume in the database.
+        
+        Args:
+            email (str): User email
+            resume (dict): Resume data
+        
+        Returns:
+            str: Updated resume ID
+        """
+        resume_doc = await Resume.find_one({"user_email": email})
+        if resume_doc:
+            resume_doc.resume = resume
+            await resume_doc.save()
+        return str(resume_doc.id)
+    
+    async def get_job(self, job_id: str):
+        """
+        Get a job from the database.
+        
+        Args:
+            job_id (str): Job ID
+        
+        Returns:
+            Optional[JobModel]: Job document or None
+        """
+        return await JobModel.find_one({"_id": job_id})
+    
+    async def get_linked_messages(self, email: str, company: str, position: str):
+        """
+        Get linkedin messages from the database.
+        
+        Args:
+            resume_id (str): Resume ID
+            company (str): Company name
+            position (str): Job position
+        
+        Returns:
+            Optional[LinkedMessages]: LinkedIn message document or None
+        """
+        return await LinkedMessages.find_one({
+            "email": email,
+            "company": company,
+            "position": position
+        })
+    
+    async def save_linked_message(self, email: str, company: str, position: str, message: dict):
+        """
+        Save a linkedin message to the database.
+        """
+        new_message = LinkedMessages(email=email, company=company, position=position, message=message)
+        await new_message.save()
+        return str(new_message.id)
+    
+    async def update_linked_message(self, email: str, company: str, position: str, message: dict):
+        """
+        Update a linkedin message in the database.
+        """
+        message_doc = await LinkedMessages.find_one({
+            "email": email,
+            "company": company,
+            "position": position
+        })
+        if message_doc:
+            message_doc.message = message
+            await message_doc.save()
+        else:
+            return await self.save_linked_message(email, company, position, message)
     

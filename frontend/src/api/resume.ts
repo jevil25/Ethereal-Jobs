@@ -7,25 +7,25 @@ import { RootState } from "../lib/redux/store";
 const saveResumeDetails = async (data: ResumeSaveRequest): Promise<ResumeSaveResponse> => {
     const response = await axios.post(constructServerUrlFromPath("/resume/save"), data.state);
     console.log(`Saved state to database: ${response.data}`);
-    const resumeId = response.data.resume_id as string;
+    const email = response.data.email as string;
     return {
-        resumeId
+        email
     }
 }
 
 // put /resume/:existingResumeId
-const updateResumeDetails = async (data: ResumeSaveRequest, existingResumeId: string): Promise<void> => {
-    const response = await axios.put(constructServerUrlFromPath(`/resume/${existingResumeId}`), data.state);
+const updateResumeDetails = async (data: ResumeSaveRequest, email: string): Promise<void> => {
+    const response = await axios.put(constructServerUrlFromPath(`/resume/${email}`), data.state);
     if (response.status == 201){
         localStorage.setItem('resumeId', response.data.resume_id);
-        return console.log(`Created new state in database: ${existingResumeId}`);
+        return console.log(`Created new state in database: ${email}`);
     }
-    console.log(`Updated state to database: ${existingResumeId}`);
+    console.log(`Updated state to database: ${email}`);
 }
 
 // get /resume/:resumeId
-const getResumeDetails = async (resumeId: string): Promise<RootState> => {
-    const response = await axios.get(constructServerUrlFromPath(`/resume/${resumeId}`));
+const getResumeDetails = async (email: string): Promise<RootState> => {
+    const response = await axios.get(constructServerUrlFromPath(`/resume/${email}`));
     return response.data as RootState;
 }
 

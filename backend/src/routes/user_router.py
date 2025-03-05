@@ -33,6 +33,7 @@ async def create_user(request:User):
         await db_ops.add_verification_token(request.email, token, (datetime.now() + timedelta(hours=24)).strftime("%Y-%m-%d %H:%M:%S"))
     else:   
         user_object["is_verified"] = True
+        user_object["provider"] = "google"
     user_id = await db_ops.insert_user(user_object)
     return JSONResponse(content={"message": "User created successfully", "is_created": True, "is_exists": True, "user_id": str(user_id)}, status_code=status.HTTP_201_CREATED)
 

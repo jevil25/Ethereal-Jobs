@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
 from bson import ObjectId
 from typing import Dict, Optional
+from src.db.model import LinkedMessages
 from src.db.mongo import DatabaseOperations
 from src.logger import logger
 from src.api.generate_linkedin_message import generate_message_api_response
@@ -12,29 +13,23 @@ app = APIRouter()
 db_ops = DatabaseOperations()
 
 
-@app.get("/generate/linkedin/message/{resume_id}")
-def generate_linkedin_message(resume_id: str, company: str, position: str, newMessage:bool) -> Dict:    
+@app.get("/generate/linkedin/message/{email}")
+async def generate_linkedin_message(email: str, company: str, position: str, newMessage:bool) -> Dict:    
     # Get resume
-    resume = db_ops.db["resumes"].find_one({"_id": ObjectId(resume_id)})
+    resume = await db_ops.get_resume(email)
     if not resume:
-        raise HTTPException(status_code=404, detail="Resume not found")
+        return JSONResponse(
+            content={"message": "Resume not found", "no_resume_found": True},
+            media_type="application/json",
+            status_code=200
+        )
 
     # Check for existing message
-    linkedin_messages_collection = db_ops.db["linkedin_messages"]
-    linkedin_message = linkedin_messages_collection.find_one({
-        "resumeId": resume_id,
-        "company": company,
-        "position": position
-    })
+    linkedin_message = await db_ops.get_linked_messages(email, company, position)
 
     if not linkedin_message or newMessage:
         message_dict = generate_message_api_response(resume, company, position)
-        message_dict.update({
-            "resumeId": resume_id,
-            "company": company,
-            "position": position
-        })
-        linkedin_messages_collection.insert_one(message_dict)
+        linkedin_message = await db_ops.update_linked_message(email, company, position, message_dict["message"])
         linkedin_message = message_dict
 
     # Clean up response
