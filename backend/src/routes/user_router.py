@@ -72,8 +72,8 @@ async def login(request:UserLogin):
     access_token = create_access_token(data={"email": request.email})
     await db_ops.add_refresh_token(request.email, refresh_token, expire.strftime("%Y-%m-%d %H:%M:%S"))
     response = JSONResponse(content={"message": "Login successful", "is_exists": True, "is_valid": True, "is_verified": True})
-    response.set_cookie(key="access_token", value=access_token, httponly=is_https, secure=is_https)
-    response.set_cookie(key="refresh_token", value=refresh_token, httponly=is_https, secure=is_https)
+    response.set_cookie(key="access_token", value=access_token, httponly=is_https, secure=is_https, samesite='none')
+    response.set_cookie(key="refresh_token", value=refresh_token, httponly=is_https, secure=is_https, samesite='none')
     return response
 
 @app.get('/me')
