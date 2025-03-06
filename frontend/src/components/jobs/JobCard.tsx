@@ -68,7 +68,7 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
         // Check if we've reached maxLength
         if (currentLength >= maxLength) {
           // Find the next closing tag if we're in the middle of one
-          let remainingHtml = html.slice(i + 1);
+          const remainingHtml = html.slice(i + 1);
           const nextClosingTag = remainingHtml.match(/<\/[^>]+>/);
           
           if (nextClosingTag) {

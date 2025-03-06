@@ -5,7 +5,6 @@ import {
   signInWithPopup,
   signOut,
 } from "firebase/auth";
-import.meta.env;
 
 // Firebase configuration
 // Get these values from your Firebase Console -> Project Settings -> General

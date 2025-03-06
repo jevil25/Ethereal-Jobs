@@ -251,8 +251,8 @@ const getBulletListStringsFromTextareaValue = (
     // Filter out empty strings
     const nonEmptyStrings = strings.filter((s) => s !== "•");
 
-    let newStrings: string[] = [];
-    for (let string of nonEmptyStrings) {
+    const newStrings: string[] = [];
+    for (const string of nonEmptyStrings) {
       if (string.startsWith("• ")) {
         newStrings.push(string.slice(2));
       } else if (string.startsWith("•")) {
