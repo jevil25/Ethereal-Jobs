@@ -64,7 +64,7 @@ async def login(request:UserLogin):
     user = await db_ops.get_user(request.email)
     if not user:
         return JSONResponse(content={"message": "User does not exist", "is_exists": False, "is_valid": False, "is_verified": False})
-    if request.provider == "custom" and not Hash.verify(user.password, request.password):
+    if user.provider == "custom" and not Hash.verify(user.password, request.password):
         return JSONResponse(content={"message": "Invalid credentials", "is_exists": True, "is_valid": False, "is_verified": False})
     if not user.is_verified:
         return JSONResponse(content={"message": "Email not verified", "is_exists": True, "is_valid": False, "is_verified": False})
@@ -72,8 +72,8 @@ async def login(request:UserLogin):
     access_token = create_access_token(data={"email": request.email})
     await db_ops.add_refresh_token(request.email, refresh_token, expire.strftime("%Y-%m-%d %H:%M:%S"))
     response = JSONResponse(content={"message": "Login successful", "is_exists": True, "is_valid": True, "is_verified": True})
-    response.set_cookie(key="access_token", value=access_token, httponly=False if is_https else True, secure=is_https)
-    response.set_cookie(key="refresh_token", value=refresh_token, httponly=False if is_https else True, secure=is_https)
+    response.set_cookie(key="access_token", value=access_token, httponly=is_https, secure=is_https)
+    response.set_cookie(key="refresh_token", value=refresh_token, httponly=is_https, secure=is_https)
     return response
 
 @app.get('/me')
