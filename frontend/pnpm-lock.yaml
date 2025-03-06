@@ -75,9 +75,6 @@ importers:
       '@types/country-list':
         specifier: ^2.1.4
         version: 2.1.4
-      '@types/firebase':
-        specifier: ^3.2.3
-        version: 3.2.3
       '@types/lodash':
         specifier: ^4.17.15
         version: 4.17.15
@@ -911,10 +908,6 @@ packages:
 
   '@types/estree@1.0.6':
     resolution: {integrity: sha512-AYnb1nQyY49te+VRAVgmzfcgjYS91mY5P0TKUDCLEM+gNnA+3T6rWITXRLYCpahpqSQbN5cE+gHpnPyXjHWxcw==}
-
-  '@types/firebase@3.2.3':
-    resolution: {integrity: sha512-fId22ajZ7CkTMnm/FveFcEGb7Trv97JsUk1Dvc1vIFDiwpVSGKeTUyBOA2Tr2riXe53ZP526G9WDCrq3ulE7tw==}
-    deprecated: This is a stub types definition. firebase provides its own type definitions, so you do not need this installed.
 
   '@types/hast@3.0.4':
     resolution: {integrity: sha512-WPs+bbQw5aCj+x6laNGWLH3wviHtoCv/P3+otBhbOhJgG8qtpdAMlTCxLtsTWA7LH1Oh/bFCHsBn0TPS5m30EQ==}
@@ -3087,12 +3080,6 @@ snapshots:
       '@types/estree': 1.0.6
 
   '@types/estree@1.0.6': {}
-
-  '@types/firebase@3.2.3':
-    dependencies:
-      firebase: 11.4.0
-    transitivePeerDependencies:
-      - '@react-native-async-storage/async-storage'
 
   '@types/hast@3.0.4':
     dependencies:

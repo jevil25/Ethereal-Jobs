@@ -38,7 +38,6 @@
     "@eslint/js": "^9.20.0",
     "@react-pdf/types": "^2.8.0",
     "@types/country-list": "^2.1.4",
-    "@types/firebase": "^3.2.3",
     "@types/lodash": "^4.17.15",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
