@@ -1,6 +1,6 @@
 import { FileText, Search, Users, MessageSquare } from 'lucide-react';
-import Button from './Button';
-import { useNavigate } from 'react-router-dom';
+import { Button } from '../ui/button';
+import { useNavigate} from 'react-router-dom';
 
 interface FeatureCardProps {
     icon: React.FC<React.SVGProps<SVGSVGElement>>;
@@ -19,7 +19,7 @@ const FeatureCard = ({ icon: Icon, title, description }: FeatureCardProps) => (
 );
 
 const FeaturesSection = () => {
-  const Navigate = useNavigate();
+  const navigate = useNavigate();
 
   const features = [
     {
@@ -71,7 +71,9 @@ const FeaturesSection = () => {
           <p className="text-slate-600 mb-6">
             Ready to accelerate your job search?
           </p>
-          <Button text='Get Started' onClick={() => Navigate("/jobs")}/>
+          <Button onClick={() => navigate('/jobs')} variant={"jobify"} size={"xxl"} className="rounded-4xl">
+            Get Started
+          </Button>
         </div>
       </div>
     </section>

@@ -109,13 +109,14 @@ const Navbar = () => {
                     <div className="flex items-center space-x-4">
                     <span className="text-sm text-gray-700">Hello, {user?.name.split(" ")[0]}</span>
                     <div className="relative">
-                        <button
-                        type="button"
-                        className="bg-black text-white px-4 py-2 rounded-full text-sm font-medium hover:cursor-pointer"
-                        onClick={handleLogout}
+                        <Button
+                            type="button"
+                            className="px-4 py-2 rounded-full text-sm font-medium hover:cursor-pointer"
+                            onClick={handleLogout}
+                            variant='jobify'
                         >
-                        Logout
-                        </button>
+                            Logout
+                        </Button>
                     </div>
                     </div>
                 ) : (
@@ -123,7 +124,7 @@ const Navbar = () => {
                     <Button onClick={() => handleAuthClick(true)} variant={"outline"}>
                         Sign In
                     </Button>
-                    <Button onClick={() => handleAuthClick(false)} variant={"default"}>
+                    <Button onClick={() => handleAuthClick(false)} variant={"jobify"}>
                         Sign Up
                     </Button>
                     </div>

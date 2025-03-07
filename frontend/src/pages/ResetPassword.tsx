@@ -184,8 +184,9 @@ const ResetPasswordPage: React.FC = () => {
 
           <Button
             type="submit"
-            className={`w-full py-3 bg-black text-white rounded-full hover:bg-gray-800 hover:cursor-pointer transition-colors ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
+            className={`w-full py-3 rounded-full hover:bg-gray-800 hover:cursor-pointer transition-colors ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
             disabled={isLoading}
+            variant={"jobify"}
           >
             {isLoading ? 'Resetting...' : 'Reset Password'}
           </Button>
@@ -195,8 +196,9 @@ const ResetPasswordPage: React.FC = () => {
           <p className="text-gray-600">
             Remembered your password?{' '}
             <Button
-              onClick={() => navigate('/signin')}
-              className="text-black font-medium hover:underline focus:outline-none hover:cursor-pointer"
+              onClick={() => navigate('/?login=true')}
+              className="text-black font-medium hover:underline focus:outline-none hover:cursor-pointer pl-1"
+              variant={"link"}
             >
               Sign In
             </Button>

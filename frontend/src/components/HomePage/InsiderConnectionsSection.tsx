@@ -1,9 +1,9 @@
 import { Users, MessageSquare, Building, CheckCircle } from 'lucide-react';
-import Button from './Button';
+import { Button } from '../ui/button';
 import { useNavigate } from 'react-router-dom';
 
 const InsiderConnectionsSection = () => {
-  const Navigate = useNavigate();
+  const navigate = useNavigate();
   return (
     <section className="py-24 bg-white" id="insider-connections">
       <div className="container mx-auto px-4">
@@ -89,7 +89,9 @@ const InsiderConnectionsSection = () => {
           </div>
 
           <div className="text-center">
-            <Button text='Find Your Connections' onClick={() => Navigate("/jobs")} />
+            <Button onClick={() => navigate('/jobs')} variant={"jobify"} size={"xxl"} className="rounded-4xl">
+                Find Your Connections
+            </Button>
           </div>
         </div>
       </div>

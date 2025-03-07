@@ -357,6 +357,7 @@ const AuthForms: React.FC<AuthFormsProps> = ({ isSignIn, setIsSignIn, onClose, s
                 type="submit"
                 className={`w-full py-3 text-white rounded-full transition-colors text-base ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
                 disabled={isLoading}
+                variant={"jobify"}
               >
                 {isLoading ? (
                   <span>Processing...</span>
@@ -384,7 +385,7 @@ const AuthForms: React.FC<AuthFormsProps> = ({ isSignIn, setIsSignIn, onClose, s
               
               <Button
                 type="submit"
-                variant={"default"}
+                variant={"jobify"}
                 className={`w-full py-3 text-white rounded-full transition-colors ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
                 disabled={isLoading}
               >

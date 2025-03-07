@@ -14,6 +14,7 @@ import { AuthProvider } from './providers/AuthProvider';
 import axios from 'axios';
 import { useAuth } from './providers/AuthProvider';
 import VerifyEmailPage from './pages/verify-email';
+import OnboardingFlow from './pages/OnBoarding';
 
 // needed for axios to send cookies
 axios.defaults.withCredentials = true;
@@ -71,6 +72,11 @@ function AppContent() {
         <Route path="/resume" element={
           <RequireAuth>
             <ResumeBuilder />
+          </RequireAuth>
+        } />
+        <Route path='/onboarding' element={
+          <RequireAuth>
+            <OnboardingFlow />
           </RequireAuth>
         } />
         <Route path="*" element={

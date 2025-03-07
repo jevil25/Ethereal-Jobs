@@ -9,7 +9,6 @@ import { ResumePDFCustom } from "./ResumePDFCustom";
 import { DEFAULT_FONT_COLOR } from "../../../lib/redux/settingsSlice";
 import type { Settings, ShowForm } from "../../../lib/redux/settingsSlice";
 import type { Resume } from "../../../lib/redux/types";
-import { SuppressResumePDFErrorMessage } from "./common/SuppressResumePDFErrorMessage";
 import { JSX } from "react";
 
 /**
@@ -132,7 +131,6 @@ export const ResumePDF = ({
           </View>
         </Page>
       </Document>
-      <SuppressResumePDFErrorMessage />
     </>
   );
 };

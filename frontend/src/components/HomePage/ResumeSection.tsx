@@ -1,5 +1,5 @@
 import { CheckCircle, FileText } from 'lucide-react';
-import Button from './Button';
+import { Button } from '../ui/button';
 import { useNavigate } from 'react-router-dom';
 
 const ResumeSection = () => {
@@ -43,7 +43,9 @@ const ResumeSection = () => {
                             ))}
                         </div>
 
-                        <Button text='Create Your Resume Now' onClick={() => {navigate("/resume")}} />
+                        <Button onClick={() => navigate('/resume')} variant={"jobify"} size={"xxl"} className="rounded-4xl">
+                            Create Your Resume Now
+                        </Button>
                     </div>
 
                     {/* Resume Preview Card */}
