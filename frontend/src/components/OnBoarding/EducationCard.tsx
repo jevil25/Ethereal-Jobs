@@ -8,7 +8,7 @@ import { Card, CardContent } from '../ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { CalendarForm } from '../ui/calendar';
 
-interface Education {
+export interface Education {
   id: string;
   school: string;
   degree: string;

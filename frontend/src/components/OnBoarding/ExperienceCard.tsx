@@ -8,7 +8,7 @@ import { X, Plus } from 'lucide-react';
 import { Card, CardContent } from '../ui/card';
 import { CalendarForm } from '../ui/calendar';
 
-interface Experience {
+export interface Experience {
   id: string;
   company: string;
   title: string;

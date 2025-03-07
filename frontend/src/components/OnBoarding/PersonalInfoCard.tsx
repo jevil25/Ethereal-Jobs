@@ -2,7 +2,7 @@ import React from 'react';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 
-interface PersonalInfoData {
+export interface PersonalInfoData {
   headline: string;
   location: string;
   phone: string;

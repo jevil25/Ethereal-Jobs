@@ -3,7 +3,7 @@ import { Label } from '../ui/label';
 import { Button } from '../ui/button';
 import { Upload, File, CheckCircle2, X } from 'lucide-react';
 
-interface ResumeUploadCardProps {
+export interface ResumeUploadCardProps {
   file: File | null;
   updateFile: (file: File | null) => void;
 }

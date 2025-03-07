@@ -3,12 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
 import PersonalInfoCard from '../components/OnBoarding/personalInfoCard';
-import ExperienceCard from '../components/OnBoarding/experienceCard';
-import EducationCard from '../components/OnBoarding/educationCard';
-import SkillsCard from '../components/OnBoarding/skillsCard';
+import ExperienceCard, { Experience } from '../components/OnBoarding/experienceCard';
+import EducationCard, { Education } from '../components/OnBoarding/educationCard';
+import SkillsCard, { SkillsCardProps } from '../components/OnBoarding/skillsCard';
 import JobPreferencesCard from '../components/OnBoarding/JobPreferencesCard';
 import ResumeUploadCard from '../components/OnBoarding/ResumeUploadCard';
-import OnboardingProgress from '../components/OnBoarding/OnboardingProgess';
+import OnboardingProgress from '../components/OnBoarding/progess';
 
 const OnboardingFlow: React.FC = () => {
   const navigate = useNavigate();
@@ -20,9 +20,9 @@ const OnboardingFlow: React.FC = () => {
       phone: '',
       website: '',
     },
-    experience: [] as any[],
-    education: [] as any[],
-    skills: [] as string[],
+    experience: [] as Experience[],
+    education: [] as Education[],
+    skills: [] as SkillsCardProps['data'],
     jobPreferences: {
       jobTypes: [] as string[],
       locations: [] as string[],

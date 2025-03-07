@@ -4,7 +4,7 @@ import { Button } from '../ui/button';
 import { X } from 'lucide-react';
 import { Badge } from '../ui/badge';
 
-interface SkillsCardProps {
+export interface SkillsCardProps {
   data: string[];
   updateData: (data: string[]) => void;
 }
