@@ -3,6 +3,7 @@ import logo from "../../assets/logo.png";
 import AuthForms from '../Auth/AuthForms';
 import { useAuth } from '../../providers/AuthProvider';
 import { useSearchParams } from 'react-router-dom';
+import { Button } from '../ui/button';
 
 const Navbar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -119,18 +120,12 @@ const Navbar = () => {
                     </div>
                 ) : (
                     <div className="flex space-x-4">
-                    <button
-                        onClick={() => handleAuthClick(true)}
-                        className="inline-flex items-center px-4 py-2 text-sm font-medium text-black hover:text-gray-700"
-                    >
+                    <Button onClick={() => handleAuthClick(true)} variant={"outline"}>
                         Sign In
-                    </button>
-                    <button
-                        onClick={() => handleAuthClick(false)}
-                        className="inline-flex items-center px-4 py-2 bg-black text-white rounded-full text-sm font-medium hover:bg-gray-800"
-                    >
+                    </Button>
+                    <Button onClick={() => handleAuthClick(false)} variant={"default"}>
                         Sign Up
-                    </button>
+                    </Button>
                     </div>
                 )}
                 </div>

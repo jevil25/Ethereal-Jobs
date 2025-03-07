@@ -4,6 +4,8 @@ import { checkIfResetPasswordTokenIsValid, updatePasswordWithToken } from '../ap
 import Navbar from '../components/HomePage/Navbar';
 import PasswordConditions from '../components/Auth/PasswordConditions';
 import { checkPasswordConditions } from '../utils/auth';
+import { Button } from '../components/ui/button';
+import { PasswordInput } from '../components/ui/passwordInput';
 
 const ResetPasswordPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -108,12 +110,12 @@ const ResetPasswordPage: React.FC = () => {
             <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
                 {error}
             </div>
-            <button
+            <Button
                 onClick={() => navigate('/signin')}
-                className="w-full py-3 bg-black text-white rounded-full hover:bg-gray-800 transition-colors"
+                className="w-full py-3 rounded-full transition-colors"
             >
                 Go to Sign In
-            </button>
+            </Button>
             </div>
         </div>
     </>);
@@ -146,8 +148,7 @@ const ResetPasswordPage: React.FC = () => {
             <label htmlFor="newPassword" className="block text-gray-700 mb-2">
               New Password
             </label>
-            <input
-              type="password"
+            <PasswordInput
               id="newPassword"
               name="newPassword"
               value={formData.newPassword}
@@ -163,7 +164,7 @@ const ResetPasswordPage: React.FC = () => {
             <label htmlFor="confirmPassword" className="block text-gray-700 mb-2">
               Confirm New Password
             </label>
-            <input
+            <PasswordInput
               type="password"
               id="confirmPassword"
               name="confirmPassword"
@@ -181,24 +182,24 @@ const ResetPasswordPage: React.FC = () => {
             <PasswordConditions password={formData.newPassword} passwordMatchCheck={true} matchPassword={formData.confirmPassword} />
           }
 
-          <button
+          <Button
             type="submit"
             className={`w-full py-3 bg-black text-white rounded-full hover:bg-gray-800 hover:cursor-pointer transition-colors ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
             disabled={isLoading}
           >
             {isLoading ? 'Resetting...' : 'Reset Password'}
-          </button>
+          </Button>
         </form>
 
         <div className="mt-4 text-center">
           <p className="text-gray-600">
             Remembered your password?{' '}
-            <button
+            <Button
               onClick={() => navigate('/signin')}
               className="text-black font-medium hover:underline focus:outline-none hover:cursor-pointer"
             >
               Sign In
-            </button>
+            </Button>
           </p>
         </div>
       </div>

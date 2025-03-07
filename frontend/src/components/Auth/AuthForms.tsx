@@ -8,6 +8,9 @@ import toast from 'react-hot-toast';
 import { Provider } from '../../api/types';
 import PasswordConditions from './PasswordConditions';
 import ResendVerification from './ResendVerification';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { PasswordInput } from '../ui/passwordInput';
 
 interface AuthFormsProps {
     isSignIn: boolean;
@@ -292,19 +295,20 @@ const AuthForms: React.FC<AuthFormsProps> = ({ isSignIn, setIsSignIn, onClose, s
           {/* Conditional rendering based on current form state */}
           {!isForgotPassword ? (
             <>
-              <button
+              <Button
                 type="button"
-                className="w-full bg-white text-gray-500 text-sm border-[1px] border-gray-500 relative p-2.5 rounded-full text-poppins flex justify-center items-center text-center gap-2 mb-2 hover:bg-gray-100 transition-colors hover:cursor-pointer"
+                variant={"outline"}
+                className="w-full text-gray-500 text-sm border-[1px] border-gray-500 relative p-2.5 rounded-full text-poppins flex justify-center items-center text-center gap-2 mb-2 transition-colors"
                 onClick={handleSignInWithGoogle}
               >
                 <div><i className="fa-brands fa-google text-lg"></i></div>
                 <div className='text-sm'>Continue with google</div>
-              </button>
+              </Button>
               
               {!isSignIn && (
                 <div className="mb-4">
                   <label htmlFor="name" className="block text-gray-700 mb-2">Name</label>
-                  <input
+                  <Input
                     type="text"
                     id="name"
                     name="name"
@@ -320,7 +324,7 @@ const AuthForms: React.FC<AuthFormsProps> = ({ isSignIn, setIsSignIn, onClose, s
               
               <div className="mb-4">
                 <label htmlFor="email" className="block text-gray-700 mb-2">Email</label>
-                <input
+                <Input
                   type="email"
                   id="email"
                   name="email"
@@ -335,8 +339,7 @@ const AuthForms: React.FC<AuthFormsProps> = ({ isSignIn, setIsSignIn, onClose, s
               
               <div className="mb-6">
                 <label htmlFor="password" className="block text-gray-700 mb-2">Password</label>
-                <input
-                  type="password"
+                <PasswordInput
                   id="password"
                   name="password"
                   value={formData.password}
@@ -350,9 +353,9 @@ const AuthForms: React.FC<AuthFormsProps> = ({ isSignIn, setIsSignIn, onClose, s
 
               {!isSignIn && formData.password.length > 0 &&<PasswordConditions password={formData.password} />}
               
-              <button
+              <Button
                 type="submit"
-                className={`w-full py-3 bg-black text-white rounded-full hover:bg-gray-800 transition-colors ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                className={`w-full py-3 text-white rounded-full transition-colors text-base ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -360,13 +363,13 @@ const AuthForms: React.FC<AuthFormsProps> = ({ isSignIn, setIsSignIn, onClose, s
                 ) : (
                   <span>{isSignIn ? 'Sign In' : 'Create Account'}</span>
                 )}
-              </button>
+              </Button>
             </>
           ) : (
             <>
               <div className="mb-4">
                 <label htmlFor="email" className="block text-gray-700 mb-2">Email</label>
-                <input
+                <Input
                   type="email"
                   id="email"
                   name="email"
@@ -379,13 +382,14 @@ const AuthForms: React.FC<AuthFormsProps> = ({ isSignIn, setIsSignIn, onClose, s
                 />
               </div>
               
-              <button
+              <Button
                 type="submit"
-                className={`w-full py-3 bg-black text-white rounded-full hover:bg-gray-800 transition-colors ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                variant={"default"}
+                className={`w-full py-3 text-white rounded-full transition-colors ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
                 disabled={isLoading}
               >
                 {isLoading ? 'Sending...' : 'Send Reset Link'}
-              </button>
+              </Button>
             </>
           )}
         </form>
@@ -395,45 +399,49 @@ const AuthForms: React.FC<AuthFormsProps> = ({ isSignIn, setIsSignIn, onClose, s
             <>
               <p className="text-gray-600">
                 {isSignIn ? "Don't have an account?" : "Already have an account?"}
-                <button
+                <Button
                   onClick={toggleForm}
-                  className="ml-2 text-black font-medium hover:underline focus:outline-none"
+                  variant="link"
+                  className="text-base pl-2"
                   disabled={isLoading}
                 >
                   {isSignIn ? 'Sign Up' : 'Sign In'}
-                </button>
+                </Button>
               </p>
               {isSignIn && (
                 <p className="mt-2 text-gray-600">
-                  <button
+                    <Button
                     onClick={() => setIsForgotPassword(true)}
-                    className="text-black font-medium hover:underline focus:outline-none hover:cursor-pointer"
+                    variant="link"
+                    className="text-base"
                     disabled={isLoading}
-                  >
-                    Forgot Password?
-                  </button>
+                    >
+                      Forgot Password?
+                    </Button>
                 </p>
               )}
             </>
           ) : (
             <p className="text-gray-600">
-              <button
-                onClick={handleBackToSignIn}
-                className="text-black font-medium hover:underline focus:outline-none"
-                disabled={isLoading}
+              <Button
+              onClick={handleBackToSignIn}
+              variant="link"
+              className="text-base"
+              disabled={isLoading}
               >
-                Back to Sign In
-              </button>
+              Back to Sign In
+              </Button>
             </p>
-          )}
-        </div>
-        <button
-          className="mt-6 text-gray-500 hover:text-gray-700 text-sm text-center w-full"
-          onClick={onClose}
-          disabled={isLoading}
-        >
-          Cancel
-        </button>
+            )}
+          </div>
+          <Button
+            className="text-gray-500 hover:text-gray-700 text-sm text-center w-full"
+            onClick={onClose}
+            variant="link"
+            disabled={isLoading}
+          >
+            Cancel
+          </Button>
       </div>
     </div>
   );
