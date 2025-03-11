@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
@@ -9,11 +9,17 @@ import SkillsCard, { SkillsCardProps } from '../components/OnBoarding/skillsCard
 import JobPreferencesCard from '../components/OnBoarding/JobPreferencesCard';
 import ResumeUploadCard from '../components/OnBoarding/ResumeUploadCard';
 import OnboardingProgress from '../components/OnBoarding/progess';
+import { FormData } from '../api/types';
+import { updateResumeDetails, getResumeDetails } from '../api/resume';
+import { debounce } from "lodash";
+import { useSearchParams } from 'react-router-dom';
 
 const OnboardingFlow: React.FC = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
-  const [formData, setFormData] = useState({
+  const [firstGetDone, setFirstGetDone] = useState(false);
+  const [firstStepCheckDone, setFirstStepCheckDone] = useState(false);
+  const [formData, setFormData] = useState<FormData>({
     personalInfo: {
       headline: '',
       location: '',
@@ -32,6 +38,49 @@ const OnboardingFlow: React.FC = () => {
     },
     resumeFile: null as File | null,
   });
+  const prevStateRef = useRef(formData);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const updateResumeDetail = async (isOnBoarded: boolean) => {
+    await updateResumeDetails({ data: formData }, isOnBoarded);
+  }
+
+  useEffect(() => {
+    const stepNumber = parseInt(searchParams.get('step') || '0');
+    if (stepNumber > -1 && stepNumber <= steps.length) {
+      setCurrentStep(stepNumber);
+    }
+    setFirstStepCheckDone(true);
+    const getFormData = async () => {
+        const data = await getResumeDetails();
+        setFormData(data);
+        setFirstGetDone(true);
+    };
+    getFormData();
+  }, []);
+
+  useEffect(() => {
+    const hasStateChanged = JSON.stringify(prevStateRef.current) !== JSON.stringify(formData);
+    if (!hasStateChanged && !firstGetDone) {
+        return;
+    }
+    const debouncedSave = debounce(async () => {
+        await updateResumeDetail(false);
+        prevStateRef.current = formData;
+    }, 500);
+    debouncedSave();
+
+    return () => {
+        debouncedSave.cancel();
+    };
+  }
+  , [formData]);
+
+  useEffect(() => {
+    if (!firstStepCheckDone) return;
+    setSearchParams({ step: currentStep.toString() });
+  }
+  , [currentStep]);
 
   const steps = [
     {
@@ -96,8 +145,9 @@ const OnboardingFlow: React.FC = () => {
     },
   ];
 
-  const onComplete = () => {
+  const onComplete = async () => {
     console.log('Onboarding complete!');
+    await updateResumeDetail(true);
 };
 
   const handleNext = () => {
@@ -118,12 +168,10 @@ const OnboardingFlow: React.FC = () => {
   const handleSubmit = async () => {
     // Here you would submit the form data to your backend
     console.log('Submitting form data:', formData);
-    
     // Call the onComplete callback to finish onboarding
-    onComplete();
-    
-    // Navigate to dashboard or profile page
-    navigate('/dashboard');
+    await onComplete();
+    console.log('Onboarding complete!');
+    navigate('/jobs?onboardingcompleted=true');
   };
 
   const handleSkip = () => {

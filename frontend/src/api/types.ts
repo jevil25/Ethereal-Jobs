@@ -1,4 +1,6 @@
-import { RootState } from "../lib/redux/store";
+import { Experience } from "@/components/OnBoarding/experienceCard";
+import { Education } from "@/components/OnBoarding/educationCard";
+import { SkillsCardProps } from "@/components/OnBoarding/skillsCard";
 
 interface GetJobsRequest {
     city: string;
@@ -9,11 +11,12 @@ interface GetJobsRequest {
 }
 
 interface ResumeSaveRequest {
-    state: RootState;
+    data: FormData;
 }
 
 interface ResumeSaveResponse {
-    email?: string;
+    message: string;
+    is_updated: boolean;
 }
 
 interface LinkedInGenerateMessageRequest {
@@ -89,6 +92,7 @@ interface UserSigninResponse {
     is_exists: boolean;
     is_valid: boolean;
     is_verified: boolean;
+    is_onboarded: boolean;
 }
 
 interface ResetPasswordRequest {
@@ -143,6 +147,31 @@ interface verifyEmailResponse {
     email?: string;
 }
 
+interface PersonalInfo {
+    headline: string;
+    location: string;
+    phone: string;
+    website: string;
+}
+
+interface JobPreferences {
+    jobTypes: string[];
+    locations: string[];
+    remotePreference: string;
+    salaryExpectation: string;
+    immediateStart: boolean;
+}
+
+interface FormData {
+    personalInfo: PersonalInfo;
+    experience: Experience[];
+    education: Education[];
+    skills: SkillsCardProps['data'];
+    jobPreferences: JobPreferences;
+    resumeFile: File | null;
+    no_resume_found?: boolean;
+}
+
 
 export type {
     ResumeSaveRequest,
@@ -168,6 +197,9 @@ export type {
     sendVerificationEmailResponse,
     verifyEmailRequest,
     verifyEmailResponse,
+    FormData,
+    PersonalInfo,
+    JobPreferences,
 }
 
 export {

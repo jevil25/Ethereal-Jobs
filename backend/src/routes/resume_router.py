@@ -1,56 +1,36 @@
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
-from typing import Dict
+from src.decorators.auth import is_user_logged_in
 from src.db.mongo import DatabaseOperations
 from src.logger import logger
+from fastapi import Request, status
+from src.db.model import ResumeUpdate, User
 
 app = APIRouter(prefix="/resume")
 db_ops = DatabaseOperations()
 
-@app.post("/save")
-async def save_resume(email: str, resume: Dict) -> Dict:
-    logger.info("Saving resume")
-    resume_id = await db_ops.save_resume(email, resume)
-    return JSONResponse(
-        content={"resume_id": resume_id},
-        media_type="application/json"
-    )
-
-@app.get("/{email}")
-async def get_resume(email: str) -> Dict:
+@app.get("/")
+@is_user_logged_in
+async def get_resume(request: Request):
+    email = request.state.user.email
     logger.info(f"Getting resume {email}")
-    resume = await db_ops.get_resume(email)
+    resume = await db_ops.get_user_resume(email)
     if not resume:
         return JSONResponse(
-            content={"message": "Resume not found"},
+            content={"message": "Resume not found", "no_resume_found": True},
             media_type="application/json",
             status_code=200
         )
     
-    resume_dict = resume.__dict__
-    fields_to_remove = ["_id", "updatedAt", "createdAt"]
+    resume_dict = resume.model_dump()
+    fields_to_remove = ["id", "updatedAt", "createdAt"]
     for field in fields_to_remove:
         resume_dict.pop(field)
     return JSONResponse(content=resume_dict, media_type="application/json")
 
-@app.put("/{email}")
-async def update_resume(email: str, resume: Dict) -> Dict:
-    logger.info(f"Updating resume {email}")
-    result = await db_ops.update_resume(email, resume)
-    
-    if not result:
-        email = await db_ops.save_resume(email, resume)
-        return JSONResponse(
-            content={"email": email},
-            media_type="application/json",
-            status_code=201
-        )
-    
-    resume_dict = result.__dict__
-    fields_to_remove = ["_id", "updatedAt", "createdAt"]
-    for field in fields_to_remove:
-        resume_dict.pop(field)
-    return JSONResponse(
-        content={"email": resume_dict},
-        media_type="application/json"
-    )
+@app.post("/")
+@is_user_logged_in
+async def update_onboarding(request: Request, data: ResumeUpdate):
+    user: User = request.state.user
+    await db_ops.update_onboarding_status(user.email, data, data.is_onboarded)
+    return JSONResponse(content={"message": "Onboarding status updated", "is_updated": True}, status_code=status.HTTP_200_OK)

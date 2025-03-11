@@ -26,7 +26,9 @@ def is_user_logged_in(func):
         if not user:
             raise HTTPException(status_code=200, detail="User does not exist")
         user.password = None
-        
+
+
+        print("User is logged in")
         request.state.user = user
         return await func(request, *args, **kwargs)
     

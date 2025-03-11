@@ -85,6 +85,7 @@ class User(Document):
     password: str
     provider: str
     is_verified: bool = False
+    is_onboarded: bool = False
     
     # Timestamp fields
     createdAt: datetime = Field(default_factory=datetime.utcnow)
@@ -159,25 +160,11 @@ class VerificationToken(Document):
             [("expire", -1)],
         ]
 
-class Resume(Document):
-    user_email: Indexed(str) # type: ignore
-    resume: dict
-    
-    # Timestamp fields
-    createdAt: datetime = Field(default_factory=datetime.utcnow)
-    updatedAt: datetime = Field(default_factory=datetime.utcnow)
-
-    class Settings:
-        name = "resumes"
-        indexes = [
-            [("user_email", 1)],
-        ]
-
 class LinkedMessages(Document):
     email: Indexed(str) # type: ignore
     company: Indexed(str) # type: ignore
     position: Indexed(str) # type: ignore
-    message: dict
+    message: str
     
     # Timestamp fields
     createdAt: datetime = Field(default_factory=datetime.utcnow)
@@ -226,3 +213,65 @@ class CheckToken(BaseModel):
     is_expired: bool
     is_valid: bool
     
+class PersonalInfo(BaseModel):
+    headline: str
+    location: str
+    phone: str
+    website: str
+
+class JobPreferences(BaseModel):
+    jobTypes: List[str]
+    locations: List[str]
+    remotePreference: str
+    salaryExpectation: str
+    immediateStart: bool
+
+class Experience(BaseModel):
+    id: str
+    company: str
+    title: str
+    location: str
+    startDate: str
+    endDate: str
+    current: bool
+    description: str
+
+class Education(BaseModel):
+    id: str
+    school: str
+    degree: str
+    fieldOfStudy: str
+    startDate: str
+    endDate: str
+    current: bool
+    grade: Optional[str] = None
+
+class SkillsCardProps(BaseModel):
+    data: List[str]
+
+class ResumeModel(Document):
+    email: Indexed(str) # type: ignore
+    personalInfo: PersonalInfo
+    experience: List[Experience]
+    education: List[Education]
+    skills: List[str]
+    jobPreferences: JobPreferences
+    resumeFile: Optional[str] = None
+    
+    # Timestamp fields
+    createdAt: datetime = Field(default_factory=datetime.utcnow)
+    updatedAt: datetime = Field(default_factory=datetime.utcnow)
+
+    class Settings:
+        name = "resume"
+        indexes = [
+            [("email", 1)],
+        ]
+class ResumeUpdate(BaseModel):
+    personalInfo: PersonalInfo
+    experience: List[Experience]
+    education: List[Education]
+    skills: List[str]
+    jobPreferences: JobPreferences
+    resumeFile: Optional[str] = None
+    is_onboarded: bool

@@ -39,4 +39,5 @@ export interface JobData {
 export interface User {
     email: string;
     name: string;
+    is_onboarded: boolean;
 }

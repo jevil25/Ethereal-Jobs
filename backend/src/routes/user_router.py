@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 import os
 
 from src.email.email_sender import send_verification_email, send_password_reset_email
-from src.db.model import User, UserLogin, ResetPassword, UserUpdatePassword
+from src.db.model import ResumeModel, User, UserLogin, ResetPassword, UserUpdatePassword
 from src.utils.jwttoken import create_access_token, create_refresh_token, verify_token
 from src.utils.hashing import Hash
 from fastapi import status, APIRouter
@@ -64,14 +64,14 @@ async def login(request:UserLogin):
     user = await db_ops.get_user(request.email)
     if not user:
         return JSONResponse(content={"message": "User does not exist", "is_exists": False, "is_valid": False, "is_verified": False})
-    if user.provider == "custom" and not Hash.verify(user.password, request.password):
+    if user.provider == "custom" and not request.provider=="google" and not Hash.verify(user.password, request.password):
         return JSONResponse(content={"message": "Invalid credentials", "is_exists": True, "is_valid": False, "is_verified": False})
     if not user.is_verified:
         return JSONResponse(content={"message": "Email not verified", "is_exists": True, "is_valid": False, "is_verified": False})
     refresh_token, expire = create_refresh_token()
     access_token = create_access_token(data={"email": request.email})
     await db_ops.add_refresh_token(request.email, refresh_token, expire.strftime("%Y-%m-%d %H:%M:%S"))
-    response = JSONResponse(content={"message": "Login successful", "is_exists": True, "is_valid": True, "is_verified": True})
+    response = JSONResponse(content={"message": "Login successful", "is_exists": True, "is_valid": True, "is_verified": True, "is_onboarded": user.is_onboarded})
     response.set_cookie(key="access_token", value=access_token, httponly=is_https, secure=is_https, samesite='none')
     response.set_cookie(key="refresh_token", value=refresh_token, httponly=is_https, secure=is_https, samesite='none')
     return response

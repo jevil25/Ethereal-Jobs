@@ -4,15 +4,16 @@ from datetime import datetime
 from src.db.model import (
     JobQuery, 
     JobModel, 
-    LinkedInProfile, 
+    LinkedInProfile,
+    ResumeUpdate, 
     User, 
     RefreshToken, 
     ResetPasswordToken, 
     CheckToken,
     CompanyLinkedInProfiles,
     VerificationToken,
-    Resume,
     LinkedMessages,
+    ResumeModel
 )
 
 from beanie import init_beanie
@@ -53,8 +54,8 @@ class DatabaseOperations:
                 RefreshToken, 
                 ResetPasswordToken,
                 VerificationToken,
-                Resume,
                 LinkedMessages,
+                ResumeModel,
             ]
         )
 
@@ -404,51 +405,6 @@ class DatabaseOperations:
         
         return True
     
-    async def get_resume(self, email: str):
-        """
-        Get a resume from the database.
-        
-        Args:
-            resume_id (str): Resume ID
-        
-        Returns:
-            Optional[dict]: Resume data or None
-        """
-        result =  await Resume.find_one({"user_email": email})
-        return result if result else None
-    
-    async def save_resume(self, email: str, resume: dict):
-        """
-        Save a resume to the database.
-        
-        Args:
-            email (str): User email
-            resume (dict): Resume data
-        
-        Returns:
-            str: Inserted resume ID
-        """
-        new_resume = Resume(user_email=email, resume=resume)
-        await new_resume.save()
-        return str(new_resume.id)
-    
-    async def update_resume(self, email: str, resume: dict):
-        """
-        Update a resume in the database.
-        
-        Args:
-            email (str): User email
-            resume (dict): Resume data
-        
-        Returns:
-            str: Updated resume ID
-        """
-        resume_doc = await Resume.find_one({"user_email": email})
-        if resume_doc:
-            resume_doc.resume = resume
-            await resume_doc.save()
-        return str(resume_doc.id)
-    
     async def get_job(self, job_id: str):
         """
         Get a job from the database.
@@ -501,4 +457,45 @@ class DatabaseOperations:
             await message_doc.save()
         else:
             return await self.save_linked_message(email, company, position, message)
+        
+    async def update_onboarding_status(self, email: str, resume_data: ResumeUpdate, is_onboarded: bool):
+        """
+        Update the onboarding status of a user.
+        """
+        user = await User.find_one({"email": email})
+        if user:
+            resume = await self.get_user_resume(email)
+            resume_data_to_insert = ResumeModel(
+                email=email,
+                personalInfo=resume_data.personalInfo,
+                experience=resume_data.experience,
+                education=resume_data.education,
+                skills=resume_data.skills,
+                jobPreferences=resume_data.jobPreferences,
+                resumeFile=resume_data.resumeFile
+            )
+            if not resume:
+                print("Inserting new resume")
+                await ResumeModel.insert(resume_data_to_insert)
+            else:
+                print("Updating existing resume")
+                resume.personalInfo = resume_data.personalInfo
+                resume.experience = resume_data.experience
+                resume.education = resume_data.education
+                resume.skills = resume_data.skills
+                resume.jobPreferences = resume_data.jobPreferences
+                resume.resumeFile = resume_data.resumeFile
+                await resume.save()
+            if not user.is_onboarded:
+                user.is_onboarded = is_onboarded
+            await user.save()
+        return user
+    
+    async def get_user_resume(self, email: str):
+        """
+        Get a user's resume from the database.
+        """
+        resume = await ResumeModel.find_one({"email": email})
+        return resume
+    
     

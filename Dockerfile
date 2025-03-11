@@ -10,6 +10,9 @@ COPY backend/requirements.txt .
 # Install project dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
+# install antiword
+RUN apt-get update && apt-get install -y antiword
+
 # Copy the rest of the application code
 COPY backend .
 

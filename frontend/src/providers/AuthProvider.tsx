@@ -36,7 +36,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       const result = await userMe();
       if (!result.needsLogin && result.user) {
-        console.log('User data:', result.user);
         setUser(result.user);
         setError(null);
       } else {

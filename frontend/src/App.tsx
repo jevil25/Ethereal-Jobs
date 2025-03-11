@@ -7,7 +7,7 @@ import ResumeBuilder from './pages/ResumeBuilder';
 import NotFoundPage from './pages/404';
 import HomePage from './pages/HomePage';
 import ResetPasswordPage from './pages/ResetPassword';
-import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate, useLocation, useSearchParams } from 'react-router-dom';
 import { Provider } from "react-redux";
 import { store } from "./lib/redux/store";
 import { AuthProvider } from './providers/AuthProvider';
@@ -23,7 +23,7 @@ function App() {
   return (
     <>
       <div className="App">
-        <main className='bg-gray-50'>
+        <main className=''>
           <Provider store={store}>
             <Router>
               <AuthProvider>
@@ -43,6 +43,19 @@ function RequireAuth({ children }: { children: ReactNode }) {
   
   if (!user) {
     return <Navigate to="/?login=true&feature-box=true" replace />;
+  }
+
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const onboardingCompleted = searchParams.get('onboardingcompleted');
+  if (location.pathname === "jobs" && onboardingCompleted === 'true') {
+    console.log('onboarding completed');
+    return;
+  }
+  console.log(`user is onboarded: ${user}`);
+  if (!user.is_onboarded && location.pathname !== '/onboarding') {
+    console.log('onboarding not completed');
+    return <Navigate to="/onboarding" replace />;
   }
   
   return <>{children}</>;

@@ -118,6 +118,9 @@ const AuthForms: React.FC<AuthFormsProps> = ({ isSignIn, setIsSignIn, onClose, s
               password: '',
               name: ''
             });
+            if (!response.is_onboarded) {
+              navigate('/onboarding');
+            }
           }, 1500);
         } else {
           if (!response.is_exists) {

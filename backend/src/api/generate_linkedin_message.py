@@ -1,8 +1,9 @@
+from datetime import datetime
 import os
 from typing import Dict, List
+from src.db.model import Experience, ResumeModel
 from src.logger import logger
 # from transformers import pipeline, set_seed, AutoModelForCausalLM, AutoTokenizer
-import json
 from google import genai
 import dotenv
 
@@ -33,6 +34,7 @@ class EnhancedLinkedInMessageGenerator:
         # set_seed(42)    
        # Enhanced templates with more natural language and better context integration
         self.prompt = """
+        your are professional writer who is skilled in writing professional linkedin referral messages
     Write a short and professional LinkedIn referral message  that i can send to the employee working at [Company].
     The message should introduce me and highlight my key skills or experience. 
     Keep it concise and offer to provide more details if needed.
@@ -41,6 +43,9 @@ class EnhancedLinkedInMessageGenerator:
     Do not add any self reference like here is the message or I am referring.
     Do not say you are generating i only need the message.
     this should be in first person
+    keep it short, dont halucinate, try to reason if any data is not right in place and avoid any unnecessary fluff
+    keep it short like 2-3 lines
+    ignore any sentence that is having [some variable] since those data is missing and should be ignored
 
     here is my resume:
     [Sender_Name] is a [YOE] professional currently working as a [Current_Work].
@@ -50,13 +55,13 @@ class EnhancedLinkedInMessageGenerator:
     I am ssking referral for [Target_Role] at [Company] to [Name].
 """
 
-    def format_experience(self, resume: Dict) -> str:
+    def format_experience(self, experience: List[Experience]) -> str:
         """Calculate years of experience and format current role details"""
-        if not resume.get('workExperiences'):
+        if len(experience) == 0:
             return "recent graduate"
             
-        current_role = resume['workExperiences'][0]
-        return f"{current_role['jobTitle']} at {current_role['company']}"
+        current_role = experience[0]
+        return f"{current_role.title} at {current_role.company}"
 
     def get_key_skills(self, resume: Dict, limit: int = 3) -> str:
         """Extract and format key skills from resume"""
@@ -105,8 +110,6 @@ class EnhancedLinkedInMessageGenerator:
                 '[Current_Project]': resume.get('projects', [{'project': 'various development projects'}])[0]['project'],
                 '[Sender_Name]': resume["profile"]["name"],
             }
-
-            logger.info(f"Message context: {json.dumps(message_context)}")
             
             base_message = self.prompt
             
@@ -142,35 +145,51 @@ class EnhancedLinkedInMessageGenerator:
             print(f"Error generating message: {str(e)}")
             return base_message
         
-    def generate_message_using_gemini(self, params: Dict, company: str, position: str) -> str:
-        resume = params['resume']
-        recipient = params.get('recipient', {})
+    def format_years_of_experience(self, experience: List[Experience]) -> str:
+        """Calculate years of experience"""
+        if len(experience) == 0:
+            return "0 years"
+            
+        current_role = experience[0]
+        start_date = current_role.startDate
+        end_date = experience[-1].endDate
+        start_date = int(start_date.split("-")[0])
+        print(start_date, end_date)
+        if end_date != "":
+            end_date = int(end_date.split("-")[0])
+        else:
+            end_date = datetime.now().year
+
+        if end_date - start_date == 0:
+            return "less than a year"
+        return f"{end_date - start_date} years"
         
+    def generate_message_using_gemini(self, params: ResumeModel, company: str, position: str, name: str) -> str:
         try:
             # Prepare context variables
-            current_experience = self.format_experience(resume)
-            key_skills = self.get_key_skills(resume)
-            achievement_context = self.get_achievement_context(resume)
+            current_experience = self.format_experience(params.experience)
+            key_skills = ",".join(params.skills)
+            years_of_experience = self.format_years_of_experience(params.experience)
+            # achievement_context = self.get_achievement_context(params.projects)
             
             # Fill template with dynamic content
             message_context = {
-                '[Name]': resume.get('name', '{{LinkedIn User}}'),
+                '[Name]': '{{LinkedIn User}}',
                 '[Company]': company,
                 '[Target_Role]': position,
-                '[YOE]': current_experience,
+                '[YOE]': years_of_experience,
                 '[Skills]': key_skills,
                 '[Current_Work]': current_experience,
-                '[Achievement_Context]': achievement_context,
-                '[Current_Project]': resume.get('projects', [{'project': 'various development projects'}])[0]['project'],
-                '[Sender_Name]': resume["profile"]["name"],
+                # '[Achievement_Context]': achievement_context,
+                # '[Current_Project]': resume.get('projects', [{'project': 'various development projects'}])[0]['project'],
+                '[Sender_Name]': name,
             }
-
-            logger.info(f"Message context: {json.dumps(message_context)}")
-            
             base_message = self.prompt
             
             for key, value in message_context.items():
                 base_message = base_message.replace(key, value)
+            
+            print(base_message)
             
             response = client.models.generate_content(
                 model="gemini-2.0-flash",
@@ -180,21 +199,29 @@ class EnhancedLinkedInMessageGenerator:
             # Clean and format the final message
             final_message = response.text.strip()
             if not any(ending in final_message.lower() for ending in ['thank', 'regards', 'best']):
-                final_message += f"\n\nBest regards,\n{resume.get('name', '')}"
+                final_message += f"\n\nBest regards,\n{name}"
             
             return {
                 "message": final_message,
                 "status": "success",
                 "metadata": {
                     "template_used": False,
-                    "skills_included": self.get_key_skills(params['resume']),
-                    "achievement_context_included": bool(self.get_achievement_context(params['resume']))
+                    "skills_included": key_skills,
+                    # "achievement_context_included": bool(self.get_achievement_context(params['resume']))
                 }
             }
             
         except Exception as e:
             print(f"Error generating message: {str(e)}")
-            return base_message
+            return {
+                "message": "Error generating message",
+                "status": "error",
+                "metadata": {
+                    "template_used": False,
+                    "skills_included": key_skills,
+                    # "achievement_context_included": bool(self.get_achievement_context(params['resume']))
+                }
+            }
 
     def generate_message_response(self, params: Dict, company: str, position: str) -> Dict:
         """Generate a response suitable for an API"""
@@ -212,7 +239,7 @@ class EnhancedLinkedInMessageGenerator:
         """Generate multiple message variants"""
         return [self.generate_message_response(**params) for _ in range(num_variants)]
     
-def generate_message_api_response(params: Dict, company: str, position: str) -> Dict:
+def generate_message_api_response(params: ResumeModel, company: str, position: str, name: str) -> Dict:
     """Generate a message response suitable for an API"""
     generator = EnhancedLinkedInMessageGenerator()
-    return generator.generate_message_using_gemini(params, company, position)
+    return generator.generate_message_using_gemini(params, company, position, name)
