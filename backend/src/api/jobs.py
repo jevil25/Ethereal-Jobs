@@ -23,7 +23,7 @@ def get_jobs(city: str, country_code: str, country: str, job_title: str, recruit
              results_wanted: int = 20, job_type: Optional[JobType] = None, 
              is_remote: Optional[bool] = None, distance: Optional[int] = None):
     # TODO: add bayt in future if improved
-    supported_recruiters = ["indeed", "linkedin", "zip_recruiter", "glassdoor", "google"]
+    supported_recruiters = ["indeed",  "zip_recruiter", "glassdoor", "google"]
     if len(recruiters) > 0:
         for recruiter in recruiters:
             if recruiter not in supported_recruiters:

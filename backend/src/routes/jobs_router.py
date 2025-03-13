@@ -56,8 +56,13 @@ async def get_jobs(
     print(f"lengeth of cached jobs: {len(cached_jobs)}")
 
     if len(cached_jobs) > 10:
+        json_response = [job.model_dump() for job in cached_jobs]
+        fields_to_remove = ["query", "createdAt", "updatedAt"]
+        for job in json_response:
+            for field in fields_to_remove:
+                job.pop(field)
         return JSONResponse(
-            content=[job.model_dump() for job in cached_jobs],
+            content=json_response,
             media_type="application/json"
         )
 

@@ -470,6 +470,8 @@ class DatabaseOperations:
                 personalInfo=resume_data.personalInfo,
                 experience=resume_data.experience,
                 education=resume_data.education,
+                projects=resume_data.projects,
+                certifications=resume_data.certifications,
                 skills=resume_data.skills,
                 jobPreferences=resume_data.jobPreferences,
                 resumeFile=resume_data.resumeFile
@@ -482,6 +484,8 @@ class DatabaseOperations:
                 resume.personalInfo = resume_data.personalInfo
                 resume.experience = resume_data.experience
                 resume.education = resume_data.education
+                resume.projects = resume_data.projects
+                resume.certifications = resume_data.certifications
                 resume.skills = resume_data.skills
                 resume.jobPreferences = resume_data.jobPreferences
                 resume.resumeFile = resume_data.resumeFile

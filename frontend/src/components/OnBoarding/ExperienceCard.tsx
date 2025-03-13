@@ -25,8 +25,9 @@ interface ExperienceCardProps {
 }
 
 const ExperienceCard: React.FC<ExperienceCardProps> = ({ data, updateData }) => {
-  const [isAdding, setIsAdding] = useState(false);
-  const [newExperience, setNewExperience] = useState<Experience>({
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [currentExperience, setCurrentExperience] = useState<Experience>({
     id: '',
     company: '',
     title: '',
@@ -36,62 +37,83 @@ const ExperienceCard: React.FC<ExperienceCardProps> = ({ data, updateData }) => 
     current: false,
     description: '',
   });
+  const [editingExperience, setEditingExperience] = useState<Experience>()
 
-  const handleStartDateChange = (date: Date | undefined) => {
+  const resetForm = () => {
+    setCurrentExperience({
+      id: '',
+      company: '',
+      title: '',
+      location: '',
+      startDate: '',
+      endDate: '',
+      current: false,
+      description: '',
+    });
+    setEditingExperience(undefined);
+    setIsFormOpen(false);
+    setIsEditing(false);
+  };
+
+  const handleDateChange = (field: 'startDate' | 'endDate', date: Date | undefined) => {
     if (!date) return;
     const offset = date.getTimezoneOffset();
     date = new Date(date.getTime() - (offset * 60 * 1000));
-    setNewExperience({
-      ...newExperience,
-      startDate: date.toISOString().split('T')[0],
+    setCurrentExperience({
+      ...currentExperience,
+      [field]: date.toISOString().split('T')[0],
     });
   };
 
-  const handleEndDateChange = (date: Date | undefined) => {
-    if (!date) return;
-    const offset = date.getTimezoneOffset();
-    date = new Date(date.getTime() - (offset * 60 * 1000));
-    setNewExperience({
-      ...newExperience,
-      endDate: date.toISOString().split('T')[0],
-    });
-  }
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setNewExperience({
-      ...newExperience,
+    setCurrentExperience({
+      ...currentExperience,
       [name]: value,
     });
   };
 
   const handleCheckboxChange = (checked: boolean) => {
-    setNewExperience({
-      ...newExperience,
+    setCurrentExperience({
+      ...currentExperience,
       current: checked,
-      endDate: checked ? '' : newExperience.endDate,
+      endDate: checked ? '' : currentExperience.endDate,
     });
   };
 
-  const addExperience = () => {
-    if (newExperience.company && newExperience.title) {
-      const experienceToAdd = {
-        ...newExperience,
-        id: Date.now().toString(),
-      };
-      updateData([...data, experienceToAdd]);
-      setNewExperience({
-        id: '',
-        company: '',
-        title: '',
-        location: '',
-        startDate: '',
-        endDate: '',
-        current: false,
-        description: '',
-      });
-      setIsAdding(false);
+  const saveExperience = () => {
+    if (currentExperience.company && currentExperience.title) {
+      if (isEditing) {
+        // Update existing experience
+        updateData(
+          data.map(item => 
+            item.id === currentExperience.id ? currentExperience : item
+          )
+        );
+        setEditingExperience(undefined);
+      } else {
+        // Add new experience
+        const experienceToAdd = {
+          ...currentExperience,
+          id: Date.now().toString(),
+        };
+        updateData([...data, experienceToAdd]);
+      }
+      resetForm();
     }
+  };
+
+  const startEditing = (experience: Experience) => {
+    setCurrentExperience({ ...experience });
+    setEditingExperience(experience);
+    setIsEditing(true);
+    setIsFormOpen(true);
+  };
+
+  const addNew = () => {
+    resetForm();
+    setIsFormOpen(true);
+    setIsEditing(false);
   };
 
   const removeExperience = (id: string) => {
@@ -102,8 +124,16 @@ const ExperienceCard: React.FC<ExperienceCardProps> = ({ data, updateData }) => 
     <div className="space-y-4">
       {data.length > 0 && (
         <div className="space-y-4">
-          {data.map((exp) => (
+          {data.filter((value) => (value.id != editingExperience?.id)).map((exp) => (
             <Card key={exp.id} className="relative">
+              <Button
+                variant="outline"
+                size="sm"
+                className="absolute top-2 left-2"
+                onClick={() => startEditing(exp)}
+              >
+                Edit
+              </Button>
               <Button
                 variant="ghost"
                 size="icon"
@@ -115,6 +145,9 @@ const ExperienceCard: React.FC<ExperienceCardProps> = ({ data, updateData }) => 
               <CardContent className="pt-6">
                 <div className="font-medium">{exp.title}</div>
                 <div className="text-sm text-gray-500">{exp.company}</div>
+                {exp.location && (
+                  <div className="text-sm text-gray-500">{exp.location}</div>
+                )}
                 <div className="text-xs text-gray-400">
                   {exp.startDate} - {exp.current ? 'Present' : exp.endDate}
                 </div>
@@ -127,9 +160,9 @@ const ExperienceCard: React.FC<ExperienceCardProps> = ({ data, updateData }) => 
         </div>
       )}
 
-      {!isAdding ? (
+      {!isFormOpen ? (
         <Button
-          onClick={() => setIsAdding(true)}
+          onClick={addNew}
           variant="outline"
           className="w-full"
         >
@@ -144,7 +177,7 @@ const ExperienceCard: React.FC<ExperienceCardProps> = ({ data, updateData }) => 
               id="title"
               name="title"
               placeholder="e.g., Software Engineer"
-              value={newExperience.title}
+              value={currentExperience.title}
               onChange={handleChange}
             />
           </div>
@@ -155,7 +188,7 @@ const ExperienceCard: React.FC<ExperienceCardProps> = ({ data, updateData }) => 
               id="company"
               name="company"
               placeholder="e.g., Acme Inc."
-              value={newExperience.company}
+              value={currentExperience.company}
               onChange={handleChange}
             />
           </div>
@@ -166,7 +199,7 @@ const ExperienceCard: React.FC<ExperienceCardProps> = ({ data, updateData }) => 
               id="location"
               name="location"
               placeholder="e.g., San Francisco, CA"
-              value={newExperience.location}
+              value={currentExperience.location}
               onChange={handleChange}
             />
           </div>
@@ -175,17 +208,17 @@ const ExperienceCard: React.FC<ExperienceCardProps> = ({ data, updateData }) => 
             <div className="space-y-2">
               <Label htmlFor="startDate">Start Date</Label>
               <CalendarForm
-                value={newExperience.startDate ? new Date(newExperience.startDate) : undefined}
-                setValue={handleStartDateChange}
+                value={currentExperience.startDate ? new Date(currentExperience.startDate) : undefined}
+                setValue={(date) => handleDateChange('startDate', date)}
               />
             </div>
             
             <div className="space-y-2">
               <Label htmlFor="endDate">End Date</Label>
               <CalendarForm
-                value={newExperience.endDate ? new Date(newExperience.endDate) : undefined}
-                setValue={handleEndDateChange}
-                disabled={newExperience.current}
+                value={currentExperience.endDate ? new Date(currentExperience.endDate) : undefined}
+                setValue={(date) => handleDateChange('endDate', date)}
+                disabled={currentExperience.current}
               />
             </div>
           </div>
@@ -193,7 +226,7 @@ const ExperienceCard: React.FC<ExperienceCardProps> = ({ data, updateData }) => 
           <div className="flex items-center space-x-2">
             <Checkbox 
               id="current" 
-              checked={newExperience.current}
+              checked={currentExperience.current}
               onCheckedChange={handleCheckboxChange}
             />
             <Label htmlFor="current" className="text-sm font-normal">
@@ -207,18 +240,18 @@ const ExperienceCard: React.FC<ExperienceCardProps> = ({ data, updateData }) => 
               id="description"
               name="description"
               placeholder="Describe your responsibilities and achievements..."
-              value={newExperience.description}
+              value={currentExperience.description}
               onChange={handleChange}
               rows={4}
             />
           </div>
           
           <div className="flex justify-end space-x-2">
-            <Button variant="outline" onClick={() => setIsAdding(false)}>
+            <Button variant="outline" onClick={resetForm}>
               Cancel
             </Button>
-            <Button variant="jobify" onClick={addExperience}>
-              Add Experience
+            <Button variant="jobify" onClick={saveExperience}>
+              {isEditing ? 'Update Experience' : 'Add Experience'}
             </Button>
           </div>
         </div>

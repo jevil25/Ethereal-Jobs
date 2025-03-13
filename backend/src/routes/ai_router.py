@@ -51,8 +51,10 @@ async def generate_linkedin_message(request: Request, email: str, company: str, 
     return JSONResponse(content=linkedin_message, media_type="application/json")
 
 @app.post("/extract/resume")
-async def extract_resume(file: UploadFile = File(...)):
+@is_user_logged_in
+async def extract_resume(request: Request, file: UploadFile = File(...)):
     try:
+        user = request.state.user
         file_path = file.filename
         with open(file_path, "wb") as f:
             content = await file.read()
@@ -62,10 +64,12 @@ async def extract_resume(file: UploadFile = File(...)):
         text = convert_to_plain_text(file_path) if not is_pdf else ""
         result = ats_extractor(file_path, text, is_pdf)
 
+        result["email"] = user.email
+
         os.remove(file_path)
-        return {"extracted_data": result}
+        return {"extracted_data": result, "is_success": True}
     except Exception as e:
-        return {"error": str(e)}
+        return {"error": str(e), "is_success": False}
 
 @app.get("/search/suggestions/job_title")
 def get_search_suggestions(query: str) -> Dict:

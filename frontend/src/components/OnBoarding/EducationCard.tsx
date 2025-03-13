@@ -25,8 +25,9 @@ interface EducationCardProps {
 }
 
 const EducationCard: React.FC<EducationCardProps> = ({ data, updateData }) => {
-  const [isAdding, setIsAdding] = useState(false);
-  const [newEducation, setNewEducation] = useState<Education>({
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [currentEducation, setCurrentEducation] = useState<Education>({
     id: '',
     school: '',
     degree: '',
@@ -36,69 +37,90 @@ const EducationCard: React.FC<EducationCardProps> = ({ data, updateData }) => {
     current: false,
     grade: '',
   });
+  const [editingEducation, setEditingEducation] = useState<Education>();
 
-  const handleStartDateChange = (date: Date | undefined) => {
+  const resetForm = () => {
+    setCurrentEducation({
+      id: '',
+      school: '',
+      degree: '',
+      fieldOfStudy: '',
+      startDate: '',
+      endDate: '',
+      current: false,
+      grade: '',
+    });
+    setEditingEducation(undefined);
+    setIsFormOpen(false);
+    setIsEditing(false);
+  };
+
+  const handleDateChange = (field: 'startDate' | 'endDate', date: Date | undefined) => {
     if (!date) return;
     const offset = date.getTimezoneOffset();
     date = new Date(date.getTime() - (offset * 60 * 1000));
-    setNewEducation({
-      ...newEducation,
-      startDate: date.toISOString().split('T')[0],
+    setCurrentEducation({
+      ...currentEducation,
+      [field]: date.toISOString().split('T')[0],
     });
-  }
-
-  const handleEndDateChange = (date: Date | undefined) => {
-    if (!date) return;
-    const offset = date.getTimezoneOffset();
-    date = new Date(date.getTime() - (offset * 60 * 1000));
-    setNewEducation({
-      ...newEducation,
-      endDate: date.toISOString().split('T')[0],
-    });
-  }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setNewEducation({
-      ...newEducation,
+    setCurrentEducation({
+      ...currentEducation,
       [name]: value,
     });
   };
 
   const handleSelectChange = (name: string, value: string) => {
-    setNewEducation({
-      ...newEducation,
+    setCurrentEducation({
+      ...currentEducation,
       [name]: value,
     });
   };
 
   const handleCheckboxChange = (checked: boolean) => {
-    setNewEducation({
-      ...newEducation,
+    setCurrentEducation({
+      ...currentEducation,
       current: checked,
-      endDate: checked ? '' : newEducation.endDate,
+      endDate: checked ? '' : currentEducation.endDate,
     });
   };
 
-  const addEducation = () => {
-    if (newEducation.school && newEducation.degree) {
-      const educationToAdd = {
-        ...newEducation,
-        id: Date.now().toString(),
-      };
-      updateData([...data, educationToAdd]);
-      setNewEducation({
-        id: '',
-        school: '',
-        degree: '',
-        fieldOfStudy: '',
-        startDate: '',
-        endDate: '',
-        current: false,
-        grade: '',
-      });
-      setIsAdding(false);
+  const saveEducation = () => {
+    if (currentEducation.school && currentEducation.degree) {
+      if (isEditing) {
+        // Update existing education
+        updateData(
+          data.map(item => 
+            item.id === currentEducation.id ? currentEducation : item
+          )
+        );
+        setEditingEducation(undefined);
+      } else {
+        // Add new education
+        const educationToAdd = {
+          ...currentEducation,
+          id: Date.now().toString(),
+        };
+        updateData([...data, educationToAdd]);
+      }
+      resetForm();
     }
+  };
+
+  const startEditing = (education: Education) => {
+    setCurrentEducation({ ...education });
+    setEditingEducation(education);
+    setIsEditing(true);
+    setIsFormOpen(true);
+  };
+
+  const addNew = () => {
+    resetForm();
+    setIsFormOpen(true);
+    setIsEditing(false);
   };
 
   const removeEducation = (id: string) => {
@@ -109,8 +131,16 @@ const EducationCard: React.FC<EducationCardProps> = ({ data, updateData }) => {
     <div className="space-y-4">
       {data.length > 0 && (
         <div className="space-y-4">
-          {data.map((edu) => (
+          {data.filter((value) => (value.id != editingEducation?.id)).map((edu) => (
             <Card key={edu.id} className="relative">
+              <Button
+                variant="outline"
+                size="sm"
+                className="absolute top-2 left-2"
+                onClick={() => startEditing(edu)}
+              >
+                Edit
+              </Button>
               <Button
                 variant="ghost"
                 size="icon"
@@ -136,9 +166,9 @@ const EducationCard: React.FC<EducationCardProps> = ({ data, updateData }) => {
         </div>
       )}
 
-      {!isAdding ? (
+      {!isFormOpen ? (
         <Button
-          onClick={() => setIsAdding(true)}
+          onClick={addNew}
           variant="outline"
           className="w-full"
         >
@@ -153,7 +183,7 @@ const EducationCard: React.FC<EducationCardProps> = ({ data, updateData }) => {
               id="school"
               name="school"
               placeholder="e.g., Stanford University"
-              value={newEducation.school}
+              value={currentEducation.school}
               onChange={handleChange}
             />
           </div>
@@ -162,7 +192,7 @@ const EducationCard: React.FC<EducationCardProps> = ({ data, updateData }) => {
             <Label htmlFor="degree">Degree</Label>
             <Select
               onValueChange={(value) => handleSelectChange('degree', value)}
-              value={newEducation.degree}
+              value={currentEducation.degree}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select degree" />
@@ -185,7 +215,7 @@ const EducationCard: React.FC<EducationCardProps> = ({ data, updateData }) => {
               id="fieldOfStudy"
               name="fieldOfStudy"
               placeholder="e.g., Computer Science"
-              value={newEducation.fieldOfStudy}
+              value={currentEducation.fieldOfStudy}
               onChange={handleChange}
             />
           </div>
@@ -194,18 +224,17 @@ const EducationCard: React.FC<EducationCardProps> = ({ data, updateData }) => {
             <div className="space-y-2">
               <Label htmlFor="startDate">Start Date</Label>
               <CalendarForm
-                value={newEducation.startDate ? new Date(newEducation.startDate) : undefined}
-                setValue={handleStartDateChange}
-                disabled={newEducation.current}
+                value={currentEducation.startDate ? new Date(currentEducation.startDate) : undefined}
+                setValue={(date) => handleDateChange('startDate', date)}
               />
             </div>
             
             <div className="space-y-2">
               <Label htmlFor="endDate">End Date</Label>
               <CalendarForm
-                value={newEducation.endDate ? new Date(newEducation.endDate) : undefined}
-                setValue={handleEndDateChange}
-                disabled={newEducation.current}
+                value={currentEducation.endDate ? new Date(currentEducation.endDate) : undefined}
+                setValue={(date) => handleDateChange('endDate', date)}
+                disabled={currentEducation.current}
               />
             </div>
           </div>
@@ -213,7 +242,7 @@ const EducationCard: React.FC<EducationCardProps> = ({ data, updateData }) => {
           <div className="flex items-center space-x-2">
             <Checkbox 
               id="current" 
-              checked={newEducation.current}
+              checked={currentEducation.current}
               onCheckedChange={handleCheckboxChange}
             />
             <Label htmlFor="current" className="text-sm font-normal">
@@ -227,17 +256,17 @@ const EducationCard: React.FC<EducationCardProps> = ({ data, updateData }) => {
               id="grade"
               name="grade"
               placeholder="e.g., 3.8 GPA"
-              value={newEducation.grade}
+              value={currentEducation.grade || ''}
               onChange={handleChange}
             />
           </div>
           
           <div className="flex justify-end space-x-2">
-            <Button variant="outline" onClick={() => setIsAdding(false)}>
+            <Button variant="outline" onClick={resetForm}>
               Cancel
             </Button>
-            <Button variant="jobify" onClick={addEducation}>
-              Add Education
+            <Button variant="jobify" onClick={saveEducation}>
+              {isEditing ? 'Update Education' : 'Add Education'}
             </Button>
           </div>
         </div>

@@ -110,10 +110,10 @@ const JobPage: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="container mx-auto px-4 py-8 max-w-4xl md:mt-18 mt-12">
       <button 
         onClick={() => navigate(-1)}
-        className="mb-6 flex items-center text-blue-600 hover:text-blue-800"
+        className="mb-6 flex items-center text-blue-600 hover:text-blue-800 hover:cursor-pointer"
       >
         ← Back to Jobs
       </button>

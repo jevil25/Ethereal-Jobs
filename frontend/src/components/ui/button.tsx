@@ -40,7 +40,7 @@ const buttonVariants = cva(
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   asChild?: boolean;
-  variant?: "default" | "outline" | "ghost" | "link" | "jobify";
+  variant?: "default" | "outline" | "ghost" | "link" | "jobify" | "destructive" | "secondary";
   size?: "sm" | "lg" | "xl" | "xxl" | "icon";
 }
 

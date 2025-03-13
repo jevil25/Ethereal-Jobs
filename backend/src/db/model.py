@@ -249,11 +249,26 @@ class Education(BaseModel):
 class SkillsCardProps(BaseModel):
     data: List[str]
 
+class Project(BaseModel):
+    id: str
+    title: str
+    url: str
+    technologies: List[str]
+    description: str
+
+class Certification(BaseModel):
+    id: str
+    name: str
+    description: str
+    credentialUrl: str
+
 class ResumeModel(Document):
     email: Indexed(str) # type: ignore
     personalInfo: PersonalInfo
     experience: List[Experience]
     education: List[Education]
+    projects: List[Project]
+    certifications: List[Certification]
     skills: List[str]
     jobPreferences: JobPreferences
     resumeFile: Optional[str] = None
@@ -271,6 +286,8 @@ class ResumeUpdate(BaseModel):
     personalInfo: PersonalInfo
     experience: List[Experience]
     education: List[Education]
+    projects: List[Project]
+    certifications: List[Certification]
     skills: List[str]
     jobPreferences: JobPreferences
     resumeFile: Optional[str] = None

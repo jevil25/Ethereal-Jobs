@@ -10,7 +10,9 @@ export interface ResumeUploadCardProps {
 
 const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({ file, updateFile }) => {
   const [isDragging, setIsDragging] = useState(false);
-  const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle');
+  const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>(
+    file ? 'success' : 'idle'
+  );
   const [progressPercent, setProgressPercent] = useState(0);
   
   const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
@@ -41,33 +43,35 @@ const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({ file, updateFile })
     setIsDragging(false);
     
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      const file = e.dataTransfer.files[0];
-      processFile(file);
+      const droppedFile = e.dataTransfer.files[0];
+      processFile(droppedFile);
       e.dataTransfer.clearData();
     }
   };
   
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
-      processFile(file);
+      const selectedFile = e.target.files[0];
+      processFile(selectedFile);
     }
   };
   
-  const processFile = (file: File) => {
+  const processFile = (selectedFile: File) => {
     const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
     const maxSize = 5 * 1024 * 1024; // 5MB
     
-    if (!validTypes.includes(file.type)) {
+    if (!validTypes.includes(selectedFile.type)) {
       alert('Please upload a PDF or Word document.');
       return;
     }
     
-    if (file.size > maxSize) {
+    if (selectedFile.size > maxSize) {
       alert('File size should be less than 5MB.');
       return;
     }
     
+    // Update the file immediately to fix the double upload issue
+    updateFile(selectedFile);
     setUploadStatus('uploading');
     
     // Simulate upload progress
@@ -78,7 +82,6 @@ const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({ file, updateFile })
       
       if (progress >= 100) {
         clearInterval(interval);
-        updateFile(file);
         setUploadStatus('success');
       }
     }, 150);
@@ -94,6 +97,34 @@ const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({ file, updateFile })
     return filename.slice((filename.lastIndexOf('.') - 1 >>> 0) + 2);
   };
 
+  const renderUploadArea = () => (
+    <div
+      className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
+        isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
+      }`}
+      onDragEnter={handleDragEnter}
+      onDragLeave={handleDragLeave}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+      onClick={() => document.getElementById('file-upload')?.click()}
+    >
+      <div className="flex flex-col items-center justify-center space-y-2">
+        <Upload className="h-12 w-12 text-gray-400" />
+        <Label htmlFor="file-upload" className="font-medium text-gray-700">
+          Drop your resume here or <span className="text-blue-500">browse</span>
+        </Label>
+        <input
+          id="file-upload"
+          name="file-upload"
+          type="file"
+          className="sr-only"
+          accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+          onChange={handleFileChange}
+        />
+      </div>
+    </div>
+  );
+
   return (
     <div className="space-y-4">
       <div className="text-center space-y-2">
@@ -102,31 +133,7 @@ const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({ file, updateFile })
       </div>
       
       {!file ? (
-        <div
-          className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
-            isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
-          }`}
-          onDragEnter={handleDragEnter}
-          onDragLeave={handleDragLeave}
-          onDragOver={handleDragOver}
-          onDrop={handleDrop}
-          onClick={() => document.getElementById('file-upload')?.click()}
-        >
-          <div className="flex flex-col items-center justify-center space-y-2">
-            <Upload className="h-12 w-12 text-gray-400" />
-            <Label htmlFor="file-upload" className="font-medium text-gray-700">
-              Drop your resume here or <span className="text-blue-500">browse</span>
-            </Label>
-            <input
-              id="file-upload"
-              name="file-upload"
-              type="file"
-              className="sr-only"
-              accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-              onChange={handleFileChange}
-            />
-          </div>
-        </div>
+        renderUploadArea()
       ) : (
         <div className="border rounded-lg p-4">
           {uploadStatus === 'uploading' ? (

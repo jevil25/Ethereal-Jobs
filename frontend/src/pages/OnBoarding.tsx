@@ -2,23 +2,27 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
-import PersonalInfoCard from '../components/OnBoarding/personalInfoCard';
-import ExperienceCard, { Experience } from '../components/OnBoarding/experienceCard';
-import EducationCard, { Education } from '../components/OnBoarding/educationCard';
-import SkillsCard, { SkillsCardProps } from '../components/OnBoarding/skillsCard';
+import PersonalInfoCard from '../components/OnBoarding/PersonalInfoCard';
+import ExperienceCard, { Experience } from '../components/OnBoarding/ExperienceCard';
+import EducationCard, { Education } from '../components/OnBoarding/EducationCard';
+import SkillsCard, { SkillsCardProps } from '../components/OnBoarding/SkillsCard';
+import ProjectCard, { Project } from '../components/OnBoarding/ProjectCard';
+import CertificationCard, { Certification } from '../components/OnBoarding/CertificationCard';
 import JobPreferencesCard from '../components/OnBoarding/JobPreferencesCard';
 import ResumeUploadCard from '../components/OnBoarding/ResumeUploadCard';
-import OnboardingProgress from '../components/OnBoarding/progess';
+import OnboardingProgress from '../components/OnBoarding/Progess';
 import { FormData } from '../api/types';
-import { updateResumeDetails, getResumeDetails } from '../api/resume';
+import { updateResumeDetails, getResumeDetails, extractResume } from '../api/resume';
 import { debounce } from "lodash";
 import { useSearchParams } from 'react-router-dom';
+
 
 const OnboardingFlow: React.FC = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
   const [firstGetDone, setFirstGetDone] = useState(false);
   const [firstStepCheckDone, setFirstStepCheckDone] = useState(false);
+  const [isParsingResume, setIsParsingResume] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     personalInfo: {
       headline: '',
@@ -29,6 +33,8 @@ const OnboardingFlow: React.FC = () => {
     experience: [] as Experience[],
     education: [] as Education[],
     skills: [] as SkillsCardProps['data'],
+    projects: [] as Project[],
+    certifications: [] as Certification[],
     jobPreferences: {
       jobTypes: [] as string[],
       locations: [] as string[],
@@ -53,6 +59,9 @@ const OnboardingFlow: React.FC = () => {
     setFirstStepCheckDone(true);
     const getFormData = async () => {
         const data = await getResumeDetails();
+        if (data.no_resume_found && data.no_resume_found) {
+            return;
+        }
         setFormData(data);
         setFirstGetDone(true);
     };
@@ -82,7 +91,58 @@ const OnboardingFlow: React.FC = () => {
   }
   , [currentStep]);
 
+  // Function to handle resume upload and parsing
+  const handleResumeUpload = async (file: File | null) => {
+    if (!file) {
+      // User cancelled file upload
+      return;
+    }
+    setIsParsingResume(true);
+    
+    try {
+      // Update the formData with the file first
+      setFormData(prev => ({
+        ...prev,
+        resumeFile: file
+      }));
+      
+      console.log('Parsing resume:', file);
+      
+      const parsedData = await extractResume({ file });
+
+      if (!parsedData) {
+        console.error('Error parsing resume');
+        return;
+      }
+      
+      // Update the form data with the parsed information
+      setFormData(prev => ({
+        ...prev,
+        ...parsedData,
+        resumeFile: file
+      }));
+      
+      // Automatically move to the next step
+      setCurrentStep(1);
+    } catch (error) {
+      console.error('Error parsing resume:', error);
+    } finally {
+      setIsParsingResume(false);
+    }
+  };
+
+  // Re-ordered steps with resume upload first
   const steps = [
+    {
+      title: 'Resume Upload (Optional)',
+      description: 'Upload your resume for automatic parsing or skip to fill in manually',
+      component: (
+        <ResumeUploadCard
+          file={formData.resumeFile}
+          updateFile={handleResumeUpload}
+        />
+      ),
+    },
     {
       title: 'Personal Information',
       description: 'Tell us about yourself',
@@ -114,6 +174,26 @@ const OnboardingFlow: React.FC = () => {
       ),
     },
     {
+      title: 'Projects',
+      description: 'Showcase your projects',
+      component: (
+        <ProjectCard
+          data={formData.projects}
+          updateData={(data) => setFormData({ ...formData, projects: data })}
+        />
+      ),
+    },
+    {
+      title: 'Certifications',
+      description: 'Add your certifications',
+      component: (
+        <CertificationCard
+          data={formData.certifications}
+          updateData={(data) => setFormData({ ...formData, certifications: data })}
+        />
+      ),
+    },
+    {
       title: 'Skills',
       description: 'List your professional skills',
       component: (
@@ -133,22 +213,12 @@ const OnboardingFlow: React.FC = () => {
         />
       ),
     },
-    {
-      title: 'Resume Upload',
-      description: 'Or upload your resume for automatic parsing',
-      component: (
-        <ResumeUploadCard
-          file={formData.resumeFile}
-          updateFile={(file) => setFormData({ ...formData, resumeFile: file })}
-        />
-      ),
-    },
   ];
 
   const onComplete = async () => {
     console.log('Onboarding complete!');
     await updateResumeDetail(true);
-};
+  };
 
   const handleNext = () => {
     if (currentStep < steps.length - 1) {
@@ -175,8 +245,10 @@ const OnboardingFlow: React.FC = () => {
   };
 
   const handleSkip = () => {
-    // Skip to the final step - resume upload
-    setCurrentStep(steps.length - 1);
+    // For resume upload step, just go to next step
+    if (currentStep === 0) {
+      setCurrentStep(1);
+    }
   };
 
   return (
@@ -204,24 +276,28 @@ const OnboardingFlow: React.FC = () => {
                 Previous
               </Button>
             )}
-            
-            {currentStep < steps.length - 1 && currentStep !== 0 && (
-              <Button 
-                onClick={handleSkip}
-                variant="ghost"
-              >
-                Skip to Resume Upload
-              </Button>
-            )}
           </div>
           
-          <Button
-            onClick={handleNext}
-            variant="jobify"
-            className="ml-auto"
-          >
-            {currentStep === steps.length - 1 ? 'Complete' : 'Next'}
-          </Button>
+          <div className="ml-auto">
+            {currentStep === 0 && (
+              <Button 
+                onClick={handleSkip}
+                variant="outline"
+                className="mr-2"
+                disabled={isParsingResume}
+              >
+                Skip
+              </Button>
+            )}
+            
+            <Button
+              onClick={handleNext}
+              variant="jobify"
+              disabled={isParsingResume}
+            >
+              {currentStep === steps.length - 1 ? 'Complete' : 'Next'}
+            </Button>
+          </div>
         </CardFooter>
       </Card>
     </div>

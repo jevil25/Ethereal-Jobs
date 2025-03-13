@@ -1,6 +1,8 @@
-import { Experience } from "@/components/OnBoarding/experienceCard";
-import { Education } from "@/components/OnBoarding/educationCard";
-import { SkillsCardProps } from "@/components/OnBoarding/skillsCard";
+import { Experience } from "@/components/OnBoarding/ExperienceCard";
+import { Education } from "@/components/OnBoarding/EducationCard";
+import { SkillsCardProps } from "@/components/OnBoarding/SkillsCard";
+import { Project } from "@/components/OnBoarding/ProjectCard";
+import { Certification } from "@/components/OnBoarding/CertificationCard";
 
 interface GetJobsRequest {
     city: string;
@@ -17,6 +19,10 @@ interface ResumeSaveRequest {
 interface ResumeSaveResponse {
     message: string;
     is_updated: boolean;
+}
+
+interface extractResumeRequest {
+    file: File;
 }
 
 interface LinkedInGenerateMessageRequest {
@@ -166,6 +172,8 @@ interface FormData {
     personalInfo: PersonalInfo;
     experience: Experience[];
     education: Education[];
+    projects: Project[];
+    certifications: Certification[];
     skills: SkillsCardProps['data'];
     jobPreferences: JobPreferences;
     resumeFile: File | null;
@@ -200,6 +208,7 @@ export type {
     FormData,
     PersonalInfo,
     JobPreferences,
+    extractResumeRequest,
 }
 
 export {
