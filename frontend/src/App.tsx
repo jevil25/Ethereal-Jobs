@@ -15,6 +15,7 @@ import axios from 'axios';
 import { useAuth } from './providers/AuthProvider';
 import VerifyEmailPage from './pages/verify-email';
 import OnboardingFlow from './pages/OnBoarding';
+import { Toaster } from "./components/ui/sonner";
 
 // needed for axios to send cookies
 axios.defaults.withCredentials = true;
@@ -32,6 +33,7 @@ function App() {
             </Router>
           </Provider>
         </main>
+        <Toaster />
       </div>
     </>
   )

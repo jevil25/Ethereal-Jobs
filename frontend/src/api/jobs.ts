@@ -30,10 +30,10 @@ export const getLinkedInProfilesForJob = async (jobId: string): Promise<JobData>
 
 // get /generate/linkedin/message/:resumeId
 export const generateLinkedInMessage = async (params: LinkedInGenerateMessageRequest): Promise<LinkedInGenerateMessageResponse> => {
-    const response = await axios.get(constructServerUrlFromPath(`/generate/linkedin/message/${params.resumeId}`), { params });
+    const response = await axios.get(constructServerUrlFromPath(`/generate/linkedin/message/${params.email}`), { params });
     if (response.data && response.data.detail && response.data.detail === 'Token expired') {
        await userRefresh();
-        await axios.get(constructServerUrlFromPath(`/generate/linkedin/message/${params.resumeId}`), { params });
+        await axios.get(constructServerUrlFromPath(`/generate/linkedin/message/${params.email}`), { params });
     }
     return response.data as LinkedInGenerateMessageResponse;
 }

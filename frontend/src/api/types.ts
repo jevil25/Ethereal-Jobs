@@ -28,7 +28,8 @@ interface extractResumeRequest {
 interface LinkedInGenerateMessageRequest {
     position: string;
     company: string;
-    resumeId: string;
+    email: string;
+    newMessage: boolean;
 }
 
 interface LinkedInGenerateMessageResponse {
