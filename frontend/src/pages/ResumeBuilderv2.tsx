@@ -13,6 +13,8 @@ import {
   updateResumeDetails,
   getResumeDetails,
   extractResume,
+  // generateResume,
+  getResume,
 } from "../api/resume";
 import { useAuth } from "../providers/useAuth";
 import MainResume from "../components/ResumeV2/mainResume";
@@ -50,10 +52,30 @@ const ResumeEditor: React.FC = () => {
     },
     resumeFile: null,
   });
+  const [generatedResume, setGeneratedResume] = useState<FormData | null>({
+    personalInfo: {
+      headline: "",
+      location: "",
+      phone: "",
+      website: "",
+    },
+    experience: [],
+    education: [],
+    skills: [],
+    projects: [],
+    certifications: [],
+    jobPreferences: {
+      jobTypes: [],
+      locations: [],
+      remotePreference: "",
+      salaryExpectation: "",
+      immediateStart: false,
+    },
+    resumeFile: null,
+  })
   const prevStateRef = useRef(resumeData);
   const resumeCard = useRef<HTMLDivElement>(null);
 
-  // Fetch resume data on component mount
   useEffect(() => {
     const fetchResumeData = async () => {
       try {
@@ -72,7 +94,6 @@ const ResumeEditor: React.FC = () => {
     fetchResumeData();
   }, []);
 
-  // Check screen size and close sidebar on small screens by default
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 768) {
@@ -82,17 +103,13 @@ const ResumeEditor: React.FC = () => {
       }
     };
 
-    // Set initial state
     handleResize();
 
-    // Add event listener
     window.addEventListener("resize", handleResize);
 
-    // Clean up
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Update resume data when changes are made
   useEffect(() => {
     const hasStateChanged =
       JSON.stringify(prevStateRef.current) !== JSON.stringify(resumeData);
@@ -119,7 +136,23 @@ const ResumeEditor: React.FC = () => {
     };
   }, [resumeData, isLoading]);
 
-  // Handle resume file upload
+  useEffect(() => {
+    const getGeneratedResume = async () => {
+      try {
+        const data = await getResume({ 
+          is_main_resume: true,
+         });
+        if (data && data.extracted_data) {
+          setGeneratedResume(data.extracted_data);
+        }
+      } catch (error) {
+        console.error("Error fetching generated resume:", error);
+      }
+    }
+    getGeneratedResume();
+  });
+
+
   const handleResumeUpload = async (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
@@ -144,7 +177,6 @@ const ResumeEditor: React.FC = () => {
     }
   };
 
-  // Update specific sections of the resume
   const updateResumeSection = <K extends keyof FormData>(
     section: K,
     data: FormData[K],
@@ -156,7 +188,6 @@ const ResumeEditor: React.FC = () => {
     }));
   };
 
-  // Handle edits for personal info fields
   const handlePersonalInfoEdit = (
     field: keyof FormData["personalInfo"],
     value: string,
@@ -170,12 +201,10 @@ const ResumeEditor: React.FC = () => {
     }));
   };
 
-  // Toggle edit mode
   const toggleEditMode = () => {
     setEditMode(!editMode);
     if (!editMode) {
       setActiveTab("personal");
-      // Ensure sidebar is open when entering edit mode on larger screens
       if (window.innerWidth >= 768) {
         setSidebarOpen(true);
       }
@@ -184,7 +213,6 @@ const ResumeEditor: React.FC = () => {
     }
   };
 
-  // Toggle sidebar visibility
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
@@ -402,6 +430,13 @@ const ResumeEditor: React.FC = () => {
                     : "Error saving changes"}
               </span>
             </div>
+          )}
+          {generatedResume && (
+            <MainResume
+              name={user?.name}
+              resumeData={generatedResume}
+              ref={resumeCard}
+            />
           )}
         </div>
       </div>

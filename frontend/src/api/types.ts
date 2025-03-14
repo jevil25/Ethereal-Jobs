@@ -181,6 +181,29 @@ interface FormData {
   no_resume_found?: boolean;
 }
 
+interface GenerateAiGetResumeRequest {
+  is_main_resume: boolean;
+  job_id?: string;
+}
+
+interface GenerateAiGetResumeResponse {
+  message: string;
+  extracted_data?: FormData;
+  is_success: boolean;
+}
+
+interface GenerateAiResumeRequest {
+  is_main_resume: boolean;
+  job_id?: string;
+}
+
+interface GenerateAiResumeResponse {
+  message: string;
+  extracted_data: FormData;
+  is_success: boolean;
+  no_resume_found?: boolean;
+}
+
 export type {
   ResumeSaveRequest,
   ResumeSaveResponse,
@@ -209,6 +232,10 @@ export type {
   PersonalInfo,
   JobPreferences,
   extractResumeRequest,
+  GenerateAiGetResumeRequest,
+  GenerateAiGetResumeResponse,
+  GenerateAiResumeRequest,
+  GenerateAiResumeResponse,
 };
 
 export { Provider };

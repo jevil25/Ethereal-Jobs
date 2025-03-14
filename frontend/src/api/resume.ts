@@ -1,6 +1,6 @@
 import axios from "axios";
 import { constructServerUrlFromPath } from "../utils/helper";
-import { ResumeSaveRequest, extractResumeRequest } from "./types";
+import { ResumeSaveRequest, extractResumeRequest, GenerateAiResumeRequest, GenerateAiResumeResponse, GenerateAiGetResumeRequest, GenerateAiGetResumeResponse } from "./types";
 import { FormData as customFormData } from "./types";
 import { userRefresh } from "./user";
 
@@ -60,3 +60,33 @@ export const extractResume = async (
   }
   return undefined;
 };
+
+// get /resume/ai/generate
+export const getResume = async (
+  data: GenerateAiGetResumeRequest,
+): Promise<GenerateAiGetResumeResponse | undefined> => {
+  const response = await axios.get(
+    constructServerUrlFromPath(`/resume/ai/generate`),
+    {
+      params: data,
+    },
+  );
+  if (response.data.is_success) {
+    return response.data as GenerateAiGetResumeResponse;
+  }
+  return undefined;
+};
+
+// post /resume/ai/generate
+export const generateResume = async (
+  data: GenerateAiResumeRequest,
+): Promise<GenerateAiResumeResponse | undefined> => {
+  const response = await axios.post(
+    constructServerUrlFromPath(`/resume/ai/generate`),
+    data,
+  );
+  if (response.data.is_success) {
+    return response.data as GenerateAiResumeResponse;
+  }
+  return undefined;
+}
