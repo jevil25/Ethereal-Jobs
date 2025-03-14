@@ -53,7 +53,7 @@ async def get_jobs(
     yesterday = str(date.today() - timedelta(days=1))
     cached_jobs = await db_ops.get_jobs_from_db(query_params, yesterday)
 
-    print(f"lengeth of cached jobs: {len(cached_jobs)}")
+    print(f"length of cached jobs: {len(cached_jobs)}")
 
     if len(cached_jobs) > 10:
         json_response = [job.model_dump() for job in cached_jobs]

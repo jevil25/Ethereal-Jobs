@@ -13,7 +13,8 @@ from src.db.model import (
     CompanyLinkedInProfiles,
     VerificationToken,
     LinkedMessages,
-    ResumeModel
+    ResumeModel,
+    AiOptimzedResumeModel
 )
 
 from beanie import init_beanie
@@ -56,6 +57,7 @@ class DatabaseOperations:
                 VerificationToken,
                 LinkedMessages,
                 ResumeModel,
+                AiOptimzedResumeModel
             ]
         )
 
@@ -502,4 +504,34 @@ class DatabaseOperations:
         resume = await ResumeModel.find_one({"email": email})
         return resume
     
+
+    async def add_ai_optimized_resume(self, email: str, resume_data: dict, is_main_resume: bool, job_id: str = None):
+        """
+        Add an AI-optimized resume to the database.
+        """
+        ai_optimized_resume = AiOptimzedResumeModel(
+            email=email,
+            personalInfo=resume_data["personalInfo"],
+            experience=resume_data["experience"],
+            education=resume_data["education"],
+            projects=resume_data["projects"],
+            certifications=resume_data["certifications"],
+            skills=resume_data["skills"],
+            jobPreferences=resume_data["jobPreferences"],
+            is_main_resume=is_main_resume,
+            job_id=job_id
+        )
+        await ai_optimized_resume.save()
+        return ai_optimized_resume
+    
+    async def get_ai_optimized_resume(self, email: str, is_main_resume: bool, job_id: str = None):
+        """
+        Get an AI-optimized resume from the database.
+        """
+        ai_optimized_resume = await AiOptimzedResumeModel.find_one(
+            AiOptimzedResumeModel.email == email,
+            AiOptimzedResumeModel.is_main_resume == is_main_resume,
+            AiOptimzedResumeModel.job_id == job_id
+        )
+        return ai_optimized_resume
     

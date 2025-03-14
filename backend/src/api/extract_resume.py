@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from google import genai
 import textract
 from dotenv import load_dotenv
-from src.db.model import ResumeUpdate
+from src.db.model import JobModel, ResumeUpdate, ResumeModel
 
 load_dotenv()
 
@@ -57,6 +57,68 @@ def ats_extractor(resume_data, text, is_pdf=False):
     response = client.models.generate_content(
         model="gemini-2.0-flash",
         contents=contents
+    )
+    data = response.text.strip()
+    remove_texts = ["```json","```"]
+    for text in remove_texts:
+        if text in data:
+            data = data.replace(text, "")
+    data_json = json.loads("".join(data))
+    data_json = replace_nulls(data_json)
+    return data_json
+
+async def get_ai_optimized_resume(resume_data: ResumeModel, is_main_resume: bool, job_id: str = None):
+    json_model = ResumeUpdate.model_json_schema()
+    json_model_string = json.dumps(json_model, indent=4)
+    headline = resume_data.personalInfo.headline
+    if not is_main_resume:
+        job_data = await JobModel.find_one(JobModel.id == job_id)
+        headline_prompt = f'''
+        give resume according to this job description:
+        {job_data.description}
+        '''
+    else: 
+        headline_prompt = f'''
+        give resume according to this headline:
+        {headline}
+        '''
+
+    print(f"headline: {headline}")  
+    prompt = f'''
+    You are an AI bot designed to act as a professional for parsing resumes. You are given with resume and your job is to extract the following information from the resume:
+    Generate a JSON-formatted professional profile for a software engineer. The profile should include the following sections:
+
+    {json_model_string}
+
+    (must follow the json schema do not change the schema)
+    directly start from personalInfo json level
+    give all dates in yyyy-mm-dd format only, if end date is not present then it should be empty string
+    Ensure the generated JSON is formatted properly and includes realistic and professional content.
+
+    Give the extracted information in json format only
+    do not hallucinate the data keep it real
+
+    The resume must be ats optimized, keep it concise and relevant to the job description or headline provided.
+    Tailor the resume to the job description by highlighting relevant skills and experience.
+    Use specific keywords and phrases relevant to the job or industry to catch the attention of recruiters and hiring managers.
+    make the resume is easy to scan and emphasize achievements and responsibilities.
+
+    {headline_prompt}
+
+    Resume:
+    sent as json string
+
+
+    '''
+    resume_data_as_json = resume_data.model_dump()
+    fields_to_remove = ["id", "updatedAt", "createdAt", "email"]
+    for field in fields_to_remove:
+        resume_data_as_json.pop(field)
+    prompt += json.dumps(resume_data_as_json, indent=4)
+
+    response = client.models.generate_content(
+        model="gemini-2.0-flash",
+        contents=[prompt]
     )
     data = response.text.strip()
     remove_texts = ["```json","```"]

@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from typing import List, Optional
-from beanie import Document, Indexed, before_event, Insert
+from beanie import Document, Indexed, before_event, Insert, BeanieObjectId
 from pydantic import BaseModel, Field
 
 class JobQuery(BaseModel):
@@ -292,3 +292,30 @@ class ResumeUpdate(BaseModel):
     jobPreferences: JobPreferences
     resumeFile: Optional[str] = None
     is_onboarded: bool
+
+class AiOptimzedResumeModel(Document):
+    email: Indexed(str) # type: ignore
+    personalInfo: PersonalInfo
+    experience: List[Experience]
+    education: List[Education]
+    projects: List[Project]
+    certifications: List[Certification]
+    skills: List[str]
+    jobPreferences: JobPreferences
+    is_main_resume: bool = True
+    job_id: Optional[str] = None
+    
+    # Timestamp fields
+    createdAt: datetime = Field(default_factory=datetime.utcnow)
+    updatedAt: datetime = Field(default_factory=datetime.utcnow)
+
+    @before_event(Insert)
+    def check_job_id(self):
+        if not self.is_main_resume and not self.job_id:
+            raise ValueError("Job ID is required for non-main resume")
+
+    class Settings:
+        name = "ai_optimized_resume"
+        indexes = [
+            [("email", 1)],
+        ]
