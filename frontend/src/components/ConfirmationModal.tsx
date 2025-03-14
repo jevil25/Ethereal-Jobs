@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Dialog,
   DialogContent,
@@ -18,10 +18,8 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   setShowRemoveModal,
   confirmationMessage,
 }) => {
-  const [isOpen, _] = useState(true);
-
   return (
-    <Dialog open={isOpen} onOpenChange={() => setShowRemoveModal(false)}>
+    <Dialog open={true} onOpenChange={() => setShowRemoveModal(false)}>
       <DialogContent className="sm:max-w-md p-6 bg-white">
         <DialogTitle className="text-lg font-semibold mb-2">
           Confirmation

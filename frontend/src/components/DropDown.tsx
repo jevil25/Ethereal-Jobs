@@ -40,7 +40,7 @@ const Dropdown: FC<DropdownProps> = ({
       const noMatches = ["No matches"];
       setFilteredCountries(noMatches);
     }
-  }, [searchTerm]);
+  }, [searchTerm, list]);
 
   // Close dropdown when clicking outside
   useEffect(() => {

@@ -8,7 +8,7 @@ import { toaster } from "../utils/helper";
 import { useSearchParams } from "react-router-dom";
 
 const JobSearch: React.FC = () => {
-  const [_, setSearchParams] = useSearchParams();
+  const [, setSearchParams] = useSearchParams();
   const [jobs, setJobs] = useState<JobData[]>([]);
   const [filteredJobs, setFilteredJobs] = useState<JobData[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -64,20 +64,31 @@ const JobSearch: React.FC = () => {
         setLoading(false);
       } catch (error) {
         setLoading(false);
-        toaster.error("Error fetching jobs. Please try again later.");
+        toaster.error(`Error fetching jobs. Please try again later: ${error}`);
       } finally {
         toaster.success("Jobs fetched successfully");
       }
     }, 300);
   };
 
-  const handleFilterChange = (newFilters: any) => {
+  const handleFilterChange = (newFilters: Partial<{
+    is_remote: boolean;
+    job_type: string;
+    salary_min: number;
+    salary_max: number;
+}>) => {
     if (newFilters.job_type == "All Types") {
       newFilters.job_type = "";
     }
     setFilters({ ...filters, ...newFilters });
     const overAllFilters = { ...filters, ...newFilters };
-    setSearchParams(new URLSearchParams(overAllFilters).toString());
+    const stringifiedFilters = {
+      ...overAllFilters,
+      is_remote: overAllFilters.is_remote.toString(),
+      salary_min: overAllFilters.salary_min.toString(),
+      salary_max: overAllFilters.salary_max.toString(),
+    };
+    setSearchParams(new URLSearchParams(stringifiedFilters).toString());
     const jobsFiltered = jobs.filter((job) => {
       const res =
         (!newFilters.is_remote || job.is_remote) &&

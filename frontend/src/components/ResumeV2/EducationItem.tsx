@@ -2,9 +2,10 @@ import { Button } from "../../components/ui/button";
 import { Card } from "../../components/ui/card";
 import { useState } from "react";
 import ConfirmationModal from "../ConfirmationModal";
+import { Education } from "../OnBoarding/EducationCard";
 
 interface EducationItemProps {
-  education: any;
+  education: Education;
   index: number;
   onChange: (index: number, field: string, value: string) => void;
   onRemove: () => void;

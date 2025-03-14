@@ -2,10 +2,14 @@ import { Button } from "../../components/ui/button";
 import { Plus } from "lucide-react";
 import EducationItem from "./EducationItem";
 import { Education } from "../OnBoarding/EducationCard";
+import { FormData } from "@/api/types";
 
 interface EducationTabProps {
   education: Education[];
-  updateResumeSection: (section: string, data: any) => void;
+  updateResumeSection: (<K extends keyof FormData>(
+    section: K,
+    data: FormData[K],
+  ) => void);
 }
 
 const EducationTab = ({

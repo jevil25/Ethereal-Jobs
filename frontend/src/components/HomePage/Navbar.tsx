@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import logo from "../../assets/logo.png";
 import AuthForms from "../Auth/AuthForms";
-import { useAuth } from "../../providers/AuthProvider";
+import { useAuth } from "../../providers/useAuth";
 import { useSearchParams } from "react-router-dom";
 import { Button } from "../ui/button";
 
@@ -33,9 +33,9 @@ const Navbar = () => {
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [searchParams]);
 
-  const scrollToSection = (event: any, id: string) => {
+  const scrollToSection = (event: React.MouseEvent<HTMLAnchorElement | HTMLDivElement, MouseEvent>, id: string) => {
     event.preventDefault();
     // check if home page
     if (window.location.pathname !== "/") {

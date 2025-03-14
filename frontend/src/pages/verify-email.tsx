@@ -6,7 +6,7 @@ import ResendVerification from "../components/Auth/ResendVerification";
 
 const VerifyEmailPage: React.FC = () => {
   const [searchParams] = useSearchParams();
-  const [_, setToken] = useState<string | null>(null);
+  const [, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);

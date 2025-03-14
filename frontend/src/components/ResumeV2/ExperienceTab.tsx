@@ -2,10 +2,14 @@ import { Button } from "../../components/ui/button";
 import { Plus } from "lucide-react";
 import ExperienceItem from "./ExperienceItem";
 import { Experience } from "../OnBoarding/ExperienceCard";
+import { FormData } from "@/api/types";
 
 interface ExperienceTabProps {
   experience: Experience[];
-  updateResumeSection: (section: string, data: any) => void;
+  updateResumeSection: (<K extends keyof FormData>(
+    section: K,
+    data: FormData[K],
+  ) => void);
 }
 
 const ExperienceTab = ({

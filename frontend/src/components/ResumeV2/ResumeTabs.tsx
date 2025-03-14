@@ -29,8 +29,11 @@ const ResumeTabs = ({
   handlePersonalInfoEdit,
   updateResumeSection,
 }: ResumeTabsProps) => {
-  const handleUpdateResumeSection = (section: string, data: any) => {
-    updateResumeSection(section as keyof FormData, data);
+  const handleUpdateResumeSection = <K extends keyof FormData>(
+      section: K,
+      data: FormData[K],
+    )=> {
+        updateResumeSection(section, data);
   };
   return (
     <Tabs

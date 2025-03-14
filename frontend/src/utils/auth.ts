@@ -44,9 +44,9 @@ export const checkPasswordConditions = (
     hasDigit: /(?=.*\d)/.test(password),
     hasLowercase: /(?=.*[a-z])/.test(password),
     hasUppercase: /(?=.*[A-Z])/.test(password),
-    hasSymbol: /(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/.test(password),
+    hasSymbol: /(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?])/.test(password),
     isValid:
-      /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/.test(
+      /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/.test(
         password,
       ),
   };

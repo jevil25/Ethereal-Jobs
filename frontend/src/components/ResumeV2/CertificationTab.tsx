@@ -2,10 +2,14 @@ import { Button } from "../../components/ui/button";
 import { Plus } from "lucide-react";
 import CertificationItem from "./CertificationItem";
 import { Certification } from "../OnBoarding/CertificationCard";
+import { FormData } from "@/api/types";
 
 interface CertificationTabProps {
   certifications: Certification[];
-  updateResumeSection: (section: string, data: any) => void;
+  updateResumeSection: (<K extends keyof FormData>(
+    section: K,
+    data: FormData[K],
+  ) => void);
 }
 
 const CertificationTab = ({

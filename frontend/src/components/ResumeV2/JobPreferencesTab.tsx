@@ -13,10 +13,14 @@ import {
   SelectValue,
 } from "../../components/ui/select";
 import { JobPreferences } from "../OnBoarding/JobPreferencesCard";
+import { FormData } from "@/api/types";
 
 interface JobPreferencesTabProps {
   jobPreferences: JobPreferences;
-  updateResumeSection: (section: string, data: any) => void;
+  updateResumeSection: (<K extends keyof FormData>(
+    section: K,
+    data: FormData[K],
+  ) => void);
 }
 
 const JobPreferencesTab = ({

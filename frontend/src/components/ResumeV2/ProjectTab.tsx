@@ -2,10 +2,14 @@ import { Button } from "../../components/ui/button";
 import { Plus } from "lucide-react";
 import ProjectItem from "./ProjectItem";
 import { Project } from "../OnBoarding/ProjectCard";
+import { FormData } from "@/api/types";
 
 interface ProjectTabProps {
   projects: Project[];
-  updateResumeSection: (section: string, data: any) => void;
+  updateResumeSection: (<K extends keyof FormData>(
+    section: K,
+    data: FormData[K],
+  ) => void);
 }
 
 const ProjectTab = ({ projects, updateResumeSection }: ProjectTabProps) => {

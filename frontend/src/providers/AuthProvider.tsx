@@ -1,31 +1,11 @@
 import React, {
-  createContext,
   useState,
   useEffect,
-  useContext,
   ReactNode,
 } from "react";
 import { userMe, userSignout } from "../api/user";
 import { User } from "../types/data";
-
-interface AuthContextType {
-  user: User | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  error: string | null;
-  logout: () => void;
-  refreshUser: () => Promise<void>;
-}
-
-// Create the context with a default value
-const AuthContext = createContext<AuthContextType>({
-  user: null,
-  isAuthenticated: false,
-  isLoading: true,
-  error: null,
-  logout: () => {},
-  refreshUser: async () => {},
-});
+import { AuthContext } from "./useAuth"; 
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -86,5 +66,3 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   );
 };
 
-// Custom hook to use the auth context
-export const useAuth = () => useContext(AuthContext);

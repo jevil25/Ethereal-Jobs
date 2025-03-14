@@ -14,7 +14,7 @@ import {
   getResumeDetails,
   extractResume,
 } from "../api/resume";
-import { useAuth } from "../providers/AuthProvider";
+import { useAuth } from "../providers/useAuth";
 import MainResume from "../components/ResumeV2/mainResume";
 import ResumeTabs from "../components/ResumeV2/ResumeTabs";
 import html2canvas from "html2canvas-pro";
@@ -198,7 +198,7 @@ const ResumeEditor: React.FC = () => {
 
         const imgWidth = 210;
         const pageHeight = 297;
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        // const imgHeight = (canvas.height * imgWidth) / canvas.width;
         const pageCanvasHeight = (pageHeight * canvas.width) / imgWidth;
 
         let heightLeft = canvas.height;
@@ -373,7 +373,6 @@ const ResumeEditor: React.FC = () => {
                 ref={resumeCard}
               />
             ) : (
-              // Edit mode - Show tabs for different sections
               <ResumeTabs
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}

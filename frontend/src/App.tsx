@@ -14,12 +14,11 @@ import {
   Navigate,
   useLocation,
   useSearchParams,
+  Location,
 } from "react-router-dom";
-import { Provider } from "react-redux";
-import { store } from "./lib/redux/store";
 import { AuthProvider } from "./providers/AuthProvider";
 import axios from "axios";
-import { useAuth } from "./providers/AuthProvider";
+import { useAuth } from "./providers/useAuth";
 import VerifyEmailPage from "./pages/verify-email";
 import OnboardingFlow from "./pages/OnBoarding";
 import { Toaster } from "./components/ui/sonner";
@@ -32,13 +31,11 @@ function App() {
     <>
       <div className="App">
         <main className="">
-          <Provider store={store}>
-            <Router>
-              <AuthProvider>
-                <AppContent />
-              </AuthProvider>
-            </Router>
-          </Provider>
+          <Router>
+            <AuthProvider>
+              <AppContent/>
+            </AuthProvider>
+          </Router>
         </main>
         <Toaster />
       </div>
@@ -47,15 +44,13 @@ function App() {
 }
 
 // Create a wrapper component that can be used for each protected route
-function RequireAuth({ children }: { children: ReactNode }) {
+function RequireAuth({ children, location , searchParams}: { children: ReactNode, location: Location, searchParams: URLSearchParams }) {
   const { user } = useAuth();
 
   if (!user) {
     return <Navigate to="/?login=true&feature-box=true" replace />;
   }
 
-  const location = useLocation();
-  const [searchParams] = useSearchParams();
   const onboardingCompleted = searchParams.get("onboardingcompleted");
   if (location.pathname === "jobs" && onboardingCompleted === "true") {
     console.log("onboarding completed");
@@ -72,6 +67,7 @@ function RequireAuth({ children }: { children: ReactNode }) {
 
 function AppContent() {
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const isHomePage =
     location.pathname === "/" ||
     location.pathname === "/reset-password" ||
@@ -87,7 +83,7 @@ function AppContent() {
         <Route
           path="/jobs"
           element={
-            <RequireAuth>
+            <RequireAuth location={location} searchParams={searchParams}>
               <JobSearch />
             </RequireAuth>
           }
@@ -95,7 +91,7 @@ function AppContent() {
         <Route
           path="/job/:id"
           element={
-            <RequireAuth>
+            <RequireAuth location={location} searchParams={searchParams}>
               <JobPage />
             </RequireAuth>
           }
@@ -103,7 +99,7 @@ function AppContent() {
         <Route
           path="/resume"
           element={
-            <RequireAuth>
+            <RequireAuth location={location} searchParams={searchParams}>
               <ResumeBuilder />
             </RequireAuth>
           }
@@ -111,7 +107,7 @@ function AppContent() {
         <Route
           path="/onboarding"
           element={
-            <RequireAuth>
+            <RequireAuth location={location} searchParams={searchParams}>
               <OnboardingFlow />
             </RequireAuth>
           }

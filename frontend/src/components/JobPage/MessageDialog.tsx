@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import Markdown from "react-markdown";
 import { JobData } from "../../types/data";
 import Dropdown from "../DropDown";
@@ -18,6 +18,7 @@ import {
   TooltipTrigger,
 } from "../ui/tooltip";
 import { ScrollArea } from "../ui/scroll-area";
+import { NavigateFunction } from "react-router-dom";
 
 const MessageDialog: React.FC<{
   isOpen: boolean;
@@ -29,7 +30,7 @@ const MessageDialog: React.FC<{
   setLinkedinName: React.Dispatch<React.SetStateAction<string>>;
   job: JobData;
   handleMessageGeneration: (newMessage?: boolean) => void;
-  navigate: any;
+  navigate: NavigateFunction;
 }> = ({
   isOpen,
   onClose,
@@ -52,10 +53,9 @@ const MessageDialog: React.FC<{
     (profile) => profile.name === linkedinName,
   );
 
-  useEffect(() => {
-    if (!isOpen) return;
-    handleMessageGeneration(false);
-  }, [isOpen]);
+  const handleRegenerate = () => {
+    handleMessageGeneration(true);
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -132,7 +132,7 @@ const MessageDialog: React.FC<{
 
                 <div className="flex gap-2">
                   <Button
-                    onClick={() => handleMessageGeneration(true)}
+                    onClick={handleRegenerate}
                     variant="secondary"
                   >
                     Regenerate Message

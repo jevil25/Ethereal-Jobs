@@ -1,11 +1,10 @@
-import { ResumeControlBarCSR } from "../Resume/ResumeControlBar";
 import React from "react";
 import { Card, CardContent } from "../ui/card";
 import { Button } from "../ui/button";
-import { JobData } from "../../types/data";
+import { JobData, LinkedInProfile } from "../../types/data";
 import { Linkedin } from "lucide-react";
 
-const LinkedInProfileCard: React.FC<{ profile: any; index: number }> = ({
+const LinkedInProfileCard: React.FC<{ profile: LinkedInProfile; index: number }> = ({
   profile,
   index,
 }) => (
@@ -30,17 +29,9 @@ const HiringManagersSection: React.FC<{
   job: JobData;
   scale: number;
   setScale: React.Dispatch<React.SetStateAction<number>>;
-  document: React.JSX.Element;
-  settings: any;
-  resume: any;
-  handleMessageGeneration: () => void;
+  handleMessageGeneration: (newMessage?: boolean) => void;
 }> = ({
   job,
-  scale,
-  setScale,
-  document,
-  settings,
-  resume,
   handleMessageGeneration,
 }) => (
   <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 mb-6 border-blue-100">
@@ -62,18 +53,10 @@ const HiringManagersSection: React.FC<{
       </div>
 
       <div className="flex items-center gap-4 mb-4">
-        <ResumeControlBarCSR
-          scale={scale}
-          setScale={setScale}
-          documentSize={settings.documentSize}
-          document={document}
-          fileName={resume.profile.name + " - Resume"}
-          showScale={false}
-        />
         <Button
           variant="outline"
           className="border-blue-500 text-blue-500 hover:bg-blue-50 hover:text-blue-600"
-          onClick={handleMessageGeneration}
+          onClick={() => handleMessageGeneration(false)}
         >
           Get Customized Message
         </Button>

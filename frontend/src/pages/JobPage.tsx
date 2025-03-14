@@ -1,14 +1,6 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { JobData } from "../types/data";
-import { useAppSelector, useSetInitialStore } from "../lib/redux/hooks";
-import { selectResume } from "../lib/redux/resumeSlice";
-import { selectSettings } from "../lib/redux/settingsSlice";
-import { ResumePDF } from "../components/Resume/ResumePDF";
-import {
-  useRegisterReactPDFFont,
-  useRegisterReactPDFHyphenationCallback,
-} from "../fonts/hooks";
 import {
   generateLinkedInMessage,
   getLinkedInProfilesForJob,
@@ -21,6 +13,7 @@ import MessageDialog from "../components/JobPage/MessageDialog";
 import HiringManagersSection from "../components/JobPage/HiringManagerSection";
 import JobHeader from "../components/JobPage/JobHeader";
 import LoadingSpinner from "../components/LoadingSpinner";
+import { useAuth } from "../providers/useAuth";
 
 // Main Component
 const JobPage: React.FC = () => {
@@ -33,17 +26,8 @@ const JobPage: React.FC = () => {
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [linkedinName, setLinkedinName] = useState<string>("");
   const [noResumeFound, setNoResumeFound] = useState<boolean>(false);
+  const { user } = useAuth();
 
-  const resume = useAppSelector(selectResume);
-  const settings = useAppSelector(selectSettings);
-  const document = useMemo(
-    () => <ResumePDF resume={resume} settings={settings} isPDF={true} />,
-    [resume, settings],
-  );
-
-  useRegisterReactPDFFont();
-  useRegisterReactPDFHyphenationCallback(settings.fontFamily);
-  useSetInitialStore(setLoading);
 
   useEffect(() => {
     async function fetchJobData() {
@@ -66,16 +50,11 @@ const JobPage: React.FC = () => {
   }, [navigate]);
 
   const handleMessageGeneration = async (newMessage: boolean = false) => {
-    setLinkedinName(job?.linkedin_profiles[0].name || "");
+    if (linkedinName === "") {
+      setLinkedinName(job?.linkedin_profiles[0].name || "");
+    }
     setGeneratingMessage(true);
     setModalOpen(true);
-    const resumeId = localStorage.getItem("resumeId");
-    if (!resumeId) {
-      setGeneratingMessage(false);
-      setNoResumeFound(true);
-      return;
-    }
-
     try {
       if (!newMessage && generatedMessage) {
         setGeneratingMessage(false);
@@ -83,20 +62,15 @@ const JobPage: React.FC = () => {
       }
 
       const message = await generateLinkedInMessage({
-        email: resumeId,
+        email: user?.email || "",
         company: job?.company || "",
         position: job?.title || "",
         newMessage: newMessage,
       });
       setGeneratedMessage(message.message);
-      setNoResumeFound(false);
+      setNoResumeFound(message.no_resume_found ? true : false);
     } catch (error) {
       console.error("Error generating message:", error);
-      // toast({
-      //   title: "Error",
-      //   description: "Failed to generate LinkedIn message. Please try again.",
-      //   variant: "destructive",
-      // });
     } finally {
       setGeneratingMessage(false);
     }
@@ -126,9 +100,6 @@ const JobPage: React.FC = () => {
                   job={job}
                   scale={scale}
                   setScale={setScale}
-                  document={document}
-                  settings={settings}
-                  resume={resume}
                   handleMessageGeneration={handleMessageGeneration}
                 />
               )}

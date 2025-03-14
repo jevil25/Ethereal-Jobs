@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { userSignin, userSignup, sendPasswordResetEmail } from "../../api/user";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../providers/AuthProvider";
+import { useAuth } from "../../providers/useAuth";
 import { onAuthStateChanged } from "firebase/auth";
 import {
   signInWithGoogle,
@@ -271,13 +271,13 @@ const AuthForms: React.FC<AuthFormsProps> = ({
     return () => {
       unsubscribe();
     };
-  }, []);
+  });
 
   const handleSignInWithGoogle = async () => {
     try {
       await signInWithGoogle();
     } catch (error) {
-      toast("Something went wrong");
+      toast(`Failed to sign in with Google: ${error}`,);
     }
   };
 

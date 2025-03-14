@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import {
@@ -65,50 +65,10 @@ const OnboardingFlow: React.FC = () => {
   const prevStateRef = useRef(formData);
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const updateResumeDetail = async (isOnBoarded: boolean) => {
+  const updateResumeDetail = useCallback(async (isOnBoarded: boolean) => {
     await updateResumeDetails({ data: formData }, isOnBoarded);
-  };
-
-  useEffect(() => {
-    const stepNumber = parseInt(searchParams.get("step") || "0");
-    if (stepNumber > -1 && stepNumber <= steps.length) {
-      setCurrentStep(stepNumber);
-    }
-    setFirstStepCheckDone(true);
-    const getFormData = async () => {
-      const data = await getResumeDetails();
-      if (data.no_resume_found && data.no_resume_found) {
-        return;
-      }
-      setFormData(data);
-      setFirstGetDone(true);
-    };
-    getFormData();
-  }, []);
-
-  useEffect(() => {
-    const hasStateChanged =
-      JSON.stringify(prevStateRef.current) !== JSON.stringify(formData);
-    if (!hasStateChanged && !firstGetDone) {
-      return;
-    }
-    const debouncedSave = debounce(async () => {
-      await updateResumeDetail(false);
-      prevStateRef.current = formData;
-    }, 500);
-    debouncedSave();
-
-    return () => {
-      debouncedSave.cancel();
-    };
   }, [formData]);
 
-  useEffect(() => {
-    if (!firstStepCheckDone) return;
-    setSearchParams({ step: currentStep.toString() });
-  }, [currentStep]);
-
-  // Function to handle resume upload and parsing
   const handleResumeUpload = async (file: File | null) => {
     if (!file) {
       // User cancelled file upload
@@ -148,7 +108,6 @@ const OnboardingFlow: React.FC = () => {
     }
   };
 
-  // Re-ordered steps with resume upload first
   const steps = [
     {
       title: "Resume Upload (Optional)",
@@ -238,6 +197,45 @@ const OnboardingFlow: React.FC = () => {
       ),
     },
   ];
+
+  useEffect(() => {
+    const stepNumber = parseInt(searchParams.get("step") || "0");
+    if (stepNumber > -1 && stepNumber <= steps.length) {
+      setCurrentStep(stepNumber);
+    }
+    setFirstStepCheckDone(true);
+    const getFormData = async () => {
+      const data = await getResumeDetails();
+      if (data.no_resume_found && data.no_resume_found) {
+        return;
+      }
+      setFormData(data);
+      setFirstGetDone(true);
+    };
+    getFormData();
+  }, [searchParams, steps.length]);
+
+  useEffect(() => {
+    const hasStateChanged =
+      JSON.stringify(prevStateRef.current) !== JSON.stringify(formData);
+    if (!hasStateChanged && !firstGetDone) {
+      return;
+    }
+    const debouncedSave = debounce(async () => {
+      await updateResumeDetail(false);
+      prevStateRef.current = formData;
+    }, 500);
+    debouncedSave();
+
+    return () => {
+      debouncedSave.cancel();
+    };
+  }, [formData, firstGetDone, updateResumeDetail]);
+
+  useEffect(() => {
+    if (!firstStepCheckDone) return;
+    setSearchParams({ step: currentStep.toString() });
+  }, [currentStep, setSearchParams, firstStepCheckDone]);
 
   const onComplete = async () => {
     console.log("Onboarding complete!");
