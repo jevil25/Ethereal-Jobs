@@ -1,11 +1,7 @@
-import React, {
-  useState,
-  useEffect,
-  ReactNode,
-} from "react";
+import React, { useState, useEffect, ReactNode } from "react";
 import { userMe, userSignout } from "../api/user";
 import { User } from "../types/data";
-import { AuthContext } from "./useAuth"; 
+import { AuthContext } from "./useAuth";
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -65,4 +61,3 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     </AuthContext.Provider>
   );
 };
-

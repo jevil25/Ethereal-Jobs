@@ -277,7 +277,7 @@ const AuthForms: React.FC<AuthFormsProps> = ({
     try {
       await signInWithGoogle();
     } catch (error) {
-      toast(`Failed to sign in with Google: ${error}`,);
+      toast(`Failed to sign in with Google: ${error}`);
     }
   };
 

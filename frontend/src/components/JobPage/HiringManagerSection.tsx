@@ -4,10 +4,10 @@ import { Button } from "../ui/button";
 import { JobData, LinkedInProfile } from "../../types/data";
 import { Linkedin } from "lucide-react";
 
-const LinkedInProfileCard: React.FC<{ profile: LinkedInProfile; index: number }> = ({
-  profile,
-  index,
-}) => (
+const LinkedInProfileCard: React.FC<{
+  profile: LinkedInProfile;
+  index: number;
+}> = ({ profile, index }) => (
   <a
     key={index}
     href={profile.profile_url}
@@ -30,10 +30,7 @@ const HiringManagersSection: React.FC<{
   scale: number;
   setScale: React.Dispatch<React.SetStateAction<number>>;
   handleMessageGeneration: (newMessage?: boolean) => void;
-}> = ({
-  job,
-  handleMessageGeneration,
-}) => (
+}> = ({ job, handleMessageGeneration }) => (
   <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 mb-6 border-blue-100">
     <CardContent className="pt-6">
       <div className="flex items-center mb-4 bg-white p-4 rounded-lg border border-blue-300 shadow-md transition-all w-fit">

@@ -26,6 +26,7 @@ const ResumeEditor: React.FC = () => {
   const [activeTab, setActiveTab] = useState("preview");
   const [editMode, setEditMode] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [openUploadResumeModal, setOpenUploadResumeModal] = useState(false);
   const [saveStatus, setSaveStatus] = useState<"saved" | "saving" | "error">(
     "saved",
   );
@@ -72,7 +73,7 @@ const ResumeEditor: React.FC = () => {
       immediateStart: false,
     },
     resumeFile: null,
-  })
+  });
   const prevStateRef = useRef(resumeData);
   const resumeCard = useRef<HTMLDivElement>(null);
 
@@ -139,19 +140,18 @@ const ResumeEditor: React.FC = () => {
   useEffect(() => {
     const getGeneratedResume = async () => {
       try {
-        const data = await getResume({ 
+        const data = await getResume({
           is_main_resume: true,
-         });
+        });
         if (data && data.extracted_data) {
           setGeneratedResume(data.extracted_data);
         }
       } catch (error) {
         console.error("Error fetching generated resume:", error);
       }
-    }
+    };
     getGeneratedResume();
   });
-
 
   const handleResumeUpload = async (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -322,6 +322,7 @@ const ResumeEditor: React.FC = () => {
               <Button
                 variant="jobify"
                 className="flex items-center gap-2 text-xs md:text-sm w-full"
+                onClick={() => setOpenUploadResumeModal(true)}
               >
                 <Upload size={16} />
                 Import Resume

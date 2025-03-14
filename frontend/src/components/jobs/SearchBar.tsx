@@ -35,7 +35,7 @@ interface SearchBarProps {
 const SearchBar: React.FC<SearchBarProps> = ({ onSearch, filters }) => {
   const countries = getNames();
 
-  const [searchParams,] = useSearchParams();
+  const [searchParams] = useSearchParams();
 
   const [city, setCity] = useState(searchParams.get("city") || "");
   const [country, setCountry] = useState(searchParams.get("country") || "");

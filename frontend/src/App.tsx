@@ -33,7 +33,7 @@ function App() {
         <main className="">
           <Router>
             <AuthProvider>
-              <AppContent/>
+              <AppContent />
             </AuthProvider>
           </Router>
         </main>
@@ -44,7 +44,15 @@ function App() {
 }
 
 // Create a wrapper component that can be used for each protected route
-function RequireAuth({ children, location , searchParams}: { children: ReactNode, location: Location, searchParams: URLSearchParams }) {
+function RequireAuth({
+  children,
+  location,
+  searchParams,
+}: {
+  children: ReactNode;
+  location: Location;
+  searchParams: URLSearchParams;
+}) {
   const { user } = useAuth();
 
   if (!user) {

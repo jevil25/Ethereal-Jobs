@@ -35,7 +35,10 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [searchParams]);
 
-  const scrollToSection = (event: React.MouseEvent<HTMLAnchorElement | HTMLDivElement, MouseEvent>, id: string) => {
+  const scrollToSection = (
+    event: React.MouseEvent<HTMLAnchorElement | HTMLDivElement, MouseEvent>,
+    id: string,
+  ) => {
     event.preventDefault();
     // check if home page
     if (window.location.pathname !== "/") {

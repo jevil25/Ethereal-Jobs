@@ -6,10 +6,10 @@ import { FormData } from "@/api/types";
 
 interface CertificationTabProps {
   certifications: Certification[];
-  updateResumeSection: (<K extends keyof FormData>(
+  updateResumeSection: <K extends keyof FormData>(
     section: K,
     data: FormData[K],
-  ) => void);
+  ) => void;
 }
 
 const CertificationTab = ({

@@ -65,9 +65,12 @@ const OnboardingFlow: React.FC = () => {
   const prevStateRef = useRef(formData);
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const updateResumeDetail = useCallback(async (isOnBoarded: boolean) => {
-    await updateResumeDetails({ data: formData }, isOnBoarded);
-  }, [formData]);
+  const updateResumeDetail = useCallback(
+    async (isOnBoarded: boolean) => {
+      await updateResumeDetails({ data: formData }, isOnBoarded);
+    },
+    [formData],
+  );
 
   const handleResumeUpload = async (file: File | null) => {
     if (!file) {
@@ -117,6 +120,7 @@ const OnboardingFlow: React.FC = () => {
         <ResumeUploadCard
           file={formData.resumeFile}
           updateFile={handleResumeUpload}
+          isParsing={isParsingResume}
         />
       ),
     },

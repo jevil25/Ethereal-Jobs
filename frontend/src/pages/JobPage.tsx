@@ -28,7 +28,6 @@ const JobPage: React.FC = () => {
   const [noResumeFound, setNoResumeFound] = useState<boolean>(false);
   const { user } = useAuth();
 
-
   useEffect(() => {
     async function fetchJobData() {
       setLoading(true);

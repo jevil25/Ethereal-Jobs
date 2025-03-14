@@ -1,6 +1,13 @@
 import axios from "axios";
 import { constructServerUrlFromPath } from "../utils/helper";
-import { ResumeSaveRequest, extractResumeRequest, GenerateAiResumeRequest, GenerateAiResumeResponse, GenerateAiGetResumeRequest, GenerateAiGetResumeResponse } from "./types";
+import {
+  ResumeSaveRequest,
+  extractResumeRequest,
+  GenerateAiResumeRequest,
+  GenerateAiResumeResponse,
+  GenerateAiGetResumeRequest,
+  GenerateAiGetResumeResponse,
+} from "./types";
 import { FormData as customFormData } from "./types";
 import { userRefresh } from "./user";
 
@@ -89,4 +96,4 @@ export const generateResume = async (
     return response.data as GenerateAiResumeResponse;
   }
   return undefined;
-}
+};

@@ -131,10 +131,7 @@ const MessageDialog: React.FC<{
                 </div>
 
                 <div className="flex gap-2">
-                  <Button
-                    onClick={handleRegenerate}
-                    variant="secondary"
-                  >
+                  <Button onClick={handleRegenerate} variant="secondary">
                     Regenerate Message
                   </Button>
                   {selectedProfile && (

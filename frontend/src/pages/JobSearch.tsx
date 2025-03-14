@@ -71,12 +71,14 @@ const JobSearch: React.FC = () => {
     }, 300);
   };
 
-  const handleFilterChange = (newFilters: Partial<{
-    is_remote: boolean;
-    job_type: string;
-    salary_min: number;
-    salary_max: number;
-}>) => {
+  const handleFilterChange = (
+    newFilters: Partial<{
+      is_remote: boolean;
+      job_type: string;
+      salary_min: number;
+      salary_max: number;
+    }>,
+  ) => {
     if (newFilters.job_type == "All Types") {
       newFilters.job_type = "";
     }

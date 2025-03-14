@@ -12,7 +12,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "prepare": "husky && husky install"
+    "prepare": "husky && husky install",
+    "prettier": "prettier --write . --ignore-path .gitignore"
   },
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown",

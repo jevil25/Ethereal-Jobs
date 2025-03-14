@@ -30,10 +30,10 @@ const ResumeTabs = ({
   updateResumeSection,
 }: ResumeTabsProps) => {
   const handleUpdateResumeSection = <K extends keyof FormData>(
-      section: K,
-      data: FormData[K],
-    )=> {
-        updateResumeSection(section, data);
+    section: K,
+    data: FormData[K],
+  ) => {
+    updateResumeSection(section, data);
   };
   return (
     <Tabs

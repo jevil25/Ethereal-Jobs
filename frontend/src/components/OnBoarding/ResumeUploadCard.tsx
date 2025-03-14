@@ -1,22 +1,43 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Label } from "../ui/label";
 import { Button } from "../ui/button";
-import { Upload, File, CheckCircle2, X } from "lucide-react";
+import { Upload, File, CheckCircle2, X, Loader2 } from "lucide-react";
 
 export interface ResumeUploadCardProps {
   file: File | null;
   updateFile: (file: File | null) => void;
+  isParsing: boolean;
 }
 
 const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({
   file,
   updateFile,
+  isParsing,
 }) => {
   const [isDragging, setIsDragging] = useState(false);
-  const [uploadStatus, setUploadStatus] = useState<
-    "idle" | "uploading" | "success" | "error"
-  >(file ? "success" : "idle");
-  const [progressPercent, setProgressPercent] = useState(0);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const processFile = (selectedFile: File) => {
+    const validTypes = [
+      "application/pdf",
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    ];
+    const maxSize = 5 * 1024 * 1024; // 5MB
+
+    if (!validTypes.includes(selectedFile.type)) {
+      alert("Please upload a PDF or Word document.");
+      return;
+    }
+
+    if (selectedFile.size > maxSize) {
+      alert("File size should be less than 5MB.");
+      return;
+    }
+
+    // Update the file immediately to fix the double upload issue
+    updateFile(selectedFile);
+  };
 
   const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -59,45 +80,8 @@ const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({
     }
   };
 
-  const processFile = (selectedFile: File) => {
-    const validTypes = [
-      "application/pdf",
-      "application/msword",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    ];
-    const maxSize = 5 * 1024 * 1024; // 5MB
-
-    if (!validTypes.includes(selectedFile.type)) {
-      alert("Please upload a PDF or Word document.");
-      return;
-    }
-
-    if (selectedFile.size > maxSize) {
-      alert("File size should be less than 5MB.");
-      return;
-    }
-
-    // Update the file immediately to fix the double upload issue
-    updateFile(selectedFile);
-    setUploadStatus("uploading");
-
-    // Simulate upload progress
-    let progress = 0;
-    const interval = setInterval(() => {
-      progress += 10;
-      setProgressPercent(progress);
-
-      if (progress >= 100) {
-        clearInterval(interval);
-        setUploadStatus("success");
-      }
-    }, 150);
-  };
-
   const removeFile = () => {
     updateFile(null);
-    setUploadStatus("idle");
-    setProgressPercent(0);
   };
 
   const getFileExtension = (filename: string) => {
@@ -115,15 +99,16 @@ const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({
       onDragLeave={handleDragLeave}
       onDragOver={handleDragOver}
       onDrop={handleDrop}
-      onClick={() => document.getElementById("file-upload")?.click()}
+      onClick={() => fileInputRef.current?.click()}
     >
       <div className="flex flex-col items-center justify-center space-y-2">
         <Upload className="h-12 w-12 text-gray-400" />
         <Label htmlFor="file-upload" className="font-medium text-gray-700">
-          Drop your resume here or <span className="text-blue-500">browse</span>
+          Drop your resume here or click to upload
         </Label>
         <input
           id="file-upload"
+          ref={fileInputRef}
           name="file-upload"
           type="file"
           className="sr-only"
@@ -150,8 +135,8 @@ const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({
         renderUploadArea()
       ) : (
         <div className="border rounded-lg p-4">
-          {uploadStatus === "uploading" ? (
-            <div className="space-y-2">
+          {isParsing ? (
+            <div className="space-y-2 h-20">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <File className="h-5 w-5 text-blue-500" />
@@ -167,17 +152,12 @@ const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({
                   <X className="h-4 w-4" />
                 </Button>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div
-                  className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${progressPercent}%` }}
-                ></div>
+              <div className="flex justify-center items-center w-full h-12 text-center">
+                <Loader2 className="w-12 animate-spin text-blue-500" />
+                Parsing your resume, please wait...
               </div>
-              <p className="text-sm text-gray-500 text-right">
-                {progressPercent}%
-              </p>
             </div>
-          ) : uploadStatus === "success" ? (
+          ) : !isParsing ? (
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <CheckCircle2 className="h-5 w-5 text-green-500" />

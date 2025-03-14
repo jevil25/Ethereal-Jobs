@@ -6,10 +6,10 @@ import { FormData } from "@/api/types";
 
 interface ProjectTabProps {
   projects: Project[];
-  updateResumeSection: (<K extends keyof FormData>(
+  updateResumeSection: <K extends keyof FormData>(
     section: K,
     data: FormData[K],
-  ) => void);
+  ) => void;
 }
 
 const ProjectTab = ({ projects, updateResumeSection }: ProjectTabProps) => {
