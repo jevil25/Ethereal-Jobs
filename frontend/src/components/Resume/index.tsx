@@ -27,14 +27,18 @@ export const Resume = ({ isLoading }: ResumeProps) => {
   const settings = useAppSelector(selectSettings);
   const document = useMemo(
     () => <ResumePDF resume={resume} settings={settings} isPDF={true} />,
-    [resume, settings]
+    [resume, settings],
   );
 
   useRegisterReactPDFFont();
   useRegisterReactPDFHyphenationCallback(settings.fontFamily);
 
   if (isLoading) {
-    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        Loading...
+      </div>
+    );
   }
 
   return (

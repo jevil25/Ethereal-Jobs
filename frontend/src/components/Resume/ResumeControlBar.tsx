@@ -8,7 +8,6 @@ import {
 import { usePDF } from "@react-pdf/renderer";
 import { Button } from "../Button";
 
-
 const ResumeControlBar = ({
   scale,
   setScale,
@@ -33,56 +32,64 @@ const ResumeControlBar = ({
 
   // Hook to update pdf when document changes
   useEffect(() => {
-    if (document){
+    if (document) {
       update(document);
     }
   }, [update, document]);
 
-  return showScale ? (<>
-    <div className="sticky bottom-0 left-0 right-0 flex h-[var(--resume-control-bar-height)] items-center justify-center px-[var(--resume-padding)] text-gray-600 lg:justify-between">
-      <div className="flex items-center gap-2">
-        <MagnifyingGlassIcon className="h-5 w-5" aria-hidden="true" />
-        <input
-          type="range"
-          min={0.5}
-          max={1.5}
-          step={0.01}
-          value={scale}
-          onChange={(e) => {
-            setScaleOnResize(false);
-            setScale(Number(e.target.value));
-          }}
-        />
-        <div className="w-10">{`${Math.round(scale * 100)}%`}</div>
-        <label className="hidden items-center gap-1 lg:flex">
+  return showScale ? (
+    <>
+      <div className="sticky bottom-0 left-0 right-0 flex h-[var(--resume-control-bar-height)] items-center justify-center px-[var(--resume-padding)] text-gray-600 lg:justify-between">
+        <div className="flex items-center gap-2">
+          <MagnifyingGlassIcon className="h-5 w-5" aria-hidden="true" />
           <input
-            type="checkbox"
-            className="mt-0.5 h-4 w-4"
-            checked={scaleOnResize}
-            onChange={() => setScaleOnResize((prev) => !prev)}
+            type="range"
+            min={0.5}
+            max={1.5}
+            step={0.01}
+            value={scale}
+            onChange={(e) => {
+              setScaleOnResize(false);
+              setScale(Number(e.target.value));
+            }}
           />
-          <span className="select-none">Autoscale</span>
-        </label>
+          <div className="w-10">{`${Math.round(scale * 100)}%`}</div>
+          <label className="hidden items-center gap-1 lg:flex">
+            <input
+              type="checkbox"
+              className="mt-0.5 h-4 w-4"
+              checked={scaleOnResize}
+              onChange={() => setScaleOnResize((prev) => !prev)}
+            />
+            <span className="select-none">Autoscale</span>
+          </label>
+        </div>
+        <a
+          className="ml-1 flex items-center gap-1 rounded-md border border-gray-300 hover:bg-blue-700 text-white bg-blue-600 px-4 py-2 lg:ml-8 cursor-pointer"
+          href={instance.url!}
+          download={fileName}
+        >
+          <ArrowDownTrayIcon className="h-4 w-4 cursor-pointer" />
+          <Button className="whitespace-nowrap cursor-pointer">
+            Download Resume
+          </Button>
+        </a>
       </div>
+    </>
+  ) : (
+    <>
       <a
-        className="ml-1 flex items-center gap-1 rounded-md border border-gray-300 hover:bg-blue-700 text-white bg-blue-600 px-4 py-2 lg:ml-8 cursor-pointer"
+        className="flex items-center gap-1 rounded-md border border-gray-300 hover:bg-blue-700 text-white bg-blue-600 px-4 py-2 cursor-pointer"
         href={instance.url!}
         download={fileName}
       >
         <ArrowDownTrayIcon className="h-4 w-4 cursor-pointer" />
-        <Button className="whitespace-nowrap cursor-pointer">Download Resume</Button>
+        <Button className="whitespace-nowrap cursor-pointer">
+          Download Resume
+        </Button>
       </a>
-    </div>
-  </>) : <>
-    <a
-      className="flex items-center gap-1 rounded-md border border-gray-300 hover:bg-blue-700 text-white bg-blue-600 px-4 py-2 cursor-pointer"
-      href={instance.url!}
-      download={fileName}
-    >
-      <ArrowDownTrayIcon className="h-4 w-4 cursor-pointer" />
-      <Button className="whitespace-nowrap cursor-pointer">Download Resume</Button>
-    </a>
-  </>;
+    </>
+  );
 };
 
 /**

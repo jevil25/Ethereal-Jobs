@@ -1,11 +1,17 @@
-import React from 'react';
-import { Label } from '../ui/label';
-import { Input } from '../ui/input';
-import { Checkbox } from '../ui/checkbox';
-import { Badge } from '../ui/badge';
-import { X } from 'lucide-react';
-import { Button } from '../ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import React from "react";
+import { Label } from "../ui/label";
+import { Input } from "../ui/input";
+import { Checkbox } from "../ui/checkbox";
+import { Badge } from "../ui/badge";
+import { X } from "lucide-react";
+import { Button } from "../ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 export interface JobPreferences {
   jobTypes: string[];
@@ -20,85 +26,90 @@ interface JobPreferencesCardProps {
   updateData: (data: JobPreferences) => void;
 }
 
-const JobPreferencesCard: React.FC<JobPreferencesCardProps> = ({ data, updateData }) => {
-  const [newLocation, setNewLocation] = React.useState('');
-  
+const JobPreferencesCard: React.FC<JobPreferencesCardProps> = ({
+  data,
+  updateData,
+}) => {
+  const [newLocation, setNewLocation] = React.useState("");
+
   const jobTypeOptions = [
-    "Full-time", 
-    "Part-time", 
-    "Contract", 
-    "Temporary", 
-    "Internship", 
-    "Freelance"
+    "Full-time",
+    "Part-time",
+    "Contract",
+    "Temporary",
+    "Internship",
+    "Freelance",
   ];
-  
+
   const remoteOptions = [
     { value: "onsite", label: "On-site only" },
     { value: "hybrid", label: "Hybrid (some remote work)" },
     { value: "remote", label: "Fully remote" },
-    { value: "flexible", label: "Flexible (open to all options)" }
+    { value: "flexible", label: "Flexible (open to all options)" },
   ];
-  
+
   const toggleJobType = (type: string) => {
     if (data.jobTypes.includes(type)) {
       updateData({
         ...data,
-        jobTypes: data.jobTypes.filter(t => t !== type)
+        jobTypes: data.jobTypes.filter((t) => t !== type),
       });
     } else {
       updateData({
         ...data,
-        jobTypes: [...data.jobTypes, type]
+        jobTypes: [...data.jobTypes, type],
       });
     }
   };
-  
+
   const addLocation = (e: React.FormEvent) => {
     e.preventDefault();
     if (newLocation.trim() && !data.locations.includes(newLocation.trim())) {
       updateData({
         ...data,
-        locations: [...data.locations, newLocation.trim()]
+        locations: [...data.locations, newLocation.trim()],
       });
-      setNewLocation('');
+      setNewLocation("");
     }
   };
-  
+
   const removeLocation = (location: string) => {
     updateData({
       ...data,
-      locations: data.locations.filter(l => l !== location)
+      locations: data.locations.filter((l) => l !== location),
     });
   };
-  
+
   const handleRemoteChange = (value: string) => {
     updateData({
       ...data,
-      remotePreference: value
+      remotePreference: value,
     });
   };
-  
+
   const handleSalaryChange = (value: string) => {
     updateData({
       ...data,
-      salaryExpectation: value
+      salaryExpectation: value,
     });
   };
-  
+
   const handleImmediateStartChange = (checked: boolean) => {
     updateData({
       ...data,
-      immediateStart: checked
+      immediateStart: checked,
     });
   };
 
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <Label className="text-base">What type of job are you looking for?</Label>
+        <Label className="text-base">
+          What type of job are you looking for?
+        </Label>
         <div className="flex flex-wrap gap-2 mt-2">
-          {jobTypeOptions.map(type => (
-            <Badge 
+          {jobTypeOptions.map((type) => (
+            <Badge
               key={type}
               variant={data.jobTypes.includes(type) ? "default" : "outline"}
               className="cursor-pointer px-3 py-1"
@@ -109,7 +120,7 @@ const JobPreferencesCard: React.FC<JobPreferencesCardProps> = ({ data, updateDat
           ))}
         </div>
       </div>
-      
+
       <div className="space-y-2">
         <Label className="text-base">Preferred work location(s)</Label>
         <form onSubmit={addLocation} className="flex space-x-2">
@@ -119,12 +130,18 @@ const JobPreferencesCard: React.FC<JobPreferencesCardProps> = ({ data, updateDat
             onChange={(e) => setNewLocation(e.target.value)}
             className="flex-1"
           />
-          <Button type="submit" variant="jobify">Add</Button>
+          <Button type="submit" variant="jobify">
+            Add
+          </Button>
         </form>
-        
+
         <div className="flex flex-wrap gap-2 mt-2">
           {data.locations.map((location) => (
-            <Badge key={location} variant="secondary" className="pl-3 pr-2 py-1.5 flex items-center">
+            <Badge
+              key={location}
+              variant="secondary"
+              className="pl-3 pr-2 py-1.5 flex items-center"
+            >
               {location}
               <Button
                 variant="ghost"
@@ -136,15 +153,19 @@ const JobPreferencesCard: React.FC<JobPreferencesCardProps> = ({ data, updateDat
               </Button>
             </Badge>
           ))}
-          
+
           {data.locations.length === 0 && (
-            <p className="text-sm text-gray-500">Add locations where you'd like to work</p>
+            <p className="text-sm text-gray-500">
+              Add locations where you'd like to work
+            </p>
           )}
         </div>
       </div>
-      
+
       <div className="space-y-2">
-        <Label htmlFor="remotePreference" className="text-base">Remote work preference</Label>
+        <Label htmlFor="remotePreference" className="text-base">
+          Remote work preference
+        </Label>
         <Select
           value={data.remotePreference}
           onValueChange={handleRemoteChange}
@@ -153,7 +174,7 @@ const JobPreferencesCard: React.FC<JobPreferencesCardProps> = ({ data, updateDat
             <SelectValue placeholder="Select your remote work preference" />
           </SelectTrigger>
           <SelectContent>
-            {remoteOptions.map(option => (
+            {remoteOptions.map((option) => (
               <SelectItem key={option.value} value={option.value}>
                 {option.label}
               </SelectItem>
@@ -161,9 +182,11 @@ const JobPreferencesCard: React.FC<JobPreferencesCardProps> = ({ data, updateDat
           </SelectContent>
         </Select>
       </div>
-      
+
       <div className="space-y-2">
-        <Label htmlFor="salaryExpectation" className="text-base">Expected annual salary</Label>
+        <Label htmlFor="salaryExpectation" className="text-base">
+          Expected annual salary
+        </Label>
         <Select
           value={data.salaryExpectation}
           onValueChange={handleSalaryChange}
@@ -182,10 +205,10 @@ const JobPreferencesCard: React.FC<JobPreferencesCardProps> = ({ data, updateDat
           </SelectContent>
         </Select>
       </div>
-      
+
       <div className="flex items-center space-x-2">
-        <Checkbox 
-          id="immediateStart" 
+        <Checkbox
+          id="immediateStart"
           checked={data.immediateStart}
           onCheckedChange={handleImmediateStartChange}
         />

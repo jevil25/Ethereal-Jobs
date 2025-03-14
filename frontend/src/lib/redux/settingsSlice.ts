@@ -75,28 +75,28 @@ export const settingsSlice = createSlice({
   reducers: {
     changeSettings: (
       draft,
-      action: PayloadAction<{ field: GeneralSetting; value: string }>
+      action: PayloadAction<{ field: GeneralSetting; value: string }>,
     ) => {
       const { field, value } = action.payload;
       draft[field] = value;
     },
     changeShowForm: (
       draft,
-      action: PayloadAction<{ field: ShowForm; value: boolean }>
+      action: PayloadAction<{ field: ShowForm; value: boolean }>,
     ) => {
       const { field, value } = action.payload;
       draft.formToShow[field] = value;
     },
     changeFormHeading: (
       draft,
-      action: PayloadAction<{ field: ShowForm; value: string }>
+      action: PayloadAction<{ field: ShowForm; value: string }>,
     ) => {
       const { field, value } = action.payload;
       draft.formToHeading[field] = value;
     },
     changeFormOrder: (
       draft,
-      action: PayloadAction<{ form: ShowForm; type: "up" | "down" }>
+      action: PayloadAction<{ form: ShowForm; type: "up" | "down" }>,
     ) => {
       const { form, type } = action.payload;
       const lastIdx = draft.formsOrder.length - 1;
@@ -116,7 +116,7 @@ export const settingsSlice = createSlice({
       action: PayloadAction<{
         field: FormWithBulletPoints;
         value: boolean;
-      }>
+      }>,
     ) => {
       const { field, value } = action.payload;
       draft["showBulletPoints"][field] = value;

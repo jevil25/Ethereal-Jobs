@@ -1,11 +1,11 @@
-import { FileText, Search, Users, MessageSquare } from 'lucide-react';
-import { Button } from '../ui/button';
-import { useNavigate} from 'react-router-dom';
+import { FileText, Search, Users, MessageSquare } from "lucide-react";
+import { Button } from "../ui/button";
+import { useNavigate } from "react-router-dom";
 
 interface FeatureCardProps {
-    icon: React.FC<React.SVGProps<SVGSVGElement>>;
-    title: string;
-    description: string;
+  icon: React.FC<React.SVGProps<SVGSVGElement>>;
+  title: string;
+  description: string;
 }
 
 const FeatureCard = ({ icon: Icon, title, description }: FeatureCardProps) => (
@@ -25,23 +25,27 @@ const FeaturesSection = () => {
     {
       icon: FileText,
       title: "AI Resume Builder",
-      description: "Transform your experience into a compelling resume in seconds. Our AI tailors your resume to match job requirements, highlighting your most relevant skills and achievements."
+      description:
+        "Transform your experience into a compelling resume in seconds. Our AI tailors your resume to match job requirements, highlighting your most relevant skills and achievements.",
     },
     {
       icon: Search,
       title: "Smart Job Matching",
-      description: "Get personalized job recommendations based on your skills, experience, and preferences. Our algorithm finds positions where you'll have the highest chance of success."
+      description:
+        "Get personalized job recommendations based on your skills, experience, and preferences. Our algorithm finds positions where you'll have the highest chance of success.",
     },
     {
       icon: Users,
       title: "Network Connections",
-      description: "Discover valuable LinkedIn connections at your target companies. We identify the most relevant professionals who can help advance your application."
+      description:
+        "Discover valuable LinkedIn connections at your target companies. We identify the most relevant professionals who can help advance your application.",
     },
     {
       icon: MessageSquare,
       title: "Outreach Templates",
-      description: "Connect with confidence using our professionally crafted message templates. Personalized outreach messages that increase your chances of getting a response."
-    }
+      description:
+        "Connect with confidence using our professionally crafted message templates. Personalized outreach messages that increase your chances of getting a response.",
+    },
   ];
 
   return (
@@ -52,10 +56,11 @@ const FeaturesSection = () => {
             Everything You Need to Land Your Next Role
           </h2>
           <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-            Our comprehensive toolkit streamlines your job search from resume to interview
+            Our comprehensive toolkit streamlines your job search from resume to
+            interview
           </p>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {features.map((feature, index) => (
             <FeatureCard
@@ -71,7 +76,12 @@ const FeaturesSection = () => {
           <p className="text-slate-600 mb-6">
             Ready to accelerate your job search?
           </p>
-          <Button onClick={() => navigate('/jobs')} variant={"jobify"} size={"xxl"} className="rounded-4xl">
+          <Button
+            onClick={() => navigate("/jobs")}
+            variant={"jobify"}
+            size={"xxl"}
+            className="rounded-4xl"
+          >
             Get Started
           </Button>
         </div>

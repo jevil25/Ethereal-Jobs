@@ -1,9 +1,5 @@
 import { ExpanderWithHeightTransition } from "../../ExpanderWithHeightTransition";
-import {
-  DeleteIconButton,
-  MoveIconButton,
-  ShowIconButton,
-} from "./IconButton";
+import { DeleteIconButton, MoveIconButton, ShowIconButton } from "./IconButton";
 import { useAppDispatch, useAppSelector } from "../../../lib/redux/hooks";
 import {
   changeFormHeading,

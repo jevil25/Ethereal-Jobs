@@ -1,9 +1,5 @@
 import { View } from "@react-pdf/renderer";
-import {
-  ResumePDFBulletList,
-  ResumePDFSection,
-  ResumePDFText,
-} from "./common";
+import { ResumePDFBulletList, ResumePDFSection, ResumePDFText } from "./common";
 import { styles, spacing } from "./styles";
 import type { ResumeEducation } from "../../../lib/redux/types";
 
@@ -57,7 +53,7 @@ export const ResumePDFEducation = ({
               )}
             </View>
           );
-        }
+        },
       )}
     </ResumePDFSection>
   );

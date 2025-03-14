@@ -1,8 +1,5 @@
 import { Form } from "./Form";
-import {
-  BulletListTextarea,
-  InputGroupWrapper,
-} from "./Form/InputGroup";
+import { BulletListTextarea, InputGroupWrapper } from "./Form/InputGroup";
 import { FeaturedSkillInput } from "./Form/FeaturedSkillInput";
 import { BulletListIconButton } from "./Form/IconButton";
 import { useAppDispatch, useAppSelector } from "../../lib/redux/hooks";
@@ -27,7 +24,7 @@ export const SkillsForm = () => {
   const handleFeaturedSkillsChange = (
     idx: number,
     skill: string,
-    rating: number
+    rating: number,
   ) => {
     dispatch(changeSkills({ field: "featuredSkills", idx, skill, rating }));
   };

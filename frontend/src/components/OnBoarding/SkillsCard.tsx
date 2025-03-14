@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { Input } from '../ui/input';
-import { Button } from '../ui/button';
-import { X } from 'lucide-react';
-import { Badge } from '../ui/badge';
+import React, { useState } from "react";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
+import { X } from "lucide-react";
+import { Badge } from "../ui/badge";
 
 export interface SkillsCardProps {
   data: string[];
@@ -10,27 +10,40 @@ export interface SkillsCardProps {
 }
 
 const SkillsCard: React.FC<SkillsCardProps> = ({ data, updateData }) => {
-  const [newSkill, setNewSkill] = useState('');
-  
+  const [newSkill, setNewSkill] = useState("");
+
   const handleAddSkill = (e: React.FormEvent) => {
     e.preventDefault();
     if (newSkill.trim() && !data.includes(newSkill.trim())) {
       updateData([...data, newSkill.trim()]);
-      setNewSkill('');
+      setNewSkill("");
     }
   };
-  
+
   const handleRemoveSkill = (skillToRemove: string) => {
-    updateData(data.filter(skill => skill !== skillToRemove));
+    updateData(data.filter((skill) => skill !== skillToRemove));
   };
-  
+
   // Some common skills for suggestions
   const skillSuggestions = [
-    'JavaScript', 'TypeScript', 'React', 'Node.js', 'Python', 'Java', 'SQL',
-    'Management', 'Leadership', 'Communication', 'Project Management',
-    'Marketing', 'Sales', 'Customer Service', 'UX/UI Design', 'Data Analysis'
+    "JavaScript",
+    "TypeScript",
+    "React",
+    "Node.js",
+    "Python",
+    "Java",
+    "SQL",
+    "Management",
+    "Leadership",
+    "Communication",
+    "Project Management",
+    "Marketing",
+    "Sales",
+    "Customer Service",
+    "UX/UI Design",
+    "Data Analysis",
   ];
-  
+
   const addSuggestion = (skill: string) => {
     if (!data.includes(skill)) {
       updateData([...data, skill]);
@@ -46,12 +59,18 @@ const SkillsCard: React.FC<SkillsCardProps> = ({ data, updateData }) => {
           onChange={(e) => setNewSkill(e.target.value)}
           className="flex-1"
         />
-        <Button type="submit" variant="jobify">Add</Button>
+        <Button type="submit" variant="jobify">
+          Add
+        </Button>
       </form>
-      
+
       <div className="flex flex-wrap gap-2 mt-4">
         {data.map((skill) => (
-          <Badge key={skill} variant="secondary" className="pl-3 pr-2 py-1.5 flex items-center">
+          <Badge
+            key={skill}
+            variant="secondary"
+            className="pl-3 pr-2 py-1.5 flex items-center"
+          >
             {skill}
             <Button
               variant="ghost"
@@ -63,23 +82,25 @@ const SkillsCard: React.FC<SkillsCardProps> = ({ data, updateData }) => {
             </Button>
           </Badge>
         ))}
-        
+
         {data.length === 0 && (
-          <p className="text-sm text-gray-500">No skills added yet. Add your top skills to help employers find you.</p>
+          <p className="text-sm text-gray-500">
+            No skills added yet. Add your top skills to help employers find you.
+          </p>
         )}
       </div>
-      
+
       {data.length < 10 && (
         <div className="mt-6">
           <p className="text-sm font-medium mb-2">Popular skills:</p>
           <div className="flex flex-wrap gap-2">
             {skillSuggestions
-              .filter(skill => !data.includes(skill))
+              .filter((skill) => !data.includes(skill))
               .slice(0, 8)
               .map((skill) => (
-                <Badge 
-                  key={skill} 
-                  variant="outline" 
+                <Badge
+                  key={skill}
+                  variant="outline"
                   className="cursor-pointer hover:bg-gray-100"
                   onClick={() => addSuggestion(skill)}
                 >

@@ -1,6 +1,12 @@
-import React, { createContext, useState, useEffect, useContext, ReactNode } from 'react';
-import { userMe, userSignout } from '../api/user';
-import { User } from '../types/data';
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  useContext,
+  ReactNode,
+} from "react";
+import { userMe, userSignout } from "../api/user";
+import { User } from "../types/data";
 
 interface AuthContextType {
   user: User | null;
@@ -18,7 +24,7 @@ const AuthContext = createContext<AuthContextType>({
   isLoading: true,
   error: null,
   logout: () => {},
-  refreshUser: async () => {}
+  refreshUser: async () => {},
 });
 
 interface AuthProviderProps {
@@ -40,12 +46,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setError(null);
       } else {
         setUser(null);
-        setError(result.message || 'Authentication failed');
+        setError(result.message || "Authentication failed");
       }
     } catch (err) {
-      console.error('Error fetching user data:', err);
+      console.error("Error fetching user data:", err);
       setUser(null);
-      setError('Failed to fetch user data');
+      setError("Failed to fetch user data");
     } finally {
       setIsLoading(false);
     }
@@ -70,7 +76,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isLoading,
     error,
     logout,
-    refreshUser: fetchUserData
+    refreshUser: fetchUserData,
   };
 
   return (

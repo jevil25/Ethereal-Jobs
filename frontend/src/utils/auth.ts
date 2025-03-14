@@ -9,9 +9,9 @@ import {
 // Firebase configuration
 // Get these values from your Firebase Console -> Project Settings -> General
 const firebaseConfig = {
-    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
 };
 
 const app = initializeApp(firebaseConfig);
@@ -36,14 +36,18 @@ export interface CheckPasswordConditions {
   passwordMatch?: boolean;
 }
 
-export const checkPasswordConditions = (password: string): CheckPasswordConditions => {
+export const checkPasswordConditions = (
+  password: string,
+): CheckPasswordConditions => {
   return {
-      meetsLength: password.length >= 8,
-      hasDigit: /(?=.*\d)/.test(password),
-      hasLowercase: /(?=.*[a-z])/.test(password),
-      hasUppercase: /(?=.*[A-Z])/.test(password),
-      hasSymbol: /(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/.test(password),
-      isValid: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/.test(password)
+    meetsLength: password.length >= 8,
+    hasDigit: /(?=.*\d)/.test(password),
+    hasLowercase: /(?=.*[a-z])/.test(password),
+    hasUppercase: /(?=.*[A-Z])/.test(password),
+    hasSymbol: /(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/.test(password),
+    isValid:
+      /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/.test(
+        password,
+      ),
   };
-}
-
+};

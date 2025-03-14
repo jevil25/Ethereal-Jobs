@@ -1,20 +1,23 @@
-import React, { useState } from 'react';
-import { Label } from '../ui/label';
-import { Button } from '../ui/button';
-import { Upload, File, CheckCircle2, X } from 'lucide-react';
+import React, { useState } from "react";
+import { Label } from "../ui/label";
+import { Button } from "../ui/button";
+import { Upload, File, CheckCircle2, X } from "lucide-react";
 
 export interface ResumeUploadCardProps {
   file: File | null;
   updateFile: (file: File | null) => void;
 }
 
-const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({ file, updateFile }) => {
+const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({
+  file,
+  updateFile,
+}) => {
   const [isDragging, setIsDragging] = useState(false);
-  const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>(
-    file ? 'success' : 'idle'
-  );
+  const [uploadStatus, setUploadStatus] = useState<
+    "idle" | "uploading" | "success" | "error"
+  >(file ? "success" : "idle");
   const [progressPercent, setProgressPercent] = useState(0);
-  
+
   const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
@@ -22,13 +25,13 @@ const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({ file, updateFile })
       setIsDragging(true);
     }
   };
-  
+
   const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(false);
   };
-  
+
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
@@ -36,77 +39,83 @@ const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({ file, updateFile })
       setIsDragging(true);
     }
   };
-  
+
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(false);
-    
+
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       const droppedFile = e.dataTransfer.files[0];
       processFile(droppedFile);
       e.dataTransfer.clearData();
     }
   };
-  
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const selectedFile = e.target.files[0];
       processFile(selectedFile);
     }
   };
-  
+
   const processFile = (selectedFile: File) => {
-    const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    const validTypes = [
+      "application/pdf",
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    ];
     const maxSize = 5 * 1024 * 1024; // 5MB
-    
+
     if (!validTypes.includes(selectedFile.type)) {
-      alert('Please upload a PDF or Word document.');
+      alert("Please upload a PDF or Word document.");
       return;
     }
-    
+
     if (selectedFile.size > maxSize) {
-      alert('File size should be less than 5MB.');
+      alert("File size should be less than 5MB.");
       return;
     }
-    
+
     // Update the file immediately to fix the double upload issue
     updateFile(selectedFile);
-    setUploadStatus('uploading');
-    
+    setUploadStatus("uploading");
+
     // Simulate upload progress
     let progress = 0;
     const interval = setInterval(() => {
       progress += 10;
       setProgressPercent(progress);
-      
+
       if (progress >= 100) {
         clearInterval(interval);
-        setUploadStatus('success');
+        setUploadStatus("success");
       }
     }, 150);
   };
-  
+
   const removeFile = () => {
     updateFile(null);
-    setUploadStatus('idle');
+    setUploadStatus("idle");
     setProgressPercent(0);
   };
-  
+
   const getFileExtension = (filename: string) => {
-    return filename.slice((filename.lastIndexOf('.') - 1 >>> 0) + 2);
+    return filename.slice(((filename.lastIndexOf(".") - 1) >>> 0) + 2);
   };
 
   const renderUploadArea = () => (
     <div
       className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
-        isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
+        isDragging
+          ? "border-blue-500 bg-blue-50"
+          : "border-gray-300 hover:border-gray-400"
       }`}
       onDragEnter={handleDragEnter}
       onDragLeave={handleDragLeave}
       onDragOver={handleDragOver}
       onDrop={handleDrop}
-      onClick={() => document.getElementById('file-upload')?.click()}
+      onClick={() => document.getElementById("file-upload")?.click()}
     >
       <div className="flex flex-col items-center justify-center space-y-2">
         <Upload className="h-12 w-12 text-gray-400" />
@@ -128,15 +137,20 @@ const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({ file, updateFile })
   return (
     <div className="space-y-4">
       <div className="text-center space-y-2">
-        <p>Save time by uploading your resume. We'll automatically fill in your details.</p>
-        <p className="text-sm text-gray-500">Supported formats: PDF, DOC, DOCX (up to 5MB)</p>
+        <p>
+          Save time by uploading your resume. We'll automatically fill in your
+          details.
+        </p>
+        <p className="text-sm text-gray-500">
+          Supported formats: PDF, DOC, DOCX (up to 5MB)
+        </p>
       </div>
-      
+
       {!file ? (
         renderUploadArea()
       ) : (
         <div className="border rounded-lg p-4">
-          {uploadStatus === 'uploading' ? (
+          {uploadStatus === "uploading" ? (
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
@@ -159,16 +173,19 @@ const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({ file, updateFile })
                   style={{ width: `${progressPercent}%` }}
                 ></div>
               </div>
-              <p className="text-sm text-gray-500 text-right">{progressPercent}%</p>
+              <p className="text-sm text-gray-500 text-right">
+                {progressPercent}%
+              </p>
             </div>
-          ) : uploadStatus === 'success' ? (
+          ) : uploadStatus === "success" ? (
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <CheckCircle2 className="h-5 w-5 text-green-500" />
                 <div>
                   <p className="font-medium text-gray-700">{file.name}</p>
                   <p className="text-sm text-gray-500">
-                    {(file.size / 1024 / 1024).toFixed(2)} MB • {getFileExtension(file.name).toUpperCase()}
+                    {(file.size / 1024 / 1024).toFixed(2)} MB •{" "}
+                    {getFileExtension(file.name).toUpperCase()}
                   </p>
                 </div>
               </div>

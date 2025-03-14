@@ -1,8 +1,5 @@
 import { Form, FormSection } from "./Form";
-import {
-  Input,
-  BulletListTextarea,
-} from "./Form/InputGroup";
+import { Input, BulletListTextarea } from "./Form/InputGroup";
 import type { CreateHandleChangeArgsWithDescriptions } from "./types";
 import { useAppDispatch, useAppSelector } from "../../lib/redux/hooks";
 import { selectProjects, changeProjects } from "../../lib/redux/resumeSlice";

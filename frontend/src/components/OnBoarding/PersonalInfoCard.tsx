@@ -1,6 +1,6 @@
-import React from 'react';
-import { Input } from '../ui/input';
-import { Label } from '../ui/label';
+import React from "react";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
 
 export interface PersonalInfoData {
   headline: string;
@@ -14,7 +14,10 @@ interface PersonalInfoCardProps {
   updateData: (data: PersonalInfoData) => void;
 }
 
-const PersonalInfoCard: React.FC<PersonalInfoCardProps> = ({ data, updateData }) => {
+const PersonalInfoCard: React.FC<PersonalInfoCardProps> = ({
+  data,
+  updateData,
+}) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     updateData({
@@ -35,7 +38,7 @@ const PersonalInfoCard: React.FC<PersonalInfoCardProps> = ({ data, updateData })
           onChange={handleChange}
         />
       </div>
-      
+
       <div className="space-y-2">
         <Label htmlFor="location">Location</Label>
         <Input
@@ -46,7 +49,7 @@ const PersonalInfoCard: React.FC<PersonalInfoCardProps> = ({ data, updateData })
           onChange={handleChange}
         />
       </div>
-      
+
       <div className="space-y-2">
         <Label htmlFor="phone">Phone Number</Label>
         <Input
@@ -58,7 +61,7 @@ const PersonalInfoCard: React.FC<PersonalInfoCardProps> = ({ data, updateData })
           onChange={handleChange}
         />
       </div>
-      
+
       <div className="space-y-2">
         <Label htmlFor="website">Website or LinkedIn Profile</Label>
         <Input

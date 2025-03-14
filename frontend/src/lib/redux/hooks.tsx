@@ -8,7 +8,7 @@ import { debounce } from "lodash";
 import { type RootState, type AppDispatch } from "../../lib/redux/store";
 import {
   loadStateFromDatabase,
-  saveStateToDatabase
+  saveStateToDatabase,
 } from "../../lib/redux/local-storage";
 import { initialResumeState, setResume } from "../../lib/redux/resumeSlice";
 import {
@@ -25,16 +25,19 @@ export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 /**
  * Hook to save store to local storage on store change
  */
-export const useSaveStateToDatabaseOnChange = (setIsLoading: (isLoading: boolean) => void) => {
+export const useSaveStateToDatabaseOnChange = (
+  setIsLoading: (isLoading: boolean) => void,
+) => {
   const state = useAppSelector((state) => state);
   const prevStateRef = useRef(state);
-  
+
   useEffect(() => {
     setIsLoading(true);
-    const hasStateChanged = JSON.stringify(prevStateRef.current) !== JSON.stringify(state);
-    
-    if (!hasStateChanged) return setIsLoading(false);;
-    
+    const hasStateChanged =
+      JSON.stringify(prevStateRef.current) !== JSON.stringify(state);
+
+    if (!hasStateChanged) return setIsLoading(false);
+
     const debouncedSave = debounce(async () => {
       await saveStateToDatabase(state);
       prevStateRef.current = state;
@@ -48,7 +51,9 @@ export const useSaveStateToDatabaseOnChange = (setIsLoading: (isLoading: boolean
   }, [state]);
 };
 
-export const useSetInitialStore = (setIsLoading: (isLoading: boolean) => void) => {
+export const useSetInitialStore = (
+  setIsLoading: (isLoading: boolean) => void,
+) => {
   const dispatch = useAppDispatch();
   useEffect(() => {
     const setInitialStore = async () => {
@@ -61,14 +66,14 @@ export const useSetInitialStore = (setIsLoading: (isLoading: boolean) => void) =
         // the initial state over time.
         const mergedResumeState = deepMerge(
           initialResumeState,
-          state.resume
+          state.resume,
         ) as Resume;
         dispatch(setResume(mergedResumeState));
       }
       if (state.settings) {
         const mergedSettingsState = deepMerge(
           initialSettings,
-          state.settings
+          state.settings,
         ) as Settings;
         dispatch(setSettings(mergedSettingsState));
       }

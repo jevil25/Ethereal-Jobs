@@ -40,7 +40,7 @@ export const useRegisterReactPDFHyphenationCallback = (fontFamily: string) => {
         word
           .split("")
           .map((char) => [char, ""])
-          .flat()
+          .flat(),
       );
     }
   }, [fontFamily]);

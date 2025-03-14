@@ -7,7 +7,6 @@ import {
 } from "../../../fonts/constants";
 import { getAllFontFamiliesToLoad } from "../../../fonts/lib";
 
-
 const Selection = ({
   selectedColor,
   isSelected,

@@ -1,6 +1,6 @@
-import { Users, MessageSquare, Building, CheckCircle } from 'lucide-react';
-import { Button } from '../ui/button';
-import { useNavigate } from 'react-router-dom';
+import { Users, MessageSquare, Building, CheckCircle } from "lucide-react";
+import { Button } from "../ui/button";
+import { useNavigate } from "react-router-dom";
 
 const InsiderConnectionsSection = () => {
   const navigate = useNavigate();
@@ -13,7 +13,8 @@ const InsiderConnectionsSection = () => {
               Unlock Your Network's Potential
             </h2>
             <p className="text-xl text-gray-600">
-              Find the right connections at your dream companies and reach out with AI-crafted personalized messages.
+              Find the right connections at your dream companies and reach out
+              with AI-crafted personalized messages.
             </p>
           </div>
 
@@ -24,8 +25,13 @@ const InsiderConnectionsSection = () => {
                   <Users className="w-6 h-6 text-blue-600" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold mb-1">Smart Connection Finding</h3>
-                  <p className="text-gray-600">Automatically discover relevant connections at your target companies</p>
+                  <h3 className="text-lg font-semibold mb-1">
+                    Smart Connection Finding
+                  </h3>
+                  <p className="text-gray-600">
+                    Automatically discover relevant connections at your target
+                    companies
+                  </p>
                 </div>
               </div>
 
@@ -34,8 +40,12 @@ const InsiderConnectionsSection = () => {
                   <MessageSquare className="w-6 h-6 text-blue-600" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold mb-1">Perfect Messages</h3>
-                  <p className="text-gray-600">Get customized outreach messages that get responses</p>
+                  <h3 className="text-lg font-semibold mb-1">
+                    Perfect Messages
+                  </h3>
+                  <p className="text-gray-600">
+                    Get customized outreach messages that get responses
+                  </p>
                 </div>
               </div>
 
@@ -45,7 +55,9 @@ const InsiderConnectionsSection = () => {
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold mb-1">Inside Access</h3>
-                  <p className="text-gray-600">Turn cold applications into warm referrals</p>
+                  <p className="text-gray-600">
+                    Turn cold applications into warm referrals
+                  </p>
                 </div>
               </div>
             </div>
@@ -59,7 +71,9 @@ const InsiderConnectionsSection = () => {
                 />
                 <div>
                   <h3 className="font-semibold">Sarah Chen</h3>
-                  <p className="text-gray-600 text-sm">Senior Software Engineer at Google</p>
+                  <p className="text-gray-600 text-sm">
+                    Senior Software Engineer at Google
+                  </p>
                   <div className="flex items-center gap-2 text-sm text-gray-600 mt-1">
                     <Users className="w-4 h-4" />
                     <span>12 mutual connections</span>
@@ -71,11 +85,15 @@ const InsiderConnectionsSection = () => {
                 <div className="flex items-start gap-2 mb-3">
                   <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-1" />
                   <p className="text-sm text-gray-600">
-                    AI-crafted message based on your profile, the job, and your connection
+                    AI-crafted message based on your profile, the job, and your
+                    connection
                   </p>
                 </div>
                 <p className="text-sm text-gray-700">
-                  "Hi Sarah, I noticed you work at Google as a Senior Software Engineer. I'm really interested in the Software Engineer role and would love to learn more about your experience. Would you be open to a quick chat about the team and culture?"
+                  "Hi Sarah, I noticed you work at Google as a Senior Software
+                  Engineer. I'm really interested in the Software Engineer role
+                  and would love to learn more about your experience. Would you
+                  be open to a quick chat about the team and culture?"
                 </p>
               </div>
 
@@ -89,8 +107,13 @@ const InsiderConnectionsSection = () => {
           </div>
 
           <div className="text-center">
-            <Button onClick={() => navigate('/jobs')} variant={"jobify"} size={"xxl"} className="rounded-4xl">
-                Find Your Connections
+            <Button
+              onClick={() => navigate("/jobs")}
+              variant={"jobify"}
+              size={"xxl"}
+              className="rounded-4xl"
+            >
+              Find Your Connections
             </Button>
           </div>
         </div>

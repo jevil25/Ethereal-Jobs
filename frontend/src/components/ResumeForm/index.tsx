@@ -39,18 +39,20 @@ export const ResumeForm = ({ isLoading, setIsLoading }: ResumeFormProps) => {
 
   if (isLoading) {
     return (
-    <div>
-        <div className="flex justify-center items-center h-screen">Loading...</div>
+      <div>
+        <div className="flex justify-center items-center h-screen">
+          Loading...
+        </div>
         <FlexboxSpacer maxWidth={50} className="hidden md:block" />
-    </div>
-    )
+      </div>
+    );
   }
 
   return (
     <div
       className={cx(
         "flex justify-center scrollbar-thin scrollbar-track-gray-100 md:h-[calc(100vh-var(--top-nav-bar-height))] md:justify-end md:overflow-y-scroll",
-        isHover ? "scrollbar-thumb-gray-200" : "scrollbar-thumb-gray-100"
+        isHover ? "scrollbar-thumb-gray-200" : "scrollbar-thumb-gray-100",
       )}
       onMouseOver={() => setIsHover(true)}
       onMouseLeave={() => setIsHover(false)}

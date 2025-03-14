@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import "../../public/fonts/fonts-zh.css";
 import "../../public/fonts/fonts.css";
 

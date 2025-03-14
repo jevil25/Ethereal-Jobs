@@ -1,6 +1,6 @@
-import React from 'react';
-import JobCard from './JobCard';
-import { JobData } from '../../types/data';
+import React from "react";
+import JobCard from "./JobCard";
+import { JobData } from "../../types/data";
 
 interface JobListProps {
   jobs: JobData[];
@@ -18,7 +18,7 @@ const JobList: React.FC<JobListProps> = ({ jobs }) => {
 
   return (
     <div className="space-y-4">
-      {jobs.map(job => (
+      {jobs.map((job) => (
         <JobCard key={job.id} job={job} />
       ))}
     </div>

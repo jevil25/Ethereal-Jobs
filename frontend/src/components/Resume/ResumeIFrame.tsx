@@ -20,18 +20,18 @@ const getIframeInitialContent = (isA4: boolean) => {
   const allFontFamiliesPreloadLinks = allFontFamilies
     .map(
       (
-        font
+        font,
       ) => `<link rel="preload" as="font" href="/fonts/${font}-Regular.ttf" type="font/ttf" crossorigin="anonymous">
-<link rel="preload" as="font" href="/fonts/${font}-Bold.ttf" type="font/ttf" crossorigin="anonymous">`
+<link rel="preload" as="font" href="/fonts/${font}-Bold.ttf" type="font/ttf" crossorigin="anonymous">`,
     )
     .join("");
 
   const allFontFamiliesFontFaces = allFontFamilies
     .map(
       (
-        font
+        font,
       ) => `@font-face {font-family: "${font}"; src: url("/fonts/${font}-Regular.ttf");}
-@font-face {font-family: "${font}"; src: url("/fonts/${font}-Bold.ttf"); font-weight: bold;}`
+@font-face {font-family: "${font}"; src: url("/fonts/${font}-Bold.ttf"); font-weight: bold;}`,
     )
     .join("");
 
@@ -67,7 +67,7 @@ const ResumeIframe = ({
   const isA4 = documentSize === "A4";
   const iframeInitialContent = useMemo(
     () => getIframeInitialContent(isA4),
-    [isA4]
+    [isA4],
   );
 
   if (enablePDFViewer) {
@@ -114,7 +114,7 @@ const ResumeIframe = ({
 /**
  * Load iframe client side since iframe can't be SSR
  */
-export const ResumeIframeCSR = ResumeIframe
+export const ResumeIframeCSR = ResumeIframe;
 
 // PDFViewer is only used for debugging. Its size is quite large, so we make it dynamic import
 const DynamicPDFViewer = PDFViewer;

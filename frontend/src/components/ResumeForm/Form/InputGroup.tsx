@@ -82,7 +82,7 @@ export const Textarea = <T extends string>({
 };
 
 export const BulletListTextarea = <T extends string>(
-  props: InputProps<T, string[]> & { showBulletPoints?: boolean }
+  props: InputProps<T, string[]> & { showBulletPoints?: boolean },
 ) => {
   const [showFallback, setShowFallback] = useState(false);
 
@@ -199,7 +199,7 @@ const BulletListTextareaFallback = <T extends string>({
 }: InputProps<T, string[]> & { showBulletPoints?: boolean }) => {
   const textareaValue = getTextareaValueFromBulletListStrings(
     bulletListStrings,
-    showBulletPoints
+    showBulletPoints,
   );
 
   return (
@@ -212,7 +212,7 @@ const BulletListTextareaFallback = <T extends string>({
       onChange={(name, value) => {
         onChange(
           name,
-          getBulletListStringsFromTextareaValue(value, showBulletPoints)
+          getBulletListStringsFromTextareaValue(value, showBulletPoints),
         );
       }}
     />
@@ -221,7 +221,7 @@ const BulletListTextareaFallback = <T extends string>({
 
 const getTextareaValueFromBulletListStrings = (
   bulletListStrings: string[],
-  showBulletPoints: boolean
+  showBulletPoints: boolean,
 ) => {
   const prefix = showBulletPoints ? "• " : "";
 
@@ -240,7 +240,7 @@ const getTextareaValueFromBulletListStrings = (
 
 const getBulletListStringsFromTextareaValue = (
   textareaValue: string,
-  showBulletPoints: boolean
+  showBulletPoints: boolean,
 ) => {
   const textareaValueWithNormalizedLineBreak =
     normalizeLineBreak(textareaValue);

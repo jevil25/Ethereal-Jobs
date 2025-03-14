@@ -1,30 +1,40 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Button } from '../components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { Pencil, Save, Download, Upload, Menu } from 'lucide-react';
+import React, { useState, useEffect, useRef } from "react";
+import { Button } from "../components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import { Pencil, Save, Download, Upload, Menu } from "lucide-react";
 import { debounce } from "lodash";
-import { FormData } from '../api/types';
-import { updateResumeDetails, getResumeDetails, extractResume } from '../api/resume';
-import { useAuth } from '../providers/AuthProvider';
-import MainResume from '../components/ResumeV2/mainResume';
-import ResumeTabs from '../components/ResumeV2/ResumeTabs';
-import html2canvas from 'html2canvas-pro';
-import jsPDF from 'jspdf';
-
+import { FormData } from "../api/types";
+import {
+  updateResumeDetails,
+  getResumeDetails,
+  extractResume,
+} from "../api/resume";
+import { useAuth } from "../providers/AuthProvider";
+import MainResume from "../components/ResumeV2/mainResume";
+import ResumeTabs from "../components/ResumeV2/ResumeTabs";
+import html2canvas from "html2canvas-pro";
+import jsPDF from "jspdf";
 
 const ResumeEditor: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('preview');
+  const [activeTab, setActiveTab] = useState("preview");
   const [editMode, setEditMode] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'error'>('saved');
+  const [saveStatus, setSaveStatus] = useState<"saved" | "saving" | "error">(
+    "saved",
+  );
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const { user } = useAuth();
   const [resumeData, setResumeData] = useState<FormData>({
     personalInfo: {
-      headline: '',
-      location: '',
-      phone: '',
-      website: '',
+      headline: "",
+      location: "",
+      phone: "",
+      website: "",
     },
     experience: [],
     education: [],
@@ -34,8 +44,8 @@ const ResumeEditor: React.FC = () => {
     jobPreferences: {
       jobTypes: [],
       locations: [],
-      remotePreference: '',
-      salaryExpectation: '',
+      remotePreference: "",
+      salaryExpectation: "",
       immediateStart: false,
     },
     resumeFile: null,
@@ -53,7 +63,7 @@ const ResumeEditor: React.FC = () => {
           setResumeData(data);
         }
       } catch (error) {
-        console.error('Error fetching resume details:', error);
+        console.error("Error fetching resume details:", error);
       } finally {
         setIsLoading(false);
       }
@@ -76,28 +86,29 @@ const ResumeEditor: React.FC = () => {
     handleResize();
 
     // Add event listener
-    window.addEventListener('resize', handleResize);
-    
+    window.addEventListener("resize", handleResize);
+
     // Clean up
-    return () => window.removeEventListener('resize', handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   // Update resume data when changes are made
   useEffect(() => {
-    const hasStateChanged = JSON.stringify(prevStateRef.current) !== JSON.stringify(resumeData);
+    const hasStateChanged =
+      JSON.stringify(prevStateRef.current) !== JSON.stringify(resumeData);
     if (!hasStateChanged || isLoading) {
       return;
     }
 
     const debouncedSave = debounce(async () => {
-      setSaveStatus('saving');
+      setSaveStatus("saving");
       try {
         await updateResumeDetails({ data: resumeData }, false);
-        setSaveStatus('saved');
+        setSaveStatus("saved");
         prevStateRef.current = resumeData;
       } catch (error) {
-        console.error('Error updating resume details:', error);
-        setSaveStatus('error');
+        console.error("Error updating resume details:", error);
+        setSaveStatus("error");
       }
     }, 800);
 
@@ -109,7 +120,9 @@ const ResumeEditor: React.FC = () => {
   }, [resumeData, isLoading]);
 
   // Handle resume file upload
-  const handleResumeUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleResumeUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = event.target.files?.[0] || null;
     if (!file) return;
 
@@ -118,14 +131,14 @@ const ResumeEditor: React.FC = () => {
       const parsedData = await extractResume({ file });
 
       if (parsedData) {
-        setResumeData(prev => ({
+        setResumeData((prev) => ({
           ...prev,
           ...parsedData,
-          resumeFile: file
+          resumeFile: file,
         }));
       }
     } catch (error) {
-      console.error('Error parsing resume:', error);
+      console.error("Error parsing resume:", error);
     } finally {
       setIsLoading(false);
     }
@@ -134,23 +147,26 @@ const ResumeEditor: React.FC = () => {
   // Update specific sections of the resume
   const updateResumeSection = <K extends keyof FormData>(
     section: K,
-    data: FormData[K]
+    data: FormData[K],
   ) => {
-    console.log('Updating section:', section, data);
-    setResumeData(prev => ({
+    console.log("Updating section:", section, data);
+    setResumeData((prev) => ({
       ...prev,
-      [section]: data
+      [section]: data,
     }));
   };
 
   // Handle edits for personal info fields
-  const handlePersonalInfoEdit = (field: keyof FormData['personalInfo'], value: string) => {
-    setResumeData(prev => ({
+  const handlePersonalInfoEdit = (
+    field: keyof FormData["personalInfo"],
+    value: string,
+  ) => {
+    setResumeData((prev) => ({
       ...prev,
       personalInfo: {
         ...prev.personalInfo,
-        [field]: value
-      }
+        [field]: value,
+      },
     }));
   };
 
@@ -158,13 +174,13 @@ const ResumeEditor: React.FC = () => {
   const toggleEditMode = () => {
     setEditMode(!editMode);
     if (!editMode) {
-      setActiveTab('personal');
+      setActiveTab("personal");
       // Ensure sidebar is open when entering edit mode on larger screens
       if (window.innerWidth >= 768) {
         setSidebarOpen(true);
       }
     } else {
-      setActiveTab('preview');
+      setActiveTab("preview");
     }
   };
 
@@ -174,28 +190,28 @@ const ResumeEditor: React.FC = () => {
   };
 
   const downloadResume = () => {
-    console.log('Downloading resume...');
-  
+    console.log("Downloading resume...");
+
     if (resumeCard.current) {
       html2canvas(resumeCard.current, { scale: 2 }).then((canvas) => {
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        
+        const pdf = new jsPDF("p", "mm", "a4");
+
         const imgWidth = 210;
         const pageHeight = 297;
         const imgHeight = (canvas.height * imgWidth) / canvas.width;
         const pageCanvasHeight = (pageHeight * canvas.width) / imgWidth;
-  
+
         let heightLeft = canvas.height;
         let position = 0;
-  
+
         while (heightLeft > 0) {
-          const canvasPage = document.createElement('canvas');
+          const canvasPage = document.createElement("canvas");
           canvasPage.width = canvas.width;
           canvasPage.height = Math.min(pageCanvasHeight, heightLeft);
-  
-          const context = canvasPage.getContext('2d');
+
+          const context = canvasPage.getContext("2d");
           if (!context) {
-            console.error('Could not get canvas context');
+            console.error("Could not get canvas context");
             return;
           }
           context.drawImage(
@@ -207,28 +223,33 @@ const ResumeEditor: React.FC = () => {
             0,
             0,
             canvas.width,
-            canvasPage.height
+            canvasPage.height,
           );
-  
-          const imgData = canvasPage.toDataURL('image/png');
-          pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, (canvasPage.height * imgWidth) / canvas.width);
-  
+
+          const imgData = canvasPage.toDataURL("image/png");
+          pdf.addImage(
+            imgData,
+            "PNG",
+            0,
+            0,
+            imgWidth,
+            (canvasPage.height * imgWidth) / canvas.width,
+          );
+
           heightLeft -= pageCanvasHeight;
           position += pageCanvasHeight;
-  
+
           if (heightLeft > 0) {
             pdf.addPage();
           }
         }
-  
-        pdf.save(`${user?.name || 'resume'}.pdf`);
+
+        pdf.save(`${user?.name || "resume"}.pdf`);
       });
     } else {
-      console.error('Resume card element not found');
+      console.error("Resume card element not found");
     }
   };
-  
-  
 
   if (isLoading) {
     return (
@@ -242,8 +263,12 @@ const ResumeEditor: React.FC = () => {
     <div className="container mx-auto px-4 py-6 max-w-5xl mt-6 md:mt-12">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">My Resume</h1>
-          <p className="text-sm md:text-base text-gray-600">Update and customize your professional profile</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+            My Resume
+          </h1>
+          <p className="text-sm md:text-base text-gray-600">
+            Update and customize your professional profile
+          </p>
         </div>
         <div className="flex flex-wrap gap-2 w-full md:w-auto">
           <Button
@@ -252,32 +277,36 @@ const ResumeEditor: React.FC = () => {
             onClick={toggleEditMode}
           >
             {editMode ? <Save size={16} /> : <Pencil size={16} />}
-            {editMode ? 'Exit Edit Mode' : 'Edit Resume'}
+            {editMode ? "Exit Edit Mode" : "Edit Resume"}
           </Button>
-          <Button
-            variant="outline"
-            className="flex items-center gap-2 text-xs md:text-sm flex-1 md:flex-none"
-            onClick={downloadResume}
-          >
-            <Download size={16} />
-            Download PDF
-          </Button>
-          <label htmlFor="resume-upload" className="flex-1 md:flex-none">
+          {!editMode && (
             <Button
               variant="jobify"
-              className="flex items-center gap-2 text-xs md:text-sm w-full"
+              className="flex items-center gap-2 text-xs md:text-sm flex-1 md:flex-none"
+              onClick={downloadResume}
             >
-              <Upload size={16} />
-              Import Resume
+              <Download size={16} />
+              Download PDF
             </Button>
-            <input
-              id="resume-upload"
-              type="file"
-              accept=".pdf,.doc,.docx"
-              className="hidden"
-              onChange={handleResumeUpload}
-            />
-          </label>
+          )}
+          {editMode && (
+            <label htmlFor="resume-upload" className="flex-1 md:flex-none">
+              <Button
+                variant="jobify"
+                className="flex items-center gap-2 text-xs md:text-sm w-full"
+              >
+                <Upload size={16} />
+                Import Resume
+              </Button>
+              <input
+                id="resume-upload"
+                type="file"
+                accept=".pdf,.doc,.docx"
+                className="hidden"
+                onChange={handleResumeUpload}
+              />
+            </label>
+          )}
         </div>
       </div>
 
@@ -291,7 +320,7 @@ const ResumeEditor: React.FC = () => {
               onClick={toggleSidebar}
             >
               <Menu size={16} />
-              {sidebarOpen ? 'Hide Sections' : 'Show Sections'}
+              {sidebarOpen ? "Hide Sections" : "Show Sections"}
             </Button>
           </div>
         )}
@@ -301,20 +330,20 @@ const ResumeEditor: React.FC = () => {
           <div className="w-full md:w-64 md:shrink-0">
             <Card className="sticky top-4">
               <CardHeader className="p-4">
-                <CardTitle className="text-lg">Resume Sections</CardTitle>
+                <CardTitle className="text-xl">Resume Sections</CardTitle>
               </CardHeader>
               <CardContent className="p-3">
                 <div className="flex flex-col gap-2">
                   {[
-                    { id: 'personal', label: 'Personal Info' },
-                    { id: 'experience', label: 'Experience' },
-                    { id: 'education', label: 'Education' },
-                    { id: 'skills', label: 'Skills' },
-                    { id: 'projects', label: 'Projects' },
-                    { id: 'certifications', label: 'Certifications' },
-                    { id: 'preferences', label: 'Job Preferences' },
+                    { id: "personal", label: "Personal Info" },
+                    { id: "experience", label: "Experience" },
+                    { id: "education", label: "Education" },
+                    { id: "skills", label: "Skills" },
+                    { id: "projects", label: "Projects" },
+                    { id: "certifications", label: "Certifications" },
+                    { id: "preferences", label: "Job Preferences" },
                   ].map((section) => (
-                    <Button 
+                    <Button
                       key={section.id}
                       variant={activeTab === section.id ? "default" : "ghost"}
                       className="justify-start"
@@ -338,10 +367,14 @@ const ResumeEditor: React.FC = () => {
         <div className="flex-1">
           <Card className="shadow-lg border-0">
             {!editMode ? (
-              <MainResume name={user?.name} resumeData={resumeData} ref={resumeCard}  />
+              <MainResume
+                name={user?.name}
+                resumeData={resumeData}
+                ref={resumeCard}
+              />
             ) : (
               // Edit mode - Show tabs for different sections
-              <ResumeTabs 
+              <ResumeTabs
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
                 resumeData={resumeData}
@@ -350,16 +383,24 @@ const ResumeEditor: React.FC = () => {
               />
             )}
           </Card>
-          
+
           {/* Save status indicator */}
           {editMode && (
             <div className="mt-4 text-right">
-              <span className={`text-sm ${
-                saveStatus === 'saved' ? 'text-green-600' : 
-                saveStatus === 'saving' ? 'text-yellow-600' : 'text-red-600'
-              }`}>
-                {saveStatus === 'saved' ? '✓ All changes saved' : 
-                 saveStatus === 'saving' ? 'Saving changes...' : 'Error saving changes'}
+              <span
+                className={`text-sm ${
+                  saveStatus === "saved"
+                    ? "text-green-600"
+                    : saveStatus === "saving"
+                      ? "text-yellow-600"
+                      : "text-red-600"
+                }`}
+              >
+                {saveStatus === "saved"
+                  ? "✓ All changes saved"
+                  : saveStatus === "saving"
+                    ? "Saving changes..."
+                    : "Error saving changes"}
               </span>
             </div>
           )}

@@ -1,8 +1,8 @@
 import SkillsCard from "../OnBoarding/SkillsCard";
 
 interface SkillsCardProps {
-    skills: string[];
-    updateData: (data: string[]) => void;
+  skills: string[];
+  updateData: (data: string[]) => void;
 }
 
 const SkillsTab = ({ skills, updateData }: SkillsCardProps) => {

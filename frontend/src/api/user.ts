@@ -1,85 +1,132 @@
-import { UserSigninRequest, UserSigninResponse, UserSignupRequest, UserSignupResponse, ResetPasswordRequest, ResetPasswordResponse, ResetPasswordCheckRequest, ResetPasswordCheckResponse, ResetPasswordUpdateRequest, ResetPasswordUpdateResponse, sendVerificationEmailRequest, sendVerificationEmailResponse, verifyEmailRequest, verifyEmailResponse } from "./types";
+import {
+  UserSigninRequest,
+  UserSigninResponse,
+  UserSignupRequest,
+  UserSignupResponse,
+  ResetPasswordRequest,
+  ResetPasswordResponse,
+  ResetPasswordCheckRequest,
+  ResetPasswordCheckResponse,
+  ResetPasswordUpdateRequest,
+  ResetPasswordUpdateResponse,
+  sendVerificationEmailRequest,
+  sendVerificationEmailResponse,
+  verifyEmailRequest,
+  verifyEmailResponse,
+} from "./types";
 import { constructServerUrlFromPath } from "../utils/helper";
-import axios from 'axios';
+import axios from "axios";
 import { User } from "../types/data";
 
 // post /user/register
-export const userSignup = async (params: UserSignupRequest): Promise<UserSignupResponse> => {
-    const response = await axios.post(constructServerUrlFromPath('/user/register'), params);
-    return response.data as UserSignupResponse;
-}
+export const userSignup = async (
+  params: UserSignupRequest,
+): Promise<UserSignupResponse> => {
+  const response = await axios.post(
+    constructServerUrlFromPath("/user/register"),
+    params,
+  );
+  return response.data as UserSignupResponse;
+};
 
 // post /user/login
-export const userSignin = async (params: UserSigninRequest): Promise<UserSigninResponse> => {
-    const response = await axios.post(constructServerUrlFromPath('/user/login'), params);
-    return response.data as UserSigninResponse;
-}
+export const userSignin = async (
+  params: UserSigninRequest,
+): Promise<UserSigninResponse> => {
+  const response = await axios.post(
+    constructServerUrlFromPath("/user/login"),
+    params,
+  );
+  return response.data as UserSigninResponse;
+};
 
 // get /user/logout
 export const userSignout = async () => {
-    await axios.post(constructServerUrlFromPath('/user/logout'));
-}
+  await axios.post(constructServerUrlFromPath("/user/logout"));
+};
 
 // get /user/me
 export const userMe = async () => {
-    const response = await axios.get(constructServerUrlFromPath('/user/me'));
-    if (response.data.detail === "user logged in") {
-        return {
-            user: response.data.user as User,
-            needsLogin: false
-        }
-    }
-    const errorMessage = response.data.detail;
-    if (errorMessage == "Token expired") {
-        const refresh = await userRefresh();
-        if (refresh.status === 200) {
-            return {
-                user: refresh.data.user as User,
-                needsLogin: false
-            }
-        }
-        return {
-            message: "User not found. Please sign in again.",
-            needsLogin: true
-        }
+  const response = await axios.get(constructServerUrlFromPath("/user/me"));
+  if (response.data.detail === "user logged in") {
+    return {
+      user: response.data.user as User,
+      needsLogin: false,
+    };
+  }
+  const errorMessage = response.data.detail;
+  if (errorMessage == "Token expired") {
+    const refresh = await userRefresh();
+    if (refresh.status === 200) {
+      return {
+        user: refresh.data.user as User,
+        needsLogin: false,
+      };
     }
     return {
-        message: "User not found. Please sign in again.",
-        needsLogin: true
-    }
-}
+      message: "User not found. Please sign in again.",
+      needsLogin: true,
+    };
+  }
+  return {
+    message: "User not found. Please sign in again.",
+    needsLogin: true,
+  };
+};
 
 // post /user/refresh
 export const userRefresh = async () => {
-    return await axios.post(constructServerUrlFromPath('/user/refresh'));
-}
+  return await axios.post(constructServerUrlFromPath("/user/refresh"));
+};
 
 // post /reset-password
-export const sendPasswordResetEmail = async (params: ResetPasswordRequest): Promise<ResetPasswordResponse> => {
-    const response = await axios.post(constructServerUrlFromPath('/user/reset-password'), params);
-    return response.data as ResetPasswordResponse;
-}
+export const sendPasswordResetEmail = async (
+  params: ResetPasswordRequest,
+): Promise<ResetPasswordResponse> => {
+  const response = await axios.post(
+    constructServerUrlFromPath("/user/reset-password"),
+    params,
+  );
+  return response.data as ResetPasswordResponse;
+};
 
 // post /user/reset-password/:token/check
-export const checkIfResetPasswordTokenIsValid = async (params: ResetPasswordCheckRequest): Promise<ResetPasswordCheckResponse> => {
-    const response = await axios.post(constructServerUrlFromPath(`/user/reset-password/${params.token}/check`));
-    return response.data as ResetPasswordCheckResponse;
-}
+export const checkIfResetPasswordTokenIsValid = async (
+  params: ResetPasswordCheckRequest,
+): Promise<ResetPasswordCheckResponse> => {
+  const response = await axios.post(
+    constructServerUrlFromPath(`/user/reset-password/${params.token}/check`),
+  );
+  return response.data as ResetPasswordCheckResponse;
+};
 
 // post /user/reset-password/:token/update
-export const updatePasswordWithToken = async (params: ResetPasswordUpdateRequest): Promise<ResetPasswordUpdateResponse> => {
-    const response = await axios.post(constructServerUrlFromPath(`/user/reset-password/${params.token}/update`), params);
-    return response.data as ResetPasswordUpdateResponse;
-}
+export const updatePasswordWithToken = async (
+  params: ResetPasswordUpdateRequest,
+): Promise<ResetPasswordUpdateResponse> => {
+  const response = await axios.post(
+    constructServerUrlFromPath(`/user/reset-password/${params.token}/update`),
+    params,
+  );
+  return response.data as ResetPasswordUpdateResponse;
+};
 
 // post /user/resend-verification/:email
-export const resendVerificationEmail = async (request: sendVerificationEmailRequest): Promise<sendVerificationEmailResponse> => {
-    const response = await axios.post(constructServerUrlFromPath(`/user/resend-verification/${request.email}`));
-    return response.data as sendVerificationEmailResponse;
-}
+export const resendVerificationEmail = async (
+  request: sendVerificationEmailRequest,
+): Promise<sendVerificationEmailResponse> => {
+  const response = await axios.post(
+    constructServerUrlFromPath(`/user/resend-verification/${request.email}`),
+  );
+  return response.data as sendVerificationEmailResponse;
+};
 
 // post /user/verify-email/:token
-export const verifyEmail = async (request: verifyEmailRequest): Promise<verifyEmailResponse> => {
-    const response = await axios.post(constructServerUrlFromPath(`/user/verify-email/${request.token}`));
-    return response.data as verifyEmailResponse;
-}
+export const verifyEmail = async (
+  request: verifyEmailRequest,
+): Promise<verifyEmailResponse> => {
+  const response = await axios.post(
+    constructServerUrlFromPath(`/user/verify-email/${request.token}`),
+  );
+  return response.data as verifyEmailResponse;
+};

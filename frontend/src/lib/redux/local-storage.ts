@@ -27,14 +27,14 @@ export const saveStateToLocalStorage = (state: RootState) => {
 export const saveStateToDatabase = async (state: RootState) => {
   try {
     const existingResumeId = localStorage.getItem("resumeId");
-    if (!existingResumeId) {  
+    if (!existingResumeId) {
       // const resumeId = await saveResumeDetails({ state });
       // if (!resumeId.email) return;
       // return localStorage.setItem("resumeId", resumeId.email);
     }
     // await updateResumeDetails({ state }, existingResumeId);
   } catch (e) {
-    console.log(`Error saving state to database: ${e}`)
+    console.log(`Error saving state to database: ${e}`);
   }
 };
 
