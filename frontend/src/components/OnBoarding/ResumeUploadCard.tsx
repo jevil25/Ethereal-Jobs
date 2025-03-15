@@ -146,7 +146,9 @@ const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <File className="h-5 w-5 text-blue-500" />
-                  <span className="font-medium text-gray-700">{file && file.name}</span>
+                  <span className="font-medium text-gray-700">
+                    {file && file.name}
+                  </span>
                 </div>
                 <Button
                   type="button"

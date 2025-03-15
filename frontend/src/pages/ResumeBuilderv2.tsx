@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from "../components/ui/card";
 import { Pencil, Save, Download, Upload, Menu } from "lucide-react";
-import { debounce, set } from "lodash";
+import { debounce } from "lodash";
 import { FormData } from "../api/types";
 import {
   updateResumeDetails,
@@ -21,7 +21,12 @@ import MainResume from "../components/ResumeV2/mainResume";
 import ResumeTabs from "../components/ResumeV2/ResumeTabs";
 import html2canvas from "html2canvas-pro";
 import jsPDF from "jspdf";
-import { Dialog, DialogClose, DialogContent, DialogTitle } from "../components/ui/dialog";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogTitle,
+} from "../components/ui/dialog";
 import ResumeUploadCard from "../components/OnBoarding/ResumeUploadCard";
 
 const ResumeEditor: React.FC = () => {
@@ -158,9 +163,7 @@ const ResumeEditor: React.FC = () => {
     getGeneratedResume();
   });
 
-  const handleResumeUpload = async (
-    file: File | null,
-  ) => {
+  const handleResumeUpload = async (file: File | null) => {
     if (!file) return;
 
     setResumeFile(file);
@@ -337,7 +340,10 @@ const ResumeEditor: React.FC = () => {
             </label>
           )}
           {openUploadResumeModal && (
-            <Dialog open={openUploadResumeModal} onOpenChange={setOpenUploadResumeModal}>
+            <Dialog
+              open={openUploadResumeModal}
+              onOpenChange={setOpenUploadResumeModal}
+            >
               <DialogContent className="sm:max-w-md p-6 bg-white">
                 <DialogTitle className="text-lg font-semibold mb-2">
                   Upload Resume
