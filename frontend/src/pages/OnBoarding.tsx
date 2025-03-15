@@ -36,6 +36,7 @@ import { debounce } from "lodash";
 import { useSearchParams } from "react-router-dom";
 
 const OnboardingFlow: React.FC = () => {
+  const controllerRef = useRef(new AbortController());
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
   const [firstGetDone, setFirstGetDone] = useState(false);
@@ -87,8 +88,8 @@ const OnboardingFlow: React.FC = () => {
       }));
 
       console.log("Parsing resume:", file);
-
-      const parsedData = await extractResume({ file });
+      controllerRef.current = new AbortController();
+      const parsedData = await extractResume({ file }, controllerRef.current);
 
       if (!parsedData) {
         console.error("Error parsing resume");
@@ -121,6 +122,7 @@ const OnboardingFlow: React.FC = () => {
           file={formData.resumeFile}
           updateFile={handleResumeUpload}
           isParsing={isParsingResume}
+          controller={controllerRef.current}
         />
       ),
     },

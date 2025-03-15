@@ -7,14 +7,17 @@ export interface ResumeUploadCardProps {
   file: File | null;
   updateFile: (file: File | null) => void;
   isParsing: boolean;
+  controller: AbortController;
 }
 
 const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({
   file,
   updateFile,
   isParsing,
+  controller,
 }) => {
   const [isDragging, setIsDragging] = useState(false);
+  const [isUploaded, setIsUploaded] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const processFile = (selectedFile: File) => {
@@ -34,6 +37,7 @@ const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({
       alert("File size should be less than 5MB.");
       return;
     }
+    setIsUploaded(true);
 
     // Update the file immediately to fix the double upload issue
     updateFile(selectedFile);
@@ -81,7 +85,9 @@ const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({
   };
 
   const removeFile = () => {
+    controller.abort();
     updateFile(null);
+    setIsUploaded(false);
   };
 
   const getFileExtension = (filename: string) => {
@@ -131,7 +137,7 @@ const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({
         </p>
       </div>
 
-      {!file ? (
+      {!isUploaded ? (
         renderUploadArea()
       ) : (
         <div className="border rounded-lg p-4">
@@ -140,7 +146,7 @@ const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <File className="h-5 w-5 text-blue-500" />
-                  <span className="font-medium text-gray-700">{file.name}</span>
+                  <span className="font-medium text-gray-700">{file && file.name}</span>
                 </div>
                 <Button
                   type="button"
@@ -157,7 +163,7 @@ const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({
                 Parsing your resume, please wait...
               </div>
             </div>
-          ) : !isParsing ? (
+          ) : !isParsing && file ? (
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <CheckCircle2 className="h-5 w-5 text-green-500" />

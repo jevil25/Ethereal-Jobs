@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from "../components/ui/card";
 import { Pencil, Save, Download, Upload, Menu } from "lucide-react";
-import { debounce } from "lodash";
+import { debounce, set } from "lodash";
 import { FormData } from "../api/types";
 import {
   updateResumeDetails,
@@ -21,12 +21,17 @@ import MainResume from "../components/ResumeV2/mainResume";
 import ResumeTabs from "../components/ResumeV2/ResumeTabs";
 import html2canvas from "html2canvas-pro";
 import jsPDF from "jspdf";
+import { Dialog, DialogClose, DialogContent, DialogTitle } from "../components/ui/dialog";
+import ResumeUploadCard from "../components/OnBoarding/ResumeUploadCard";
 
 const ResumeEditor: React.FC = () => {
+  const controllerRef = useRef(new AbortController());
   const [activeTab, setActiveTab] = useState("preview");
   const [editMode, setEditMode] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isParsing, setIsParsing] = useState(false);
   const [openUploadResumeModal, setOpenUploadResumeModal] = useState(false);
+  const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [saveStatus, setSaveStatus] = useState<"saved" | "saving" | "error">(
     "saved",
   );
@@ -154,14 +159,15 @@ const ResumeEditor: React.FC = () => {
   });
 
   const handleResumeUpload = async (
-    event: React.ChangeEvent<HTMLInputElement>,
+    file: File | null,
   ) => {
-    const file = event.target.files?.[0] || null;
     if (!file) return;
 
+    setResumeFile(file);
+
     try {
-      setIsLoading(true);
-      const parsedData = await extractResume({ file });
+      setIsParsing(true);
+      const parsedData = await extractResume({ file }, controllerRef.current);
 
       if (parsedData) {
         setResumeData((prev) => ({
@@ -169,11 +175,12 @@ const ResumeEditor: React.FC = () => {
           ...parsedData,
           resumeFile: file,
         }));
+        setOpenUploadResumeModal(false);
       }
     } catch (error) {
       console.error("Error parsing resume:", error);
     } finally {
-      setIsLoading(false);
+      setIsParsing(false);
     }
   };
 
@@ -327,14 +334,23 @@ const ResumeEditor: React.FC = () => {
                 <Upload size={16} />
                 Import Resume
               </Button>
-              <input
-                id="resume-upload"
-                type="file"
-                accept=".pdf,.doc,.docx"
-                className="hidden"
-                onChange={handleResumeUpload}
-              />
             </label>
+          )}
+          {openUploadResumeModal && (
+            <Dialog open={openUploadResumeModal} onOpenChange={setOpenUploadResumeModal}>
+              <DialogContent className="sm:max-w-md p-6 bg-white">
+                <DialogTitle className="text-lg font-semibold mb-2">
+                  Upload Resume
+                </DialogTitle>
+                <DialogClose onClick={() => setOpenUploadResumeModal(false)} />
+                <ResumeUploadCard
+                  file={resumeFile}
+                  isParsing={isParsing}
+                  updateFile={handleResumeUpload}
+                  controller={controllerRef.current}
+                />
+              </DialogContent>
+            </Dialog>
           )}
         </div>
       </div>
@@ -432,7 +448,7 @@ const ResumeEditor: React.FC = () => {
               </span>
             </div>
           )}
-          {generatedResume && (
+          {generatedResume && !editMode && (
             <MainResume
               name={user?.name}
               resumeData={generatedResume}

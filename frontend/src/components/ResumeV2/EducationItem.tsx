@@ -3,6 +3,7 @@ import { Card } from "../../components/ui/card";
 import { useState } from "react";
 import ConfirmationModal from "../ConfirmationModal";
 import { Education } from "../OnBoarding/EducationCard";
+import { CalendarForm } from "../ui/calendar";
 
 interface EducationItemProps {
   education: Education;
@@ -60,20 +61,26 @@ const EducationItem = ({
           </div>
           <div className="space-y-2">
             <label className="block text-sm font-medium">Start Date</label>
-            <input
-              type="text"
-              className="w-full p-2 border rounded"
-              value={education.startDate}
-              onChange={(e) => onChange(index, "startDate", e.target.value)}
+            <CalendarForm
+              value={
+                education.startDate ? new Date(education.startDate) : undefined
+              }
+              setValue={(date: Date | undefined) =>
+                onChange(index, "endDate", date ? date.toISOString() : "")
+              }
+              className="w-full"
             />
           </div>
           <div className="space-y-2">
             <label className="block text-sm font-medium">End Date</label>
-            <input
-              type="text"
-              className="w-full p-2 border rounded"
-              value={education.endDate}
-              onChange={(e) => onChange(index, "endDate", e.target.value)}
+            <CalendarForm
+              value={
+                education.endDate ? new Date(education.endDate) : undefined
+              }
+              setValue={(date: Date | undefined) =>
+                onChange(index, "endDate", date ? date.toISOString() : "")
+              }
+              className="w-full"
             />
           </div>
           <div className="mt-4 flex justify-end md:col-span-2">

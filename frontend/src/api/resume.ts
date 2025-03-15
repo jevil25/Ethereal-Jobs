@@ -49,6 +49,7 @@ export { updateResumeDetails, getResumeDetails };
 // post /extract/resume
 export const extractResume = async (
   data: extractResumeRequest,
+  controller?: AbortController,
 ): Promise<customFormData | undefined> => {
   const formData = new FormData();
   formData.append("file", data.file);
@@ -60,6 +61,7 @@ export const extractResume = async (
       headers: {
         "Content-Type": "multipart/form-data",
       },
+      signal: controller?.signal,
     },
   );
   if (response.data.is_success) {
