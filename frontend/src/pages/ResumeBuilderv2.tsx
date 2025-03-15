@@ -6,18 +6,17 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
-import { Pencil, Save, Download, Upload, Menu } from "lucide-react";
+import { Pencil, Save, Download, Upload, Menu, BrainCircuit } from "lucide-react";
 import { debounce } from "lodash";
 import { FormData } from "../api/types";
 import {
   updateResumeDetails,
   getResumeDetails,
   extractResume,
-  // generateResume,
+  generateResume,
   getResume,
 } from "../api/resume";
 import { useAuth } from "../providers/useAuth";
-import MainResume from "../components/ResumeV2/mainResume";
 import ResumeTabs from "../components/ResumeV2/ResumeTabs";
 import html2canvas from "html2canvas-pro";
 import jsPDF from "jspdf";
@@ -28,6 +27,7 @@ import {
   DialogTitle,
 } from "../components/ui/dialog";
 import ResumeUploadCard from "../components/OnBoarding/ResumeUploadCard";
+import ResumeComparison from "../components/ResumeV2/ResumeComparision";
 
 const ResumeEditor: React.FC = () => {
   const controllerRef = useRef(new AbortController());
@@ -36,6 +36,7 @@ const ResumeEditor: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isParsing, setIsParsing] = useState(false);
   const [openUploadResumeModal, setOpenUploadResumeModal] = useState(false);
+  const [gettingAiResume, setGettingAiResume] = useState(false);
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [saveStatus, setSaveStatus] = useState<"saved" | "saving" | "error">(
     "saved",
@@ -63,7 +64,8 @@ const ResumeEditor: React.FC = () => {
     },
     resumeFile: null,
   });
-  const [generatedResume, setGeneratedResume] = useState<FormData | null>({
+  const [showGeneratedResume, setShowGeneratedResume] = useState(false);
+  const [generatedResume, setGeneratedResume] = useState<FormData>({
     personalInfo: {
       headline: "",
       location: "",
@@ -150,11 +152,18 @@ const ResumeEditor: React.FC = () => {
   useEffect(() => {
     const getGeneratedResume = async () => {
       try {
+        if (showGeneratedResume) {
+          return
+        }
         const data = await getResume({
           is_main_resume: true,
         });
+        if (data?.is_success) {
+          setShowGeneratedResume(false);
+        }
         if (data && data.extracted_data) {
           setGeneratedResume(data.extracted_data);
+          setShowGeneratedResume(true);
         }
       } catch (error) {
         console.error("Error fetching generated resume:", error);
@@ -289,6 +298,24 @@ const ResumeEditor: React.FC = () => {
     }
   };
 
+  const startResumeGeneration = async(regenerate = false)  => {
+    try {
+      console.log("Generating resume...");
+      setGettingAiResume(true);
+      const data = await generateResume({
+        is_main_resume: true,
+        regenerate: regenerate,
+      });
+      if (data && data.extracted_data) {
+        setGeneratedResume(data.extracted_data);
+        setShowGeneratedResume(true);
+      }
+      setGettingAiResume(false);
+    } catch (error) {
+      console.error("Error generating resume:", error);
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -319,12 +346,12 @@ const ResumeEditor: React.FC = () => {
           </Button>
           {!editMode && (
             <Button
-              variant="jobify"
+              variant="default"
               className="flex items-center gap-2 text-xs md:text-sm flex-1 md:flex-none"
               onClick={downloadResume}
             >
               <Download size={16} />
-              Download PDF
+              Download Resume
             </Button>
           )}
           {editMode && (
@@ -338,6 +365,39 @@ const ResumeEditor: React.FC = () => {
                 Import Resume
               </Button>
             </label>
+          )}
+          {!editMode && !showGeneratedResume && (
+            <Button
+              variant="jobify"
+              className="flex items-center gap-2 text-xs md:text-sm flex-1 md:flex-none"
+              onClick={() => startResumeGeneration(false)}
+            >
+              <BrainCircuit size={16} />
+              Improve Resume
+            </Button>
+          )}
+          {!editMode && showGeneratedResume && (
+            <Button
+              variant="jobify"
+              className="flex items-center gap-2 text-xs md:text-sm flex-1 md:flex-none"
+              onClick={() => startResumeGeneration(true)}
+            >
+              <BrainCircuit size={16} />
+              Regenerate Resume
+            </Button>
+          )}
+          {gettingAiResume && (
+            <Dialog
+              open={gettingAiResume}
+              onOpenChange={setGettingAiResume}
+            >
+              <DialogContent className="sm:max-w-md p-6 bg-white">
+                <DialogTitle className="text-lg font-semibold mb-2">
+                  Generating Resume
+                </DialogTitle>
+                Please wait while we generate your resume...
+              </DialogContent>
+            </Dialog>
           )}
           {openUploadResumeModal && (
             <Dialog
@@ -418,10 +478,11 @@ const ResumeEditor: React.FC = () => {
         <div className="flex-1">
           <Card className="shadow-lg border-0">
             {!editMode ? (
-              <MainResume
+              <ResumeComparison
                 name={user?.name}
-                resumeData={resumeData}
-                ref={resumeCard}
+                originalResume={resumeData}
+                optimizedResume={generatedResume}
+                resumeRef={resumeCard}
               />
             ) : (
               <ResumeTabs
@@ -453,13 +514,6 @@ const ResumeEditor: React.FC = () => {
                     : "Error saving changes"}
               </span>
             </div>
-          )}
-          {generatedResume && !editMode && (
-            <MainResume
-              name={user?.name}
-              resumeData={generatedResume}
-              ref={resumeCard}
-            />
           )}
         </div>
       </div>

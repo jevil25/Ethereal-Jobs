@@ -194,6 +194,7 @@ interface GenerateAiGetResumeResponse {
 
 interface GenerateAiResumeRequest {
   is_main_resume: boolean;
+  regenerate: boolean;
   job_id?: string;
 }
 

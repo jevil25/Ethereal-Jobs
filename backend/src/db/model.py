@@ -319,3 +319,8 @@ class AiOptimzedResumeModel(Document):
         indexes = [
             [("email", 1)],
         ]
+
+class AIResumeUpdate(BaseModel):
+    is_main_resume: bool
+    job_id: Optional[str] = None
+    regenerate: Optional[bool] = False

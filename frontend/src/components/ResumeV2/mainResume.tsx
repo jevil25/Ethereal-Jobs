@@ -69,7 +69,11 @@ const MainResume = React.forwardRef<HTMLDivElement, MainResumeProps>(
                   </div>
                 </div>
                 <p className="text-gray-600 mt-2">{exp.location}</p>
-                <p className="mt-2 whitespace-pre-line">{exp.description}</p>
+                <ul className="mt-2 list-disc pl-5">
+                  {exp.description.split("\n").map((line, index) => (
+                    <li className="whitespace-pre-line text-justify mb-1" key={index}>{line}</li>
+                  ))}
+                </ul>
               </div>
             ))}
           </div>
@@ -107,9 +111,11 @@ const MainResume = React.forwardRef<HTMLDivElement, MainResumeProps>(
                     <h3 className="text-xl font-semibold">{project.title}</h3>
                   </div>
                 </div>
-                <p className="mt-2 whitespace-pre-line">
-                  {project.description}
-                </p>
+                <ul className="mt-2 list-disc pl-5">
+                  {project.description.split("\n").map((line, index) => (
+                    <li className="whitespace-pre-line mb-1 text-justify" key={index}>{line}</li>
+                  ))}
+                </ul>
                 {project.url && (
                   <a
                     href={project.url}
@@ -134,7 +140,7 @@ const MainResume = React.forwardRef<HTMLDivElement, MainResumeProps>(
             {resumeData.certifications.map((cert, index) => (
               <div key={index} className="mb-4">
                 <h3 className="text-xl font-semibold">{cert.name}</h3>
-                <p className="text-gray-700">{cert.description}</p>
+                <p className="text-gray-700 text-justify">{cert.description}</p>
                 {cert.credentialUrl && (
                   <a
                     href={cert.credentialUrl}

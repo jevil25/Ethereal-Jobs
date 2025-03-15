@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 import os
 
 from src.email.email_sender import send_verification_email, send_password_reset_email
-from src.db.model import ResumeModel, User, UserLogin, ResetPassword, UserUpdatePassword
+from src.db.model import User, UserLogin, ResetPassword, UserUpdatePassword
 from src.utils.jwttoken import create_access_token, create_refresh_token, verify_token
 from src.utils.hashing import Hash
 from fastapi import status, APIRouter

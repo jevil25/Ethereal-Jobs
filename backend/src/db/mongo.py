@@ -509,19 +509,34 @@ class DatabaseOperations:
         """
         Add an AI-optimized resume to the database.
         """
-        ai_optimized_resume = AiOptimzedResumeModel(
-            email=email,
-            personalInfo=resume_data["personalInfo"],
-            experience=resume_data["experience"],
-            education=resume_data["education"],
-            projects=resume_data["projects"],
-            certifications=resume_data["certifications"],
-            skills=resume_data["skills"],
-            jobPreferences=resume_data["jobPreferences"],
-            is_main_resume=is_main_resume,
-            job_id=job_id
+        ai_optimized_resume = await AiOptimzedResumeModel.find_one(
+            AiOptimzedResumeModel.email == email,
+            AiOptimzedResumeModel.is_main_resume == is_main_resume,
+            AiOptimzedResumeModel.job_id == job_id
         )
-        await ai_optimized_resume.save()
+        if not ai_optimized_resume:
+            ai_optimized_resume = AiOptimzedResumeModel(
+                email=email,
+                personalInfo=resume_data["personalInfo"],
+                experience=resume_data["experience"],
+                education=resume_data["education"],
+                projects=resume_data["projects"],
+                certifications=resume_data["certifications"],
+                skills=resume_data["skills"],
+                jobPreferences=resume_data["jobPreferences"],
+                is_main_resume=is_main_resume,
+                job_id=job_id
+            )
+            ai_optimized_resume = await ai_optimized_resume.insert()
+        else:
+            ai_optimized_resume.personalInfo = resume_data["personalInfo"]
+            ai_optimized_resume.experience = resume_data["experience"]
+            ai_optimized_resume.education = resume_data["education"]
+            ai_optimized_resume.projects = resume_data["projects"]
+            ai_optimized_resume.certifications = resume_data["certifications"]
+            ai_optimized_resume.skills = resume_data["skills"]
+            ai_optimized_resume.jobPreferences = resume_data["jobPreferences"]
+            ai_optimized_resume = await ai_optimized_resume.save()
         return ai_optimized_resume
     
     async def get_ai_optimized_resume(self, email: str, is_main_resume: bool, job_id: str = None):

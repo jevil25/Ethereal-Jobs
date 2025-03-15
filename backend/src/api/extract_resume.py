@@ -42,6 +42,7 @@ def ats_extractor(resume_data, text, is_pdf=False):
 
     directly start from personalInfo json level
     give all dates in yyyy-mm-dd format only, if end date is not present then it should be empty string
+    for experience and project description separate points by new line character
     Ensure the generated JSON is formatted properly and includes realistic and professional content.
 
     Give the extracted information in json format only
@@ -73,11 +74,13 @@ async def get_ai_optimized_resume(resume_data: ResumeModel, is_main_resume: bool
     headline = resume_data.personalInfo.headline
     if not is_main_resume:
         job_data = await JobModel.find_one(JobModel.id == job_id)
+        mode = "job description"
         headline_prompt = f'''
         give resume according to this job description:
         {job_data.description}
         '''
     else: 
+        mode = "job role needed"
         headline_prompt = f'''
         give resume according to this headline:
         {headline}
@@ -95,11 +98,15 @@ async def get_ai_optimized_resume(resume_data: ResumeModel, is_main_resume: bool
     give all dates in yyyy-mm-dd format only, if end date is not present then it should be empty string
     Ensure the generated JSON is formatted properly and includes realistic and professional content.
 
+    keep it professional and concise, change project and experience descriptions as per the {mode}, divide the points by new line character
+    remove or add skills as per the {mode}, user can later edit the skills soo don't worry about it
+    keep skills that are relevant to the {mode}, remove irrelevant skills
+
     Give the extracted information in json format only
     do not hallucinate the data keep it real
 
-    The resume must be ats optimized, keep it concise and relevant to the job description or headline provided.
-    Tailor the resume to the job description by highlighting relevant skills and experience.
+    The resume must be ats optimized, keep it concise and relevant to the {mode} provided.
+    Tailor the resume to the {mode} by highlighting relevant skills and experience.
     Use specific keywords and phrases relevant to the job or industry to catch the attention of recruiters and hiring managers.
     make the resume is easy to scan and emphasize achievements and responsibilities.
 

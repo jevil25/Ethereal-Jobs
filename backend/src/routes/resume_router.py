@@ -6,7 +6,7 @@ from src.decorators.auth import is_user_logged_in
 from src.db.mongo import DatabaseOperations
 from src.logger import logger
 from fastapi import Request, status
-from src.db.model import ResumeUpdate, User, AiOptimzedResumeModel
+from src.db.model import AIResumeUpdate, ResumeUpdate, User, AiOptimzedResumeModel
 
 app = APIRouter(prefix="/resume")
 db_ops = DatabaseOperations()
@@ -39,11 +39,14 @@ async def update_onboarding(request: Request, data: ResumeUpdate):
 
 @app.post("/ai/generate")
 @is_user_logged_in
-async def generate_resume(request: Request, is_main_resume: bool, job_id: Optional[str] = None):
+async def generate_resume(request: Request, data: AIResumeUpdate):
+    is_main_resume = data.is_main_resume
+    job_id = data.job_id
     user: User = request.state.user
-    ai_resume = await db_ops.get_ai_optimized_resume(user.email, is_main_resume, job_id)
-    if ai_resume:
-        return JSONResponse(content={"message": "AI optimized resume already exists", "extracted_data": ai_resume, "is_success": False}, media_type="application/json", status_code=200)
+    if not data.regenerate:
+        ai_resume = await db_ops.get_ai_optimized_resume(user.email, is_main_resume, job_id)
+        if ai_resume:
+            return JSONResponse(content={"message": "AI optimized resume already exists", "extracted_data": ai_resume, "is_success": True}, media_type="application/json", status_code=200)
     resume = await db_ops.get_user_resume(user.email)
     if not resume:
         return JSONResponse(
@@ -62,4 +65,8 @@ async def get_ai_resume(request: Request, is_main_resume: bool, job_id: Optional
     ai_resume = await db_ops.get_ai_optimized_resume(user.email, is_main_resume, job_id)
     if not ai_resume:
         return JSONResponse(content={"message": "AI optimized resume not found", "is_success": False}, media_type="application/json", status_code=200)
+    ai_resume = ai_resume.model_dump()
+    fields_to_remove = ["id", "updatedAt", "createdAt"]
+    for field in fields_to_remove:
+        ai_resume.pop(field)
     return JSONResponse(content={"extracted_data": ai_resume, "is_success": True}, media_type="application/json", status_code=200)
