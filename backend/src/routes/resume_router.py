@@ -1,15 +1,20 @@
 from typing import Optional
 from fastapi import APIRouter
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
+from fastapi.templating import Jinja2Templates
+from src.utils.helpers import get_templates
 from src.api.extract_resume import get_ai_optimized_resume
 from src.decorators.auth import is_user_logged_in
 from src.db.mongo import DatabaseOperations
 from src.logger import logger
 from fastapi import Request, status
-from src.db.model import AIResumeUpdate, ResumeUpdate, User, AiOptimzedResumeModel
+from src.db.model import AIResumeUpdate, ResumeUpdate, User, DownloadResume
+from weasyprint import HTML
+import os
 
 app = APIRouter(prefix="/resume")
 db_ops = DatabaseOperations()
+templates = Jinja2Templates(directory=os.path.join(os.getcwd(),"src/templates"))
 
 @app.get("/")
 @is_user_logged_in
@@ -70,3 +75,36 @@ async def get_ai_resume(request: Request, is_main_resume: bool, job_id: Optional
     for field in fields_to_remove:
         ai_resume.pop(field)
     return JSONResponse(content={"extracted_data": ai_resume, "is_success": True}, media_type="application/json", status_code=200)
+
+@app.post("/download")
+@is_user_logged_in
+async def download_resume(request: Request, data: DownloadResume):
+    user: User = request.state.user
+    print(f"name: {user.name}")
+    template = "resume.jinja2"
+    if data.optimized:
+        resume = await db_ops.get_ai_optimized_resume(user.email, data.is_main_resume, data.job_id)
+        filename = f"{user.name}_optimized_resume.pdf" if user.name else "resume_optimized.pdf"
+    else:
+        resume = await db_ops.get_user_resume(user.email)
+        filename = f"{user.name}_resume.pdf" if user.name else "resume.pdf"
+    print(f"filename: {filename}")
+    rendered_template = templates.TemplateResponse(template, {
+        "request": request,
+        "name": user.name,
+        "personalInfo": resume.personalInfo,
+        "experience": resume.experience,
+        "education": resume.education,
+        "projects": resume.projects,
+        "certifications": resume.certifications,
+        "skills": resume.skills,
+        "jobPreferences": resume.jobPreferences
+    })
+    pdf = HTML(string=rendered_template.body.decode()).write_pdf()
+    return Response(
+        content=pdf,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"'
+        }
+    )

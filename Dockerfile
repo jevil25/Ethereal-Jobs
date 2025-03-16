@@ -11,7 +11,7 @@ COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # install antiword
-RUN apt-get update && apt-get install -y antiword
+RUN apt-get update && apt-get install -y antiword weasyprint
 
 # Copy the rest of the application code
 COPY backend .

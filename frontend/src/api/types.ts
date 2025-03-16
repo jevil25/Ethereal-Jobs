@@ -205,6 +205,12 @@ interface GenerateAiResumeResponse {
   no_resume_found?: boolean;
 }
 
+interface DownloadResumeRequest {
+  optimized: boolean;
+  is_main_resume: boolean;
+  job_id?: string;
+}
+
 export type {
   ResumeSaveRequest,
   ResumeSaveResponse,
@@ -237,6 +243,7 @@ export type {
   GenerateAiGetResumeResponse,
   GenerateAiResumeRequest,
   GenerateAiResumeResponse,
+  DownloadResumeRequest,
 };
 
 export { Provider };

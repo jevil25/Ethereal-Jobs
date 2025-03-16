@@ -15,11 +15,10 @@ import {
   extractResume,
   generateResume,
   getResume,
+  DownloadResume,
 } from "../api/resume";
 import { useAuth } from "../providers/useAuth";
 import ResumeTabs from "../components/ResumeV2/ResumeTabs";
-import html2canvas from "html2canvas-pro";
-import jsPDF from "jspdf";
 import {
   Dialog,
   DialogClose,
@@ -238,65 +237,27 @@ const ResumeEditor: React.FC = () => {
 
   const downloadResume = () => {
     console.log("Downloading resume...");
-
     if (resumeCard.current) {
-      html2canvas(resumeCard.current, { scale: 2 }).then((canvas) => {
-        const pdf = new jsPDF("p", "mm", "a4");
-
-        const imgWidth = 210;
-        const pageHeight = 297;
-        // const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        const pageCanvasHeight = (pageHeight * canvas.width) / imgWidth;
-
-        let heightLeft = canvas.height;
-        let position = 0;
-
-        while (heightLeft > 0) {
-          const canvasPage = document.createElement("canvas");
-          canvasPage.width = canvas.width;
-          canvasPage.height = Math.min(pageCanvasHeight, heightLeft);
-
-          const context = canvasPage.getContext("2d");
-          if (!context) {
-            console.error("Could not get canvas context");
-            return;
-          }
-          context.drawImage(
-            canvas,
-            0,
-            position,
-            canvas.width,
-            canvasPage.height,
-            0,
-            0,
-            canvas.width,
-            canvasPage.height,
-          );
-
-          const imgData = canvasPage.toDataURL("image/png");
-          pdf.addImage(
-            imgData,
-            "PNG",
-            0,
-            0,
-            imgWidth,
-            (canvasPage.height * imgWidth) / canvas.width,
-          );
-
-          heightLeft -= pageCanvasHeight;
-          position += pageCanvasHeight;
-
-          if (heightLeft > 0) {
-            pdf.addPage();
-          }
-        }
-
-        pdf.save(`${user?.name || "resume"}.pdf`);
-      });
+      DownloadResume({
+        optimized: false,
+        is_main_resume: true,
+      })
     } else {
       console.error("Resume card element not found");
     }
   };
+
+  const downloadOptimizedResume = async () => {
+    console.log("Downloading optimized resume...");
+    if (showGeneratedResume) {
+      DownloadResume({
+        optimized: true,
+        is_main_resume: true,
+      });
+    } else {
+      console.error("Resume card element not found");
+    }
+  }
 
   const startResumeGeneration = async(regenerate = false)  => {
     try {
@@ -352,6 +313,16 @@ const ResumeEditor: React.FC = () => {
             >
               <Download size={16} />
               Download Resume
+            </Button>
+          )}
+          {!editMode && showGeneratedResume && (
+            <Button
+              variant="default"
+              className="flex items-center gap-2 text-xs md:text-sm flex-1 md:flex-none"
+              onClick={downloadOptimizedResume}
+            >
+              <Download size={16} />
+              Download Ai Optimized Resume
             </Button>
           )}
           {editMode && (

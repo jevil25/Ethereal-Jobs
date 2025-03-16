@@ -7,6 +7,7 @@ import {
   GenerateAiResumeResponse,
   GenerateAiGetResumeRequest,
   GenerateAiGetResumeResponse,
+  DownloadResumeRequest,
 } from "./types";
 import { FormData as customFormData } from "./types";
 import { userRefresh } from "./user";
@@ -98,4 +99,24 @@ export const generateResume = async (
     return response.data as GenerateAiResumeResponse;
   }
   return undefined;
+};
+
+// post /resume/download
+export const DownloadResume = async (
+  data: DownloadResumeRequest,
+): Promise<void> => {
+  const response = await axios.post(
+    constructServerUrlFromPath(`/resume/download`),
+    data,
+    {
+      responseType: "blob",
+    },
+  );
+  const url = window.URL.createObjectURL(new Blob([response.data]));
+  const link = document.createElement("a");
+  link.href = url;
+  link.setAttribute("download", "resume.pdf");
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
 };

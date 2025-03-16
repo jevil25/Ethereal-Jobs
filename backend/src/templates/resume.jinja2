@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ name }} | Resume</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.4;
+            margin: 0;
+            padding: 4px 8px;
+            max-width: 100%;
+            color: #222;
+            font-size: 10.5pt;
+        }
+        h1 {
+            font-size: 18pt;
+            text-align: center;
+            margin: 0 0 3px 0;
+            letter-spacing: 0.5px;
+        }
+        h2 {
+            font-size: 12pt;
+            border-bottom: 1px solid #555;
+            padding-bottom: 2px;
+            margin: 8px 0 4px 0;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 6px;
+            padding-bottom: 2px;
+            border-bottom: 0.5px solid #ddd;
+        }
+        .contact-info {
+            margin: 3px 0;
+            font-size: 9.5pt;
+        }
+        .section {
+            margin-bottom: 8px;
+        }
+        .entry {
+            margin-bottom: 6px;
+        }
+        .entry-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2px;
+        }
+        .title {
+            font-weight: bold;
+            font-size: 10.5pt;
+        }
+        .company, .institution {
+            font-weight: bold;
+            font-size: 10.5pt;
+        }
+        .date {
+            color: #444;
+            font-size: 9.5pt;
+            font-weight: 500;
+        }
+        .location {
+            font-style: italic;
+            color: #444;
+            font-size: 9.5pt;
+        }
+        ul {
+            margin: 3px 0;
+            padding-left: 17px;
+        }
+        li {
+            margin-bottom: 3px;
+            padding-left: 0;
+            line-height: 1.3;
+        }
+        li:last-child {
+            margin-bottom: 0;
+        }
+        p {
+            margin: 3px 0;
+        }
+        .skills-list {
+            margin: 3px 0;
+            padding: 0;
+            line-height: 1.4;
+        }
+        a {
+            color: #222;
+            text-decoration: none;
+        }
+        .summary {
+            line-height: 1.4;
+        }
+        @media print {
+            body {
+                padding: 0.15in 0.2in;
+                margin: 0;
+            }
+            @page {
+                margin: 0.1in;
+                size: letter portrait;
+            }
+            h2 {
+                page-break-after: avoid;
+            }
+            .entry {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>{{ name }}</h1>
+        <div class="contact-info">
+            {{ personalInfo.location }}{% if personalInfo.phone %} | {{ personalInfo.phone }}{% endif %}{% if email %} | {{ email }}{% endif %}{% if personalInfo.website %} | {{ personalInfo.website }}{% endif %}
+        </div>
+    </header>
+
+    <div class="section">
+        <h2>Professional Summary</h2>
+        <p class="summary">{% if personalInfo.summary %}{{ personalInfo.summary }}{% else %}Experienced professional with expertise in {% if skills and skills|length > 0 %}{{ skills[0:3]|join(', ') }}{% else %}relevant industry skills{% endif %}. Proven track record of delivering results through effective solutions.{% endif %}</p>
+    </div>
+
+    {% if skills and skills|length > 0 %}
+    <div class="section">
+        <h2>Skills</h2>
+        <p class="skills-list">{{ skills|join(', ') }}</p>
+    </div>
+    {% endif %}
+
+    {% if experience and experience|length > 0 %}
+    <div class="section">
+        <h2>Experience</h2>
+        {% for exp in experience %}
+        <div class="entry">
+            <div class="entry-header">
+                <span class="title">{{ exp.title }}</span>
+                <span class="date">{{ exp.startDate }} - {% if exp.current %}Present{% else %}{{ exp.endDate }}{% endif %}</span>
+            </div>
+            <div><span class="company">{{ exp.company }}</span>{% if exp.location %} | <span class="location">{{ exp.location }}</span>{% endif %}</div>
+            {% if exp.description %}
+            <ul>
+                {% for item in exp.description.split('\n') %}
+                {% if item.strip() %}
+                <li>{{ item.strip() }}</li>
+                {% endif %}
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if projects and projects|length > 0 %}
+    <div class="section">
+        <h2>Projects</h2>
+        {% for project in projects %}
+        <div class="entry">
+            <div class="entry-header">
+                <span class="title">{{ project.title }}</span>
+                {% if project.date %}<span class="date">{{ project.date }}</span>{% endif %}
+            </div>
+            {% if project.technologies and project.technologies|length > 0 %}
+            <div><em>Technologies: {{ project.technologies|join(', ') }}</em></div>
+            {% endif %}
+            {% if project.description %}
+            <ul>
+                {% for item in project.description.split('\n') %}
+                {% if item.strip() %}
+                <li>{{ item.strip() }}</li>
+                {% endif %}
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if education and education|length > 0 %}
+    <div class="section">
+        <h2>Education</h2>
+        {% for edu in education %}
+        <div class="entry">
+            <div class="entry-header">
+                <span class="title">{{ edu.degree }}{% if edu.fieldOfStudy %}, {{ edu.fieldOfStudy }}{% endif %}</span>
+                <span class="date">{{ edu.startDate }} - {% if edu.current %}Present{% else %}{{ edu.endDate }}{% endif %}</span>
+            </div>
+            <div><span class="institution">{{ edu.school }}</span>{% if edu.grade %} ({{ edu.grade }}){% endif %}</div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if certifications and certifications|length > 0 %}
+    <div class="section">
+        <h2>Certifications</h2>
+        <ul>
+            {% for cert in certifications %}
+            <li><strong>{{ cert.name }}</strong>{% if cert.date %} ({{ cert.date }}){% endif %}{% if cert.description %}: {{ cert.description }}{% endif %}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</body>
+</html>

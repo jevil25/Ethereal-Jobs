@@ -324,3 +324,8 @@ class AIResumeUpdate(BaseModel):
     is_main_resume: bool
     job_id: Optional[str] = None
     regenerate: Optional[bool] = False
+
+class DownloadResume(BaseModel):
+    optimized: bool
+    is_main_resume: bool = False
+    job_id: Optional[str] = None
