@@ -291,7 +291,7 @@ class ResumeUpdate(BaseModel):
     skills: List[str]
     jobPreferences: JobPreferences
     resumeFile: Optional[str] = None
-    is_onboarded: bool
+    is_onboarded: bool = True
 
 class AiOptimzedResumeModel(Document):
     email: Indexed(str) # type: ignore
@@ -324,6 +324,11 @@ class AIResumeUpdate(BaseModel):
     is_main_resume: bool
     job_id: Optional[str] = None
     regenerate: Optional[bool] = False
+
+class AIResumeSave(BaseModel):
+    is_main_resume: bool
+    job_id: Optional[str] = None
+    data: ResumeUpdate
 
 class DownloadResume(BaseModel):
     optimized: bool

@@ -71,7 +71,12 @@ const MainResume = React.forwardRef<HTMLDivElement, MainResumeProps>(
                 <p className="text-gray-600 mt-2">{exp.location}</p>
                 <ul className="mt-2 list-disc pl-5">
                   {exp.description.split("\n").map((line, index) => (
-                    <li className="whitespace-pre-line text-justify mb-1" key={index}>{line}</li>
+                    <li
+                      className="whitespace-pre-line text-justify mb-1"
+                      key={index}
+                    >
+                      {line}
+                    </li>
                   ))}
                 </ul>
               </div>
@@ -113,7 +118,12 @@ const MainResume = React.forwardRef<HTMLDivElement, MainResumeProps>(
                 </div>
                 <ul className="mt-2 list-disc pl-5">
                   {project.description.split("\n").map((line, index) => (
-                    <li className="whitespace-pre-line mb-1 text-justify" key={index}>{line}</li>
+                    <li
+                      className="whitespace-pre-line mb-1 text-justify"
+                      key={index}
+                    >
+                      {line}
+                    </li>
                   ))}
                 </ul>
                 {project.url && (

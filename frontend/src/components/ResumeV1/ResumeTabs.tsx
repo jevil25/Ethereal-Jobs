@@ -19,6 +19,7 @@ interface ResumeTabsProps {
   updateResumeSection: <K extends keyof FormData>(
     section: K,
     data: FormData[K],
+    isOptimizedResume: boolean,
   ) => void;
 }
 
@@ -33,7 +34,7 @@ const ResumeTabs = ({
     section: K,
     data: FormData[K],
   ) => {
-    updateResumeSection(section, data);
+    updateResumeSection(section, data, false);
   };
   return (
     <Tabs

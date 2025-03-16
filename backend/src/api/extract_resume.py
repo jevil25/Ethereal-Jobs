@@ -41,6 +41,7 @@ def ats_extractor(resume_data, text, is_pdf=False):
     {json_model_string}
 
     directly start from personalInfo json level
+    headline is only job tile of the person
     give all dates in yyyy-mm-dd format only, if end date is not present then it should be empty string
     for experience and project description separate points by new line character
     Ensure the generated JSON is formatted properly and includes realistic and professional content.

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useRef, useState } from "react";
 import { Button } from "../components/ui/button";
 import {
   Card,
@@ -6,276 +6,83 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
-import { Pencil, Save, Download, Upload, Menu, BrainCircuit } from "lucide-react";
-import { debounce } from "lodash";
-import { FormData } from "../api/types";
-import {
-  updateResumeDetails,
-  getResumeDetails,
-  extractResume,
-  generateResume,
-  getResume,
-  DownloadResume,
-} from "../api/resume";
-import { useAuth } from "../providers/useAuth";
-import ResumeTabs from "../components/ResumeV2/ResumeTabs";
+import { Download, Upload, Menu, BrainCircuit } from "lucide-react";
 import {
   Dialog,
   DialogClose,
   DialogContent,
   DialogTitle,
 } from "../components/ui/dialog";
+import { useAuth } from "../providers/useAuth";
+import ResumeTabs from "../components/ResumeV1/ResumeTabs";
 import ResumeUploadCard from "../components/OnBoarding/ResumeUploadCard";
 import ResumeComparison from "../components/ResumeV2/ResumeComparision";
+import { useResumeData } from "../components/ResumeV2/hooks/useResumeData";
+import { useResumeUpload } from "../components/ResumeV2/hooks/useResumeUpload";
+import { useWindowSize } from "../components/ResumeV2/hooks/useWindowSize";
 
 const ResumeEditor: React.FC = () => {
-  const controllerRef = useRef(new AbortController());
+  // Local UI state
   const [activeTab, setActiveTab] = useState("preview");
-  const [editMode, setEditMode] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isParsing, setIsParsing] = useState(false);
+  const [editMode] = useState(false);
   const [openUploadResumeModal, setOpenUploadResumeModal] = useState(false);
   const [gettingAiResume, setGettingAiResume] = useState(false);
-  const [resumeFile, setResumeFile] = useState<File | null>(null);
-  const [saveStatus, setSaveStatus] = useState<"saved" | "saving" | "error">(
-    "saved",
-  );
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const { user } = useAuth();
-  const [resumeData, setResumeData] = useState<FormData>({
-    personalInfo: {
-      headline: "",
-      location: "",
-      phone: "",
-      website: "",
-    },
-    experience: [],
-    education: [],
-    skills: [],
-    projects: [],
-    certifications: [],
-    jobPreferences: {
-      jobTypes: [],
-      locations: [],
-      remotePreference: "",
-      salaryExpectation: "",
-      immediateStart: false,
-    },
-    resumeFile: null,
-  });
-  const [showGeneratedResume, setShowGeneratedResume] = useState(false);
-  const [generatedResume, setGeneratedResume] = useState<FormData>({
-    personalInfo: {
-      headline: "",
-      location: "",
-      phone: "",
-      website: "",
-    },
-    experience: [],
-    education: [],
-    skills: [],
-    projects: [],
-    certifications: [],
-    jobPreferences: {
-      jobTypes: [],
-      locations: [],
-      remotePreference: "",
-      salaryExpectation: "",
-      immediateStart: false,
-    },
-    resumeFile: null,
-  });
-  const prevStateRef = useRef(resumeData);
+
+  // Refs
   const resumeCard = useRef<HTMLDivElement>(null);
+  const controllerRef = useRef(new AbortController());
 
-  useEffect(() => {
-    const fetchResumeData = async () => {
-      try {
-        setIsLoading(true);
-        const data = await getResumeDetails();
-        if (!data.no_resume_found) {
-          setResumeData(data);
-        }
-      } catch (error) {
-        console.error("Error fetching resume details:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  // Context hooks
+  const { user } = useAuth();
 
-    fetchResumeData();
-  }, []);
+  // Custom hooks
+  const {
+    resumeData,
+    setResumeData,
+    generatedResume,
+    isLoading,
+    saveStatus,
+    showGeneratedResume,
+    updateResumeSection,
+    handlePersonalInfoEdit,
+    generateResume,
+    downloadRegularResume,
+    downloadOptimizedResume,
+  } = useResumeData();
 
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 768) {
-        setSidebarOpen(false);
-      } else {
-        setSidebarOpen(true);
-      }
-    };
+  const { resumeFile, isParsing, handleResumeUpload } = useResumeUpload(
+    controllerRef.current,
+    (data) => setResumeData((prev) => ({ ...prev, ...data })),
+  );
 
-    handleResize();
-
-    window.addEventListener("resize", handleResize);
-
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  useEffect(() => {
-    const hasStateChanged =
-      JSON.stringify(prevStateRef.current) !== JSON.stringify(resumeData);
-    if (!hasStateChanged || isLoading) {
-      return;
-    }
-
-    const debouncedSave = debounce(async () => {
-      setSaveStatus("saving");
-      try {
-        await updateResumeDetails({ data: resumeData }, false);
-        setSaveStatus("saved");
-        prevStateRef.current = resumeData;
-      } catch (error) {
-        console.error("Error updating resume details:", error);
-        setSaveStatus("error");
-      }
-    }, 800);
-
-    debouncedSave();
-
-    return () => {
-      debouncedSave.cancel();
-    };
-  }, [resumeData, isLoading]);
-
-  useEffect(() => {
-    const getGeneratedResume = async () => {
-      try {
-        if (showGeneratedResume) {
-          return
-        }
-        const data = await getResume({
-          is_main_resume: true,
-        });
-        if (data?.is_success) {
-          setShowGeneratedResume(false);
-        }
-        if (data && data.extracted_data) {
-          setGeneratedResume(data.extracted_data);
-          setShowGeneratedResume(true);
-        }
-      } catch (error) {
-        console.error("Error fetching generated resume:", error);
-      }
-    };
-    getGeneratedResume();
-  });
-
-  const handleResumeUpload = async (file: File | null) => {
-    if (!file) return;
-
-    setResumeFile(file);
-
-    try {
-      setIsParsing(true);
-      const parsedData = await extractResume({ file }, controllerRef.current);
-
-      if (parsedData) {
-        setResumeData((prev) => ({
-          ...prev,
-          ...parsedData,
-          resumeFile: file,
-        }));
-        setOpenUploadResumeModal(false);
-      }
-    } catch (error) {
-      console.error("Error parsing resume:", error);
-    } finally {
-      setIsParsing(false);
-    }
+  const uploadResume = async (file: File | null) => {
+    await handleResumeUpload(file);
   };
 
-  const updateResumeSection = <K extends keyof FormData>(
-    section: K,
-    data: FormData[K],
-  ) => {
-    console.log("Updating section:", section, data);
-    setResumeData((prev) => ({
-      ...prev,
-      [section]: data,
-    }));
-  };
-
-  const handlePersonalInfoEdit = (
-    field: keyof FormData["personalInfo"],
-    value: string,
-  ) => {
-    setResumeData((prev) => ({
-      ...prev,
-      personalInfo: {
-        ...prev.personalInfo,
-        [field]: value,
-      },
-    }));
-  };
-
-  const toggleEditMode = () => {
-    setEditMode(!editMode);
-    if (!editMode) {
-      setActiveTab("personal");
-      if (window.innerWidth >= 768) {
-        setSidebarOpen(true);
-      }
+  // Handle responsive sidebar
+  useWindowSize((width) => {
+    if (width < 768) {
+      setSidebarOpen(false);
     } else {
-      setActiveTab("preview");
+      setSidebarOpen(true);
     }
-  };
+  });
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
-  const downloadResume = () => {
-    console.log("Downloading resume...");
-    if (resumeCard.current) {
-      DownloadResume({
-        optimized: false,
-        is_main_resume: true,
-      })
-    } else {
-      console.error("Resume card element not found");
+  const startResumeGeneration = async (regenerate = false) => {
+    try {
+      setGettingAiResume(true);
+      await generateResume(regenerate);
+    } catch (error) {
+      console.error("Error during resume generation:", error);
+    } finally {
+      setGettingAiResume(false);
     }
   };
-
-  const downloadOptimizedResume = async () => {
-    console.log("Downloading optimized resume...");
-    if (showGeneratedResume) {
-      DownloadResume({
-        optimized: true,
-        is_main_resume: true,
-      });
-    } else {
-      console.error("Resume card element not found");
-    }
-  }
-
-  const startResumeGeneration = async(regenerate = false)  => {
-    try {
-      console.log("Generating resume...");
-      setGettingAiResume(true);
-      const data = await generateResume({
-        is_main_resume: true,
-        regenerate: regenerate,
-      });
-      if (data && data.extracted_data) {
-        setGeneratedResume(data.extracted_data);
-        setShowGeneratedResume(true);
-      }
-      setGettingAiResume(false);
-    } catch (error) {
-      console.error("Error generating resume:", error);
-    }
-  }
 
   if (isLoading) {
     return (
@@ -297,19 +104,11 @@ const ResumeEditor: React.FC = () => {
           </p>
         </div>
         <div className="flex flex-wrap gap-2 w-full md:w-auto">
-          <Button
-            variant="outline"
-            className="flex items-center gap-2 text-xs md:text-sm flex-1 md:flex-none"
-            onClick={toggleEditMode}
-          >
-            {editMode ? <Save size={16} /> : <Pencil size={16} />}
-            {editMode ? "Exit Edit Mode" : "Edit Resume"}
-          </Button>
           {!editMode && (
             <Button
               variant="default"
               className="flex items-center gap-2 text-xs md:text-sm flex-1 md:flex-none"
-              onClick={downloadResume}
+              onClick={downloadRegularResume}
             >
               <Download size={16} />
               Download Resume
@@ -325,7 +124,7 @@ const ResumeEditor: React.FC = () => {
               Download Ai Optimized Resume
             </Button>
           )}
-          {editMode && (
+          {!editMode && (
             <label htmlFor="resume-upload" className="flex-1 md:flex-none">
               <Button
                 variant="jobify"
@@ -358,10 +157,7 @@ const ResumeEditor: React.FC = () => {
             </Button>
           )}
           {gettingAiResume && (
-            <Dialog
-              open={gettingAiResume}
-              onOpenChange={setGettingAiResume}
-            >
+            <Dialog open={gettingAiResume} onOpenChange={setGettingAiResume}>
               <DialogContent className="sm:max-w-md p-6 bg-white">
                 <DialogTitle className="text-lg font-semibold mb-2">
                   Generating Resume
@@ -383,7 +179,7 @@ const ResumeEditor: React.FC = () => {
                 <ResumeUploadCard
                   file={resumeFile}
                   isParsing={isParsing}
-                  updateFile={handleResumeUpload}
+                  updateFile={uploadResume}
                   controller={controllerRef.current}
                 />
               </DialogContent>
@@ -392,7 +188,7 @@ const ResumeEditor: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-4 md:gap-6 relative">
+      <div className="flex flex-col gap-4 md:gap-6 relative">
         {/* Mobile sidebar toggle */}
         {editMode && (
           <div className="md:hidden mb-4">
@@ -446,6 +242,26 @@ const ResumeEditor: React.FC = () => {
           </div>
         )}
 
+        {!editMode && (
+          <div className="mt-4 text-right">
+            <span
+              className={`text-sm ${
+                saveStatus === "saved"
+                  ? "text-green-600"
+                  : saveStatus === "saving"
+                    ? "text-yellow-600"
+                    : "text-red-600"
+              }`}
+            >
+              {saveStatus === "saved"
+                ? "✓ All changes saved"
+                : saveStatus === "saving"
+                  ? "Saving changes..."
+                  : "Error saving changes"}
+            </span>
+          </div>
+        )}
+
         <div className="flex-1">
           <Card className="shadow-lg border-0">
             {!editMode ? (
@@ -454,6 +270,7 @@ const ResumeEditor: React.FC = () => {
                 originalResume={resumeData}
                 optimizedResume={generatedResume}
                 resumeRef={resumeCard}
+                updateResumeSection={updateResumeSection}
               />
             ) : (
               <ResumeTabs
@@ -465,27 +282,6 @@ const ResumeEditor: React.FC = () => {
               />
             )}
           </Card>
-
-          {/* Save status indicator */}
-          {editMode && (
-            <div className="mt-4 text-right">
-              <span
-                className={`text-sm ${
-                  saveStatus === "saved"
-                    ? "text-green-600"
-                    : saveStatus === "saving"
-                      ? "text-yellow-600"
-                      : "text-red-600"
-                }`}
-              >
-                {saveStatus === "saved"
-                  ? "✓ All changes saved"
-                  : saveStatus === "saving"
-                    ? "Saving changes..."
-                    : "Error saving changes"}
-              </span>
-            </div>
-          )}
         </div>
       </div>
     </div>

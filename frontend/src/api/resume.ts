@@ -8,11 +8,12 @@ import {
   GenerateAiGetResumeRequest,
   GenerateAiGetResumeResponse,
   DownloadResumeRequest,
+  GenerateAiResumeUpdateRequest,
 } from "./types";
 import { FormData as customFormData } from "./types";
 import { userRefresh } from "./user";
 
-// put /resume/:email
+// put /resume
 const updateResumeDetails = async (
   data: ResumeSaveRequest,
   is_onboarded: boolean,
@@ -39,7 +40,7 @@ const updateResumeDetails = async (
   console.log(`Updated state to database`);
 };
 
-// get /resume/:resumeId
+// get /resume
 const getResumeDetails = async (): Promise<customFormData> => {
   const response = await axios.get(constructServerUrlFromPath(`/resume`));
   return response.data as customFormData;
@@ -93,6 +94,20 @@ export const generateResume = async (
 ): Promise<GenerateAiResumeResponse | undefined> => {
   const response = await axios.post(
     constructServerUrlFromPath(`/resume/ai/generate`),
+    data,
+  );
+  if (response.data.is_success) {
+    return response.data as GenerateAiResumeResponse;
+  }
+  return undefined;
+};
+
+// post /resume/ai/update
+export const updateGeneratedResume = async (
+  data: GenerateAiResumeUpdateRequest,
+): Promise<GenerateAiResumeResponse | undefined> => {
+  const response = await axios.post(
+    constructServerUrlFromPath(`/resume/ai/update`),
     data,
   );
   if (response.data.is_success) {

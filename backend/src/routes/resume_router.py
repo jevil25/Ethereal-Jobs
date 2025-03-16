@@ -8,7 +8,7 @@ from src.decorators.auth import is_user_logged_in
 from src.db.mongo import DatabaseOperations
 from src.logger import logger
 from fastapi import Request, status
-from src.db.model import AIResumeUpdate, ResumeUpdate, User, DownloadResume
+from src.db.model import AIResumeSave, AIResumeUpdate, ResumeUpdate, User, DownloadResume
 from weasyprint import HTML
 import os
 
@@ -75,6 +75,17 @@ async def get_ai_resume(request: Request, is_main_resume: bool, job_id: Optional
     for field in fields_to_remove:
         ai_resume.pop(field)
     return JSONResponse(content={"extracted_data": ai_resume, "is_success": True}, media_type="application/json", status_code=200)
+
+@app.post("/ai/update")
+@is_user_logged_in
+async def update_ai_resume(request: Request, data: AIResumeSave):
+    user: User = request.state.user
+    ai_resume = await db_ops.add_ai_optimized_resume(user.email, data.data.model_dump(), data.is_main_resume, data.job_id)
+    ai_resume = ai_resume.model_dump()
+    fields_to_remove = ["id", "updatedAt", "createdAt"]
+    for field in fields_to_remove:
+        ai_resume.pop(field)
+    return JSONResponse(content={"message": "AI optimized resume updated", "is_success": True, "extracted_data": ai_resume}, media_type="application/json", status_code=200)
 
 @app.post("/download")
 @is_user_logged_in
