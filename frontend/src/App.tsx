@@ -61,12 +61,9 @@ function RequireAuth({
 
   const onboardingCompleted = searchParams.get("onboardingcompleted");
   if (location.pathname === "jobs" && onboardingCompleted === "true") {
-    console.log("onboarding completed");
     return;
   }
-  console.log(`user is onboarded: ${user}`);
   if (!user.is_onboarded && location.pathname !== "/onboarding") {
-    console.log("onboarding not completed");
     return <Navigate to="/onboarding" replace />;
   }
 

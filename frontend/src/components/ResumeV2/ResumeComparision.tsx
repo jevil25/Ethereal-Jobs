@@ -9,7 +9,6 @@ interface ResumeComparisonProps {
   name: string | undefined;
   originalResume: FormData;
   optimizedResume: FormData;
-  resumeRef: React.RefObject<HTMLDivElement | null>;
   updateResumeSection: <K extends keyof FormData>(
     section: K,
     data: FormData[K],
@@ -21,7 +20,6 @@ const ResumeComparison = ({
   name,
   originalResume,
   optimizedResume,
-  resumeRef,
   updateResumeSection,
 }: ResumeComparisonProps) => {
   const [viewMode, setViewMode] = React.useState<
@@ -59,7 +57,7 @@ const ResumeComparison = ({
   }, [originalResume, optimizedResume]);
 
   return (
-    <div ref={resumeRef} className="font-sans">
+    <div className="font-sans">
       <ViewToggle viewMode={viewMode} setViewMode={setViewMode} />
 
       <Card className="shadow-md">

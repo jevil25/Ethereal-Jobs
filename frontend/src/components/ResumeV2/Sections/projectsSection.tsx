@@ -58,6 +58,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
         {project.technologies.length > 0 && (
             <p className="text-gray-600 text-sm">
                 <EditableSkills
+                    key={Date.now()}
                     diffInfo={{added: [], unchanged: project.technologies}}
                     isOptimized={isOptimized}
                     skills={project.technologies}

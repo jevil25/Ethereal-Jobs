@@ -33,7 +33,6 @@ export const getJobs = async (params: GetJobsRequest): Promise<JobData[]> => {
 export const getLinkedInProfilesForJob = async (
   jobId: string,
 ): Promise<JobData> => {
-  console.log("getLinkedInProfilesForJob", jobId);
   const response = await axios.get(
     constructServerUrlFromPath(`/job/${jobId}/linkedin/profile`),
   );

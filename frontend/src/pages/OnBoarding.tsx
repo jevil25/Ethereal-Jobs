@@ -87,7 +87,6 @@ const OnboardingFlow: React.FC = () => {
         resumeFile: file,
       }));
 
-      console.log("Parsing resume:", file);
       controllerRef.current = new AbortController();
       const parsedData = await extractResume({ file }, controllerRef.current);
 
@@ -244,7 +243,6 @@ const OnboardingFlow: React.FC = () => {
   }, [currentStep, setSearchParams, firstStepCheckDone]);
 
   const onComplete = async () => {
-    console.log("Onboarding complete!");
     await updateResumeDetail(true);
   };
 
@@ -264,11 +262,7 @@ const OnboardingFlow: React.FC = () => {
   };
 
   const handleSubmit = async () => {
-    // Here you would submit the form data to your backend
-    console.log("Submitting form data:", formData);
-    // Call the onComplete callback to finish onboarding
     await onComplete();
-    console.log("Onboarding complete!");
     navigate("/jobs?onboardingcompleted=true");
   };
 

@@ -11,6 +11,7 @@ import { ExperienceSection } from "./Sections/ExperienceSection";
 import { EducationSection } from "./Sections/EducationSection";
 import { ProjectsSection } from "./Sections/projectsSection";
 import { CertificationsSection } from "./Sections/CertificationsSection";
+import toast from "react-hot-toast";
 
 interface ResumeContentProps {
   name: string | undefined;
@@ -36,7 +37,7 @@ interface ResumeContentProps {
   ) => void;
 }
 
-const  ResumeContent = ({
+const ResumeContent = ({
     name,
     resumeData,
     diffs,
@@ -116,14 +117,16 @@ const  ResumeContent = ({
       <div className="mb-8 border-b pb-4">
         <h1 className="text-3xl font-bold mb-2">
           <EditableText
+            key={Date.now()}
             initialValue={name || ""}
-            onSave={(value: string) => {
-                // onSavePersonalInfo("name", value);
-            }}
+            onSave={(_value: string) => { 
+                console.log("Name can only be edited in settings page");
+                toast.error("Name can only be edited in settings page") }}
           />
         </h1>
         <p className="text-gray-600 text-lg">
           <EditableText
+            key={Date.now()}
             initialValue={
               resumeData.personalInfo.headline || "Professional Resume"
             }
@@ -137,6 +140,7 @@ const  ResumeContent = ({
             <span className="flex items-center gap-1">
               📍
               <EditableText
+                key={Date.now()}
                 initialValue={resumeData.personalInfo.location}
                 onSave={(value: string) => {
                     onSavePersonalInfo("location", value);
@@ -148,6 +152,7 @@ const  ResumeContent = ({
             <span className="flex items-center gap-1">
               📱
               <EditableText
+                key={Date.now()}
                 initialValue={resumeData.personalInfo.phone}
                 onSave={(value: string) => {
                     onSavePersonalInfo("phone", value);
@@ -159,6 +164,7 @@ const  ResumeContent = ({
             <span className="flex items-center gap-1">
               🔗
               <EditableText
+                key={Date.now()}
                 initialValue={resumeData.personalInfo.website}
                 onSave={(value: string) => {
                     onSavePersonalInfo("website", value);
@@ -174,6 +180,7 @@ const  ResumeContent = ({
         <div className="mb-6">
           <h2 className="text-xl font-bold mb-3 text-gray-800">Skills</h2>
           <EditableSkills
+            key={Date.now()}
             skills={resumeData.skills}
             diffInfo={
               isOptimized

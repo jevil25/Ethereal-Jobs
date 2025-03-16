@@ -17,76 +17,63 @@ const EditableText: React.FC<EditableTextProps> = ({
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [value, setValue] = useState(initialValue);
-  const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
+  const editableRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (isEditing && inputRef.current) {
-      inputRef.current.focus();
-      inputRef.current.select();
+    if (isEditing && editableRef.current) {
+      editableRef.current.focus();
     }
   }, [isEditing]);
 
   const handleClick = () => {
-    setIsEditing(true);
-  };
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    setValue(e.target.value);
-    onSave(e.target.value);
+    if (!isEditing) {
+      setIsEditing(true);
+    }
   };
 
   const handleBlur = () => {
     setIsEditing(false);
-    if (value !== initialValue) {
-      onSave(value);
+    const newValue = editableRef.current?.textContent || "";
+    if (newValue !== initialValue) {
+      setValue(newValue);
+      onSave(newValue);
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !multiline) {
+      e.preventDefault();
       setIsEditing(false);
-      onSave(value);
+      const newValue = editableRef.current?.textContent || "";
+      setValue(newValue);
+      onSave(newValue);
     } else if (e.key === "Escape") {
-      setValue(initialValue);
+      e.preventDefault();
       setIsEditing(false);
+      if (editableRef.current) {
+        editableRef.current.textContent = initialValue;
+      }
     }
   };
 
-  if (isEditing) {
-    return multiline ? (
-      <textarea
-        ref={inputRef as React.RefObject<HTMLTextAreaElement>}
-        value={value}
-        onChange={handleChange}
-        onBlur={handleBlur}
-        onKeyDown={handleKeyDown}
-        className={`w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${className}`}
-        placeholder={placeholder}
-        rows={3}
-      />
-    ) : (
-      <input
-        ref={inputRef as React.RefObject<HTMLInputElement>}
-        type="text"
-        value={value}
-        onChange={handleChange}
-        onBlur={handleBlur}
-        onKeyDown={handleKeyDown}
-        className={`w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${className}`}
-        placeholder={placeholder}
-      />
-    );
-  }
-
   return (
-    <span
+    <div
+      ref={editableRef}
+      contentEditable={isEditing}
       onClick={handleClick}
-      className={`cursor-text hover:bg-gray-100 rounded px-1 ${className} ${!value && "text-gray-400 italic"}`}
+      onBlur={handleBlur}
+      onKeyDown={handleKeyDown}
+      className={`
+        hover: cursor-text
+        ${className}
+        ${isEditing ? "cursor-text bg-gray-100" : ""}
+        ${!value && !isEditing ? "text-gray-400 italic" : ""}
+        outline-none cursor-text rounded px-1 inline-block
+      `}
+      suppressContentEditableWarning={true}
     >
       {value || placeholder}
-    </span>
+    </div>
   );
 };
 

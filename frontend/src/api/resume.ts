@@ -37,7 +37,6 @@ const updateResumeDetails = async (
     await userRefresh();
     await axios.post(constructServerUrlFromPath(`/resume`), data_to_send);
   }
-  console.log(`Updated state to database`);
 };
 
 // get /resume
@@ -75,11 +74,13 @@ export const extractResume = async (
 // get /resume/ai/generate
 export const getResume = async (
   data: GenerateAiGetResumeRequest,
+  signal: AbortSignal,
 ): Promise<GenerateAiGetResumeResponse | undefined> => {
   const response = await axios.get(
     constructServerUrlFromPath(`/resume/ai/generate`),
     {
       params: data,
+      signal: signal,
     },
   );
   if (response.data.is_success) {

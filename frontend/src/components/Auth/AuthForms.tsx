@@ -208,8 +208,6 @@ const AuthForms: React.FC<AuthFormsProps> = ({
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      console.log("isSignIn", isSignInRef.current); // Now it always gets the latest value!
-      console.log("user", user);
       if (isSignInRef.current) {
         if (user) {
           const response = await userSignin({
@@ -240,7 +238,6 @@ const AuthForms: React.FC<AuthFormsProps> = ({
         }
       } else {
         if (user) {
-          console.log("sending request");
           const response = await userSignup({
             email: user.email as string,
             password: "",

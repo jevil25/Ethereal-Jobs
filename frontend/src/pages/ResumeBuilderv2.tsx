@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
-import { Download, Upload, Menu, BrainCircuit } from "lucide-react";
+import { Download, Upload, Menu, BrainCircuit, Loader2 } from "lucide-react";
 import {
   Dialog,
   DialogClose,
@@ -29,8 +29,6 @@ const ResumeEditor: React.FC = () => {
   const [gettingAiResume, setGettingAiResume] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  // Refs
-  const resumeCard = useRef<HTMLDivElement>(null);
   const controllerRef = useRef(new AbortController());
 
   // Context hooks
@@ -162,6 +160,7 @@ const ResumeEditor: React.FC = () => {
                 <DialogTitle className="text-lg font-semibold mb-2">
                   Generating Resume
                 </DialogTitle>
+                <Loader2 className="h-12 w-12 animate-spin text-primary" />
                 Please wait while we generate your resume...
               </DialogContent>
             </Dialog>
@@ -269,7 +268,6 @@ const ResumeEditor: React.FC = () => {
                 name={user?.name}
                 originalResume={resumeData}
                 optimizedResume={generatedResume}
-                resumeRef={resumeCard}
                 updateResumeSection={updateResumeSection}
               />
             ) : (

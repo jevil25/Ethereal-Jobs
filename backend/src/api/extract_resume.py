@@ -98,6 +98,8 @@ async def get_ai_optimized_resume(resume_data: ResumeModel, is_main_resume: bool
     directly start from personalInfo json level
     give all dates in yyyy-mm-dd format only, if end date is not present then it should be empty string
     Ensure the generated JSON is formatted properly and includes realistic and professional content.
+    dont add any thing from {mode} that person resume does not have example if job has html and resume does not have html then do not add html anywhere in the resume
+    do not add any skill in points or descriptions that is not present in the resume (must follow rule)
 
     keep it professional and concise, change project and experience descriptions as per the {mode}, divide the points by new line character
     remove or add skills as per the {mode}, user can later edit the skills soo don't worry about it

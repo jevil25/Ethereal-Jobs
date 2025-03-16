@@ -21,8 +21,6 @@ const EditableSkills: React.FC<EditableSkillsProps> = ({
   const [newSkill, setNewSkill] = useState("");
   const [localSkills, setLocalSkills] = useState<string[]>(skills);
 
-  console.log(diffInfo)
-
   // Synchronize local state with incoming props
   useEffect(() => {
     setLocalSkills(skills);
@@ -124,7 +122,7 @@ const EditableSkills: React.FC<EditableSkillsProps> = ({
           diffInfo.removed.map((skill, index) => (
             <div
               key={`removed-${index}`}
-              className="bg-red-100 text-red-800 px-3 py-1 rounded-full flex items-center line-through"
+              className="bg-red-100 text-red-800 px-3 py-1 rounded-full flex items-center"
             >
               <div className="mr-2">
                 <EditableText

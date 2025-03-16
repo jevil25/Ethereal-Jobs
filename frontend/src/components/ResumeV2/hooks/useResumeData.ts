@@ -11,8 +11,7 @@ import {
 } from "../../../api/resume";
 
 export const useResumeData = () => {
-  // Regular resume state
-  const [resumeData, setResumeData] = useState<FormData>({
+  const emptyResumeData: FormData = {
     personalInfo: {
       headline: "",
       location: "",
@@ -32,30 +31,12 @@ export const useResumeData = () => {
       immediateStart: false,
     },
     resumeFile: null,
-  });
+  };
+  const [resumeData, setResumeData] = useState<FormData>(emptyResumeData);
 
   // AI-generated resume state
-  const [generatedResume, setGeneratedResume] = useState<FormData>({
-    personalInfo: {
-      headline: "",
-      location: "",
-      phone: "",
-      website: "",
-    },
-    experience: [],
-    education: [],
-    skills: [],
-    projects: [],
-    certifications: [],
-    jobPreferences: {
-      jobTypes: [],
-      locations: [],
-      remotePreference: "",
-      salaryExpectation: "",
-      immediateStart: false,
-    },
-    resumeFile: null,
-  });
+  const [generatedResume, setGeneratedResume] = useState<FormData>(emptyResumeData);
+  const [abortController, setAbortController] = useState<AbortController | null>(null);
 
   // UI state
   const [isLoading, setIsLoading] = useState(true);
@@ -94,11 +75,21 @@ export const useResumeData = () => {
         if (showGeneratedResume) {
           return;
         }
+        if (abortController) {
+          abortController.abort();
+        }
+        const abort = new AbortController();
+        setAbortController(abort);
+        const { signal } = abort;
         const data = await getResume({
-          is_main_resume: true,
-        });
-        if (data?.is_success) {
+          is_main_resume: isMainResume,
+          job_id: jobId,
+        }, signal);
+        console.log("data", data);
+        if (!data?.is_success) {
+          setGeneratedResume(emptyResumeData);
           setShowGeneratedResume(false);
+          return;
         }
         if (data && data.extracted_data) {
           setGeneratedResume(data.extracted_data);
@@ -110,7 +101,7 @@ export const useResumeData = () => {
     };
 
     fetchGeneratedResume();
-  }, [showGeneratedResume]);
+  }, [showGeneratedResume, isMainResume, jobId]);
 
   // Auto-save when resumeData changes
   useEffect(() => {
@@ -151,7 +142,7 @@ export const useResumeData = () => {
       setSaveStatus("saving");
       try {
         const req = {
-          is_main_resume: isMainResume,
+          is_main_resume: jobId ? false : true,
           data: generatedResume,
           job_id: jobId,
         }
@@ -174,8 +165,6 @@ export const useResumeData = () => {
   // Resume section update handler
   const updateResumeSection = useCallback(
     <K extends keyof FormData>(section: K, data: FormData[K], isOptimizedResume: boolean) => {
-      console.log("Updating section:", section, data);
-      console.log("isOptimizedResume:", isOptimizedResume);
       
       if (isOptimizedResume) {
         // Update only the AI-generated resume
@@ -219,14 +208,14 @@ export const useResumeData = () => {
   );
 
   // Generate AI resume handler
-  const handleGenerateResume = useCallback(async (regenerate = false) => {
+  const handleGenerateResume = useCallback(async (regenerate = false, isMain = true, jobId: string | undefined = undefined) => {
     try {
       const data = await generateResume({
-        is_main_resume: true,
+        is_main_resume: isMain,
         regenerate: regenerate,
+        job_id: jobId,
       });
       if (data && data.extracted_data) {
-        console.log("Generated resume:", data.extracted_data);
         setGeneratedResume(data.extracted_data);
         setShowGeneratedResume(true);
       }

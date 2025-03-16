@@ -35,16 +35,7 @@ const compareArrays = (original: string[], updated: string[]) => {
       const updatedCount = updatedFreq.get(item) || 0;
       return originalCount === updatedCount;
     });
-
-
-    if (removed.includes("Testing 2")){
-        console.log("original: ", original);
-        console.log("updated: ", updated);
-        console.log("removed: ", removed);
-        console.log("added: ", added);
-        console.log("unchanged: ", unchanged);
-    }
-    
+        
     return {
       removed,
       added,

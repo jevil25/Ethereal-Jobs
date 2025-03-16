@@ -51,6 +51,10 @@ async def generate_resume(request: Request, data: AIResumeUpdate):
     if not data.regenerate:
         ai_resume = await db_ops.get_ai_optimized_resume(user.email, is_main_resume, job_id)
         if ai_resume:
+            fields_to_remove = ["id", "updatedAt", "createdAt"]
+            ai_resume = ai_resume.model_dump()
+            for field in fields_to_remove:
+                ai_resume.pop(field)
             return JSONResponse(content={"message": "AI optimized resume already exists", "extracted_data": ai_resume, "is_success": True}, media_type="application/json", status_code=200)
     resume = await db_ops.get_user_resume(user.email)
     if not resume:
@@ -80,7 +84,10 @@ async def get_ai_resume(request: Request, is_main_resume: bool, job_id: Optional
 @is_user_logged_in
 async def update_ai_resume(request: Request, data: AIResumeSave):
     user: User = request.state.user
-    ai_resume = await db_ops.add_ai_optimized_resume(user.email, data.data.model_dump(), data.is_main_resume, data.job_id)
+    if data.is_main_resume:
+        ai_resume = await db_ops.add_ai_optimized_resume(user.email, data.data.model_dump(), data.is_main_resume, data.job_id)
+    else:
+        return JSONResponse(content={"message": "Cannot update AI optimized resume", "is_success": False}, media_type="application/json", status_code=200)
     ai_resume = ai_resume.model_dump()
     fields_to_remove = ["id", "updatedAt", "createdAt"]
     for field in fields_to_remove:

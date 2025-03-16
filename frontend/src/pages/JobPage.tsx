@@ -20,7 +20,6 @@ const JobPage: React.FC = () => {
   const navigate = useNavigate();
   const [job, setJob] = useState<JobData>();
   const [loading, setLoading] = useState<boolean>(true);
-  const [scale, setScale] = useState(0.8);
   const [generatedMessage, setGeneratedMessage] = useState<string>("");
   const [generatingMessage, setGeneratingMessage] = useState<boolean>(false);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
@@ -49,8 +48,8 @@ const JobPage: React.FC = () => {
   }, [navigate]);
 
   const handleMessageGeneration = async (newMessage: boolean = false) => {
-    if (linkedinName === "") {
-      setLinkedinName(job?.linkedin_profiles[0].name || "");
+    if (linkedinName === "" && job?.linkedin_profiles) {
+      setLinkedinName(job?.linkedin_profiles.length > 0 ? job?.linkedin_profiles[0].name || "" : "");
     }
     setGeneratingMessage(true);
     setModalOpen(true);
@@ -93,15 +92,11 @@ const JobPage: React.FC = () => {
               <JobHeader job={job} />
 
               <Separator className="my-6" />
-
-              {job.linkedin_profiles && job.linkedin_profiles.length > 0 && (
-                <HiringManagersSection
-                  job={job}
-                  scale={scale}
-                  setScale={setScale}
-                  handleMessageGeneration={handleMessageGeneration}
-                />
-              )}
+        
+              <HiringManagersSection
+                job={job}
+                handleMessageGeneration={handleMessageGeneration}
+              />
 
               <div className="prose max-w-none">
                 <h2 className="text-xl font-semibold mb-4">Job Description</h2>
