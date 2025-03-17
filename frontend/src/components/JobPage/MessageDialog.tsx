@@ -1,6 +1,6 @@
 import React from "react";
 import Markdown from "react-markdown";
-import { JobData } from "../../types/data";
+import { JobData, LinkedInProfile } from "../../types/data";
 import Dropdown from "../DropDown";
 import {
   Dialog,
@@ -31,6 +31,7 @@ const MessageDialog: React.FC<{
   job: JobData;
   handleMessageGeneration: (newMessage?: boolean) => void;
   navigate: NavigateFunction;
+  linkedInProfiles: LinkedInProfile[];
 }> = ({
   isOpen,
   onClose,
@@ -42,6 +43,7 @@ const MessageDialog: React.FC<{
   job,
   handleMessageGeneration,
   navigate,
+  linkedInProfiles,
 }) => {
   const reg = new RegExp("\\[[^\\]]*\\]|\\{\\{[^}]*\\}\\}|\\{[^}]*\\}", "g");
 
@@ -49,7 +51,7 @@ const MessageDialog: React.FC<{
     navigator.clipboard.writeText(generatedMessage.replace(reg, linkedinName));
   };
 
-  const selectedProfile = job?.linkedin_profiles.find(
+  const selectedProfile = linkedInProfiles.find(
     (profile) => profile.name === linkedinName,
   );
 
@@ -120,7 +122,7 @@ const MessageDialog: React.FC<{
                   <Dropdown
                     value={linkedinName}
                     list={
-                      job?.linkedin_profiles.map(
+                      linkedInProfiles.map(
                         (profile) => profile.name,
                       ) as string[]
                     }

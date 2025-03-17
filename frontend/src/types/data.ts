@@ -33,7 +33,13 @@ export interface JobData {
   company_num_employees: string;
   company_revenue: string;
   company_description: string;
+  has_linkedIn_profiles: boolean;
+}
+
+export interface JobDataWithLinkedInProfiles extends JobData {
   linkedin_profiles: LinkedInProfile[];
+  is_success: boolean;
+  is_empty: boolean;
 }
 
 export interface User {

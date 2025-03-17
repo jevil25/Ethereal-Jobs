@@ -51,9 +51,6 @@ class JobModel(Document):
             [("job_title", 1)],
             [("date_posted", -1)],
         ]
-        use_cache = True
-        cache_expiration_time = timedelta(minutes=5)
-        cache_capacity = 100
 
 class LinkedInProfile(BaseModel):
     name: str
@@ -61,9 +58,7 @@ class LinkedInProfile(BaseModel):
     profile_url: str
 
 class CompanyLinkedInProfiles(Document):
-    company: Indexed(str) # type: ignore
-    city: Indexed(str) # type: ignore
-    title: Indexed(str) # type: ignore
+    jobId: Indexed(str) # type: ignore
     profiles: List[LinkedInProfile]
     
     # Timestamp fields
@@ -75,9 +70,21 @@ class CompanyLinkedInProfiles(Document):
         indexes = [
             [("company", 1), ("city", 1), ("title", 1)],
         ]
-        use_cache = True
-        cache_expiration_time = timedelta(minutes=5)
-        cache_capacity = 100
+
+class UserLinkedInProfiles(Document):
+    email: Indexed(str) # type: ignore
+    jobId: Indexed(str) # type: ignore
+    profiles: List[LinkedInProfile]
+    
+    # Timestamp fields
+    createdAt: datetime = Field(default_factory=datetime.utcnow)
+    updatedAt: datetime = Field(default_factory=datetime.utcnow)
+
+    class Settings:
+        name = "user_linkedin_profiles"
+        indexes = [
+            [("email", 1)],
+        ]
 
 class User(Document):
     name: str
@@ -101,9 +108,6 @@ class User(Document):
             [("email", 1)],
             [("provider", 1)],
         ]
-        # use_cache = True
-        cache_expiration_time = timedelta(minutes=5)
-        cache_capacity = 100
         
 
 class RefreshToken(Document):

@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { JobData } from "../types/data";
+import { JobData, LinkedInProfile } from "../types/data";
 import {
   generateLinkedInMessage,
   getLinkedInProfilesForJob,
+  getJob,
 } from "../api/jobs";
 import { Card, CardContent } from "../components/ui/card";
 import { Button } from "../components/ui/button";
@@ -19,6 +20,8 @@ import { useAuth } from "../providers/useAuth";
 const JobPage: React.FC = () => {
   const navigate = useNavigate();
   const [job, setJob] = useState<JobData>();
+  const [linkedInProfiles, setLinkedInProfiles] = useState<LinkedInProfile[]>([]);
+  const [gettingLinkedInProfiles, setGettingLinkedInProfiles] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [generatedMessage, setGeneratedMessage] = useState<string>("");
   const [generatingMessage, setGeneratingMessage] = useState<boolean>(false);
@@ -36,7 +39,7 @@ const JobPage: React.FC = () => {
         return navigate("/");
       }
       try {
-        const data = await getLinkedInProfilesForJob(id);
+        const data = await getJob(id);
         setJob(data);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -47,9 +50,21 @@ const JobPage: React.FC = () => {
     fetchJobData();
   }, [navigate]);
 
+  const fetchLinkedInProfiles = async (getNew: boolean) => {
+    if (job) {
+      setGettingLinkedInProfiles(true);
+      const profiles = await getLinkedInProfilesForJob(job.id, getNew);
+      if (profiles.is_success){
+        console.log(profiles.linkedin_profiles);
+        setLinkedInProfiles(profiles.linkedin_profiles);
+      }
+      setGettingLinkedInProfiles(false);
+    }
+  }
+
   const handleMessageGeneration = async (newMessage: boolean = false) => {
-    if (linkedinName === "" && job?.linkedin_profiles) {
-      setLinkedinName(job?.linkedin_profiles.length > 0 ? job?.linkedin_profiles[0].name || "" : "");
+    if (linkedinName === "" && linkedInProfiles.length === 0) {
+      setLinkedinName(linkedInProfiles.length > 0 ? linkedInProfiles[0].name || "" : "");
     }
     setGeneratingMessage(true);
     setModalOpen(true);
@@ -96,6 +111,10 @@ const JobPage: React.FC = () => {
               <HiringManagersSection
                 job={job}
                 handleMessageGeneration={handleMessageGeneration}
+                fetchLinkedInProfiles={fetchLinkedInProfiles}
+                linkedInProfiles={linkedInProfiles}
+                hasLinkedInProfiles={job.has_linkedIn_profiles}
+                gettingLinkedInProfiles={gettingLinkedInProfiles}
               />
 
               <div className="prose max-w-none">
@@ -123,6 +142,7 @@ const JobPage: React.FC = () => {
             job={job}
             handleMessageGeneration={handleMessageGeneration}
             navigate={navigate}
+            linkedInProfiles={linkedInProfiles}
           />
         </>
       )}

@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Card, CardContent } from "../ui/card";
 import { Button } from "../ui/button";
 import { JobData, LinkedInProfile } from "../../types/data";
-import { Linkedin } from "lucide-react";
+import { Linkedin, Loader2 } from "lucide-react";
 import ResumeDrawer from "./ResumeDrawer";
 
 const LinkedInProfileCard: React.FC<{
@@ -29,8 +29,18 @@ const LinkedInProfileCard: React.FC<{
 const HiringManagersSection: React.FC<{
   job: JobData;
   handleMessageGeneration: (newMessage?: boolean) => void;
-}> = ({ job, handleMessageGeneration }) => {
+  fetchLinkedInProfiles: (getNew: boolean) => Promise<void>;
+  linkedInProfiles: LinkedInProfile[];
+  hasLinkedInProfiles: boolean;
+  gettingLinkedInProfiles: boolean;
+}> = ({ job, handleMessageGeneration, fetchLinkedInProfiles, linkedInProfiles, hasLinkedInProfiles, gettingLinkedInProfiles }) => {
   const [openResumeRightDrawer, setOpenResumeRightDrawer] = React.useState(false);
+
+  useEffect(() => {
+    if (hasLinkedInProfiles && linkedInProfiles.length === 0) {
+      fetchLinkedInProfiles(false);
+    }
+  }, [hasLinkedInProfiles]);
 
   const renderResumeInDrawer = () => {
     if (!openResumeRightDrawer) return null;
@@ -79,17 +89,29 @@ const HiringManagersSection: React.FC<{
             >
               Get Job Specific Resume
             </Button>
+            <Button
+              variant="jobify"
+              className=""
+              onClick={() => fetchLinkedInProfiles(hasLinkedInProfiles)}
+            >
+              {!hasLinkedInProfiles ? "Get LinkedIn Profiles" : "Refresh LinkedIn Profiles"}
+            </Button>
           </div>
 
           <h2 className="text-lg font-semibold mb-4">
             Contact Hiring Managers from {job.company}
           </h2>
-          {job.linkedin_profiles.length === 0 && (
+          {!gettingLinkedInProfiles && linkedInProfiles.length === 0 && (
             <p className="text-sm text-gray-600">
-              No LinkedIn profiles found for hiring managers from {job.company}.
+              {
+                !hasLinkedInProfiles
+                  ? "Click the button above to get LinkedIn profiles of hiring managers from this company."
+                  :
+                  "We couldn't find any LinkedIn profiles of hiring managers from this company. You can try again later with the refresh button."
+              }
             </p>
           )}
-          {job.linkedin_profiles.length > 0 && (
+          {!gettingLinkedInProfiles && linkedInProfiles.length > 0 && (
             <>
               <p className="text-sm text-gray-600">
                 Our backend system has found LinkedIn profiles of hiring managers from{" "}
@@ -101,11 +123,19 @@ const HiringManagersSection: React.FC<{
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {job.linkedin_profiles.map((profile, index) => (
+                {linkedInProfiles.map((profile, index) => (
                   <LinkedInProfileCard key={index} profile={profile} index={index} />
                 ))}
               </div>
             </>
+          )}
+          {gettingLinkedInProfiles && (
+            <div>
+              <Loader2 className="h-12 w-12 animate-spin text-blue-500" />
+              <div>
+                Please wait while we fetch LinkedIn profiles for you...
+              </div>
+            </div>
           )}
         </CardContent>
       </Card>

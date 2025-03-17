@@ -1,4 +1,4 @@
-import { JobData } from "../types/data";
+import { JobData, JobDataWithLinkedInProfiles } from "../types/data";
 import {
   GetJobsRequest,
   LinkedInGenerateMessageResponse,
@@ -29,14 +29,21 @@ export const getJobs = async (params: GetJobsRequest): Promise<JobData[]> => {
   return response.data as JobData[];
 };
 
+export const getJob = async (jobId: string): Promise<JobData> => {
+  const response = await axios.get(constructServerUrlFromPath(`/job/${jobId}`));
+  return response.data as JobData;
+}
+
 // get /job/:id/linkedin/profile
 export const getLinkedInProfilesForJob = async (
   jobId: string,
-): Promise<JobData> => {
+  getNew: boolean = false,
+): Promise<JobDataWithLinkedInProfiles> => {
   const response = await axios.get(
-    constructServerUrlFromPath(`/job/${jobId}/linkedin/profile`),
+    constructServerUrlFromPath(`/job/${jobId}/linkedin/profile?get_new=${getNew}`),
   );
-  return response.data as JobData;
+  console.log(response.data);
+  return response.data as JobDataWithLinkedInProfiles;
 };
 
 // get /generate/linkedin/message/:resumeId

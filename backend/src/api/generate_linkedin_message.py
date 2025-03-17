@@ -154,7 +154,6 @@ class EnhancedLinkedInMessageGenerator:
         start_date = current_role.startDate
         end_date = experience[-1].endDate
         start_date = int(start_date.split("-")[0])
-        print(start_date, end_date)
         if end_date != "":
             end_date = int(end_date.split("-")[0])
         else:
@@ -188,8 +187,6 @@ class EnhancedLinkedInMessageGenerator:
             
             for key, value in message_context.items():
                 base_message = base_message.replace(key, value)
-            
-            print(base_message)
             
             response = client.models.generate_content(
                 model="gemini-2.0-flash",

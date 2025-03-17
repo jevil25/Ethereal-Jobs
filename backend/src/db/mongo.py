@@ -14,7 +14,8 @@ from src.db.model import (
     VerificationToken,
     LinkedMessages,
     ResumeModel,
-    AiOptimzedResumeModel
+    AiOptimzedResumeModel,
+    UserLinkedInProfiles
 )
 
 from beanie import init_beanie
@@ -57,7 +58,8 @@ class DatabaseOperations:
                 VerificationToken,
                 LinkedMessages,
                 ResumeModel,
-                AiOptimzedResumeModel
+                AiOptimzedResumeModel,
+                UserLinkedInProfiles
             ]
         )
 
@@ -96,7 +98,7 @@ class DatabaseOperations:
             job.query = query_params
             await job.save()
 
-    async def get_linkedin_profiles(self, company: str, location: str, title: str) -> Optional[List[LinkedInProfile]]:
+    async def get_linkedin_profiles(self, job: JobModel, userEmail: str) -> Optional[List[LinkedInProfile]]:
         """
         Get LinkedIn profiles for a company and location.
         
@@ -108,15 +110,18 @@ class DatabaseOperations:
         Returns:
             Optional[List[LinkedInProfile]]: List of LinkedIn profiles or None
         """
-        profiles_doc = await CompanyLinkedInProfiles.find_one(
-            CompanyLinkedInProfiles.company == company,
-            CompanyLinkedInProfiles.city == location,
-            CompanyLinkedInProfiles.title == title
+        profiles_doc = await UserLinkedInProfiles.find_one(
+            UserLinkedInProfiles.email == userEmail,
+            UserLinkedInProfiles.jobId == job.id
         )
-        
+        if not profiles_doc:
+            profiles_doc = await CompanyLinkedInProfiles.find_one(
+                CompanyLinkedInProfiles.jobId == job.id
+            )
+
         return profiles_doc.profiles if profiles_doc else None
 
-    async def update_linkedin_profiles(self, company: str, location: str, title: str, profiles: List[LinkedInProfile]):
+    async def update_linkedin_profiles(self, job: JobModel, profiles: List[LinkedInProfile], userEmail: str):
         """
         Update LinkedIn profiles in database.
         
@@ -126,18 +131,34 @@ class DatabaseOperations:
             title (str): Job title
             profiles (List[LinkedInProfile]): List of LinkedIn profiles to update
         """
-        await CompanyLinkedInProfiles.find_one_and_update(
-            {
-                "company": company, 
-                "city": location, 
-                "title": title
-            },
-            {"$set": {
-                "profiles": [profile.dict() for profile in profiles],
-                "updatedAt": datetime.utcnow()
-            }},
-            upsert=True
+        company_linked_profiles = await CompanyLinkedInProfiles.find_one(
+            CompanyLinkedInProfiles.jobId == job.id
         )
+        if company_linked_profiles:
+            company_linked_profiles.profiles = profiles
+            await company_linked_profiles.save()
+        else:
+            await CompanyLinkedInProfiles.insert(
+                CompanyLinkedInProfiles(
+                    jobId=job.id,
+                    profiles=profiles
+                )
+            )
+        user_linked_profiles = await UserLinkedInProfiles.find_one(
+            UserLinkedInProfiles.email == userEmail,
+            UserLinkedInProfiles.jobId == job.id
+        )
+        if user_linked_profiles:
+            user_linked_profiles.profiles = profiles
+            await user_linked_profiles.save()
+        else:
+            await UserLinkedInProfiles.insert(
+                UserLinkedInProfiles(
+                    email=userEmail,
+                    jobId=job.id,
+                    profiles=profiles
+                )
+            )
 
     async def insert_user(self, user: dict):
         """
@@ -419,6 +440,23 @@ class DatabaseOperations:
         """
         return await JobModel.find_one({"_id": job_id})
     
+    async def check_if_user_has_linked_profiles_for_a_job(self, job: JobModel, email: str):
+        """
+        Check if a user has linkedin profiles for a job.
+        
+        Args:
+            email (str): User email
+            job_id (str): Job ID
+        
+        Returns:
+            bool: Whether user has linkedin profiles for the job
+        """
+        result = await UserLinkedInProfiles.find_one({
+            "email": email,
+            "jobId": job.id
+        })
+        return result is not None
+    
     async def get_linked_messages(self, email: str, company: str, position: str):
         """
         Get linkedin messages from the database.
@@ -479,10 +517,8 @@ class DatabaseOperations:
                 resumeFile=resume_data.resumeFile
             )
             if not resume:
-                print("Inserting new resume")
                 await ResumeModel.insert(resume_data_to_insert)
             else:
-                print("Updating existing resume")
                 resume.personalInfo = resume_data.personalInfo
                 resume.experience = resume_data.experience
                 resume.education = resume_data.education

@@ -1,11 +1,12 @@
-from fastapi import APIRouter, Query, HTTPException
+from fastapi import APIRouter, Query, HTTPException, Request
 from fastapi.responses import JSONResponse
 from typing import List, Dict, Optional
 from datetime import date, timedelta
 from jobspy import JobType
+from src.decorators.auth import is_user_logged_in
 from src.db.model import JobModel, JobQuery
 from src.api.jobs import get_jobs_api_response
-from src.db.mongo import DatabaseOperations
+from src.db.mongo import DatabaseOperations, User
 from src.utils.helpers import serialize_dates
 from src.api.linkedin_profiles import get_linkedin_profiles_api_response
 from src.logger import logger
@@ -52,8 +53,6 @@ async def get_jobs(
     # Check for cached jobs from yesterday onwards
     yesterday = str(date.today() - timedelta(days=1))
     cached_jobs = await db_ops.get_jobs_from_db(query_params, yesterday)
-
-    print(f"length of cached jobs: {len(cached_jobs)}")
 
     if len(cached_jobs) > 10:
         json_response = [job.model_dump() for job in cached_jobs]
@@ -114,8 +113,34 @@ async def get_jobs(
         media_type="application/json"
     )
 
+@app.get("/job/{job_id}")
+@is_user_logged_in
+async def get_job(request: Request, job_id: str) -> Dict:
+    user: User = request.state.user
+    logger.info(f"Getting job {job_id}")
+
+    job = await db_ops.get_job(job_id)
+    if not job:
+        return JSONResponse(
+            content={"message": "Job not found"},
+            media_type="application/json",
+            status_code=200
+        )
+    
+    has_linkedIn_profiles = await db_ops.check_if_user_has_linked_profiles_for_a_job(job, user.email)
+
+    job_dict = job.model_dump()
+    fields_to_remove = ["query", "createdAt", "updatedAt"]
+    for field in fields_to_remove:
+        job_dict.pop(field)
+    job_dict["has_linkedIn_profiles"] = has_linkedIn_profiles
+    
+    return JSONResponse(content=job_dict, media_type="application/json")
+
 @app.get("/job/{job_id}/linkedin/profile")
-async def get_linkedin_profile(job_id: str) -> Dict:
+@is_user_logged_in
+async def get_linkedin_profile(request: Request, job_id: str, get_new: bool) -> Dict:
+    user: User = request.state.user
     logger.info(f"Getting linkedin profile for job {job_id}")
 
     # Get job details
@@ -126,31 +151,33 @@ async def get_linkedin_profile(job_id: str) -> Dict:
             media_type="application/json",
             status_code=200
         )
-
-    company = job.company.lower()
-    city = job.query.city.lower()
-    # TODO: Add title to query if needed
-    # title = job["title"] if job.get("title") else ""
-    title = ""
-
-    if not company or not city:
-        raise HTTPException(status_code=400, detail="Company and city are required")
-
     # Get or fetch LinkedIn profiles
-    linkedin_profiles = await db_ops.get_linkedin_profiles(company, city, title)
+    linkedin_profiles = await db_ops.get_linkedin_profiles(job, user.email)
+
+    if (linkedin_profiles and len(linkedin_profiles) == 0) and not get_new:
+        return JSONResponse(
+            content={"message": "No LinkedIn profiles found 1", "is_success": False, "is_empty": True},
+            media_type="application/json",
+            status_code=200
+        )
     
-    if not linkedin_profiles or not linkedin_profiles:
-        logger.info(f"Getting linkedin profiles for {company} in {city}")
-        profiles = get_linkedin_profiles_api_response(company, city, title)
-        db_ops.update_linkedin_profiles(company, city, title, profiles)
+    if get_new or not linkedin_profiles:
+        profiles = get_linkedin_profiles_api_response(job)
+        if len(profiles) == 0:
+            return JSONResponse(
+                content={"message": "No LinkedIn profiles found", "is_success": False, "is_empty": True},
+                media_type="application/json",
+                status_code=200
+            )
+        await db_ops.update_linkedin_profiles(job, profiles, user.email)
     else:
         profiles = linkedin_profiles
 
     # Prepare response
     job_dict = job.model_dump()
-    job_dict["linkedin_profiles"] = [profile.model_dump() for profile in profiles]
     fields_to_remove = ["updatedAt", "createdAt"]
+    profiles_dict = [profile.dict() for profile in profiles]
     for field in fields_to_remove:
         job_dict.pop(field)
     
-    return JSONResponse(content=job_dict, media_type="application/json")
+    return JSONResponse(content={"job": job_dict, "linkedin_profiles": profiles_dict, "is_success": True, "is_empty": False}, media_type="application/json")

@@ -5,6 +5,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "../ui/card";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
+import { MapPin, Briefcase, Calendar, CreditCard, Building, ArrowRight } from "lucide-react";
 
 interface JobCardProps {
   job: JobData;
@@ -38,55 +39,6 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
     return navigate(`/job/${job.id}`);
   };
 
-  const truncateDescriptionHtml = (
-    html: string,
-    maxLength: number = 200,
-  ): string => {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, "text/html");
-    const text = doc.body.textContent || "";
-
-    if (text.length <= maxLength) {
-      return html;
-    }
-
-    let truncated = "";
-    let currentLength = 0;
-    let inTag = false;
-
-    for (let i = 0; i < html.length; i++) {
-      const char = html[i];
-
-      if (char === "<") {
-        inTag = true;
-      }
-
-      truncated += char;
-
-      if (!inTag) {
-        currentLength++;
-
-        if (currentLength >= maxLength) {
-          const remainingHtml = html.slice(i + 1);
-          const nextClosingTag = remainingHtml.match(/<\/[^>]+>/);
-
-          if (nextClosingTag) {
-            truncated += "..." + nextClosingTag[0];
-          } else {
-            truncated += "...";
-          }
-          break;
-        }
-      }
-
-      if (char === ">") {
-        inTag = false;
-      }
-    }
-
-    return truncated;
-  };
-
   return (
     <Card
       className="hover:shadow-lg transition duration-200"
@@ -95,49 +47,55 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start">
           <div>
-            <h2 className="text-xl font-semibold mb-1">{job.title}</h2>
-            <p className="text-gray-700 mb-1">{job.company}</p>
-            <p className="text-gray-600">
-              {job.location} {job.is_remote ? "(Remote)" : ""}
-            </p>
+            <h2 className="text-xl font-semibold mb-1 text-blue-800">{job.title}</h2>
+            <div className="flex items-center text-gray-700 mb-1">
+              <Building className="h-4 w-4 mr-1" />
+              <p>{job.company}</p>
+            </div>
+            <div className="flex items-center text-gray-600">
+              <MapPin className="h-4 w-4 mr-1" />
+              <p>{job.location} {job.is_remote ? "🌐 Remote" : ""}</p>
+            </div>
           </div>
           {job.company_logo ? (
-            <Avatar className="h-12 w-12">
+            <Avatar className="h-16 w-16 border-2 border-gray-200">
               <AvatarImage src={job.company_logo} alt={`${job.company} logo`} />
-              <AvatarFallback>
+              <AvatarFallback className="bg-blue-100 text-blue-800">
                 {job.company.substring(0, 2).toUpperCase()}
               </AvatarFallback>
             </Avatar>
-          ) : null}
+          ) : (
+            <Avatar className="h-16 w-16 bg-blue-100">
+              <AvatarFallback className="text-blue-800">
+                {job.company.substring(0, 2).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+          )}
         </div>
       </CardHeader>
 
       <CardContent>
-        <p className="text-blue-600 font-medium mb-3">{formatSalary()}</p>
-
-        <div className="mb-4">
-          <p
-            dangerouslySetInnerHTML={{
-              __html: truncateDescriptionHtml(job.description),
-            }}
-          ></p>
+        <div className="flex items-center text-blue-700 font-medium mb-4">
+          <CreditCard className="h-4 w-4 mr-2" />
+          <p>{formatSalary()}</p>
         </div>
 
-        <div className="flex flex-wrap gap-2 mb-4">
-          {job.job_type && <Badge variant="secondary">{job.job_type}</Badge>}
-          {job.job_level && <Badge variant="secondary">{job.job_level}</Badge>}
+        <div className="flex flex-wrap gap-2 mb-3">
+          {job.job_type && <Badge variant="secondary" className="flex items-center gap-1"><Briefcase className="h-3 w-3" /> {job.job_type}</Badge>}
+          {job.job_level && <Badge variant="secondary" className="bg-blue-100 text-blue-800 hover:bg-blue-200">{job.job_level}</Badge>}
           {job.job_function && (
-            <Badge variant="secondary">{job.job_function}</Badge>
+            <Badge variant="secondary" className="bg-gray-100 text-gray-800 hover:bg-gray-200">{job.job_function}</Badge>
           )}
         </div>
       </CardContent>
 
-      <CardFooter className="flex justify-between items-center">
-        <span className="text-sm text-gray-500">
+      <CardFooter className="flex justify-between items-center pt-2 border-t border-gray-100">
+        <span className="text-sm text-gray-500 flex items-center">
+          <Calendar className="h-4 w-4 mr-1" />
           Posted: {new Date(job.date_posted).toLocaleDateString()}
         </span>
-        <Button onClick={(e) => redirectToJobPage(e)} variant="jobify">
-          Apply Now
+        <Button onClick={(e) => redirectToJobPage(e)} variant="jobify" className="group">
+          Apply Now <ArrowRight className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
         </Button>
       </CardFooter>
     </Card>

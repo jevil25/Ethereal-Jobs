@@ -98,7 +98,6 @@ async def update_ai_resume(request: Request, data: AIResumeSave):
 @is_user_logged_in
 async def download_resume(request: Request, data: DownloadResume):
     user: User = request.state.user
-    print(f"name: {user.name}")
     template = "resume.jinja2"
     if data.optimized:
         resume = await db_ops.get_ai_optimized_resume(user.email, data.is_main_resume, data.job_id)
@@ -106,7 +105,6 @@ async def download_resume(request: Request, data: DownloadResume):
     else:
         resume = await db_ops.get_user_resume(user.email)
         filename = f"{user.name}_resume.pdf" if user.name else "resume.pdf"
-    print(f"filename: {filename}")
     rendered_template = templates.TemplateResponse(template, {
         "request": request,
         "name": user.name,

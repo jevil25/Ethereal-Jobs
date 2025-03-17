@@ -9,7 +9,6 @@ def is_user_logged_in(func):
     """Decorator to check if user is logged in."""
     @wraps(func)
     async def wrapper(request: Request, *args, **kwargs):
-        print("Checking if user is logged in")
         if "access_token" not in request.cookies:
             raise HTTPException(status_code=200, detail="User not logged in")
         
@@ -26,9 +25,6 @@ def is_user_logged_in(func):
         if not user:
             raise HTTPException(status_code=200, detail="User does not exist")
         user.password = None
-
-
-        print("User is logged in")
         request.state.user = user
         return await func(request, *args, **kwargs)
     

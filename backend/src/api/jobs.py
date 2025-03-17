@@ -63,8 +63,6 @@ def get_jobs_api_response(city: str, country_code: str, country: str, job_title:
                          recruiters: list = [], results_wanted: int = 20,
                          job_type: Optional[JobType] = None, is_remote: Optional[bool] = None,
                          distance: Optional[int] = None) -> list[dict]:
-    print("Getting jobs...")
-    print(f"{city} {country_code} {country} {job_title} {recruiters}")
     jobs = get_jobs(city, country_code, country, job_title, recruiters,
                     results_wanted, job_type, is_remote, distance)
     jobs = jobs.fillna("")

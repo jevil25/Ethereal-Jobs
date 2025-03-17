@@ -86,8 +86,7 @@ async def get_ai_optimized_resume(resume_data: ResumeModel, is_main_resume: bool
         give resume according to this headline:
         {headline}
         '''
-
-    print(f"headline: {headline}")  
+        
     prompt = f'''
     You are an AI bot designed to act as a professional for parsing resumes. You are given with resume and your job is to extract the following information from the resume:
     Generate a JSON-formatted professional profile for a software engineer. The profile should include the following sections:
