@@ -10,6 +10,8 @@ interface GetJobsRequest {
   country: string;
   job_title: string;
   recruiters: string;
+  job_type: string; 
+  results_wanted?: number;
 }
 
 interface ResumeSaveRequest {

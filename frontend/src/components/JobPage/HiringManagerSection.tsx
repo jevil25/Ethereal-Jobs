@@ -42,6 +42,35 @@ const HiringManagersSection: React.FC<{
     }
   }, [hasLinkedInProfiles]);
 
+  useEffect(() => {
+    const priorityTitles = ["recruit", "hiring", "hire", "talent", "manager", "staffing", "specialist"];
+  
+    linkedInProfiles.sort((a, b) => {
+      const aCompany = a.company.toLowerCase();
+      const bCompany = b.company.toLowerCase();
+  
+      const aTitlePriority = priorityTitles.some((title) => a.company.toLowerCase().includes(title)) ? 1 : 0;
+      const bTitlePriority = priorityTitles.some((title) => a.company.toLowerCase().includes(title)) ? 1 : 0;
+  
+      if (aTitlePriority !== bTitlePriority) {
+        return bTitlePriority - aTitlePriority;
+      }
+  
+      if (aCompany === bCompany) {
+        return 0;
+      }
+      if (aCompany === job.company.toLowerCase()) {
+        return -1;
+      }
+      if (bCompany === job.company.toLowerCase()) {
+        return 1;
+      }
+  
+      return aCompany.localeCompare(bCompany);
+    });
+  }, [linkedInProfiles, job.company]);
+  
+
   const renderResumeInDrawer = () => {
     if (!openResumeRightDrawer) return null;
 

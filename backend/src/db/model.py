@@ -56,6 +56,7 @@ class LinkedInProfile(BaseModel):
     name: str
     vanity_name: str
     profile_url: str
+    company: str
 
 class CompanyLinkedInProfiles(Document):
     jobId: Indexed(str) # type: ignore

@@ -21,7 +21,7 @@ async def get_jobs(
     country: str,
     job_title: str,
     recruiters: str = "",
-    results_wanted: int = Query(default=20, ge=1, le=200),
+    results_wanted: int = Query(default=10, ge=1, le=200),
     job_type: Optional[str] = None,
     is_remote: Optional[bool] = None,
     distance: Optional[int] = Query(default=None, ge=0, le=100)
@@ -56,6 +56,17 @@ async def get_jobs(
 
     if len(cached_jobs) > 10:
         json_response = [job.model_dump() for job in cached_jobs]
+        json_response = sorted(
+            json_response,
+            key=lambda x: (
+                float(x.get("min_amount", 0) or 0),
+                float(x.get("max_amount", 0) or 0),
+                x.get("date_posted", ""),
+                x.get("title", "")
+            ),
+            reverse=True
+        )
+        json_response = json_response[:results_wanted]
         fields_to_remove = ["query", "createdAt", "updatedAt"]
         for job in json_response:
             for field in fields_to_remove:
@@ -106,8 +117,18 @@ async def get_jobs(
         currency=job.get("currency") if job.get("currency") else "",
     ) for job in serialized_jobs]
     await db_ops.update_jobs(job_models, query_params)
-    
-    logger.info(f"Returning {len(jobs)} jobs")
+
+    jobs = sorted(
+        jobs,
+        key=lambda x: (
+            float(x.get("min_amount", 0) or 0),
+            float(x.get("max_amount", 0) or 0),
+            x.get("date_posted", ""),
+            x.get("title", "")
+        ),
+        reverse=True
+    )
+    jobs = jobs[:results_wanted]
     return JSONResponse(
         content=[{k: v for k, v in job.items() if k != '_id'} for job in serialized_jobs],
         media_type="application/json"

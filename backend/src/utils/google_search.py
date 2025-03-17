@@ -80,9 +80,11 @@ def get_linkedin_profiles(company, location, title) -> List[Dict]:
     profiles = []
     for result in results:
         if "linkedin.com" in result["link"]:
-            result["title"] = result["title"].split(" - ")[0]
+            title_arrary = result["title"].split("-")
+            result["title"] = title_arrary[0] if len(title_arrary) > 0 else ""
+            result["company"] = title_arrary[1] if len(title_arrary) > 1 else ""
             result["title"] = re.sub(r"\(.*?\)", "", result["title"]).strip()
-            result["vanity_name"] = result["link"].split("/in/")[1].split("/")[0]
+            result["vanity_name"] = result["link"].split("/in/")[1].split("/")[0] if "/in/" in result["link"] else ""
             result.pop("snippet")
             profiles.append(result)
     return profiles

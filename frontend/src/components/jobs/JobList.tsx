@@ -1,12 +1,53 @@
-import React from "react";
+import React, { useEffect, useState, useRef } from "react";
 import JobCard from "./JobCard";
 import { JobData } from "../../types/data";
 
 interface JobListProps {
   jobs: JobData[];
+  loading?: boolean;
+  onLoadMore: (results: number) => void;
+  hasMore: boolean;
 }
 
-const JobList: React.FC<JobListProps> = ({ jobs }) => {
+const JobList: React.FC<JobListProps> = ({ jobs, loading = false, onLoadMore, hasMore }) => {
+  const [,setPage] = useState<number>(1);
+  const [resultsPerPage,] = useState<number>(10);
+  const observer = useRef<IntersectionObserver | null>(null);
+  const lastJobElementRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    // Disconnect previous observer if it exists
+    if (observer.current) {
+      observer.current.disconnect();
+    }
+
+    // Only observe if there are more jobs to load
+    if (!hasMore || loading) return;
+
+    observer.current = new IntersectionObserver((entries) => {
+      const [entry] = entries;
+      if (entry.isIntersecting) {
+        // Load more jobs when the last element is visible
+        setPage((prevPage) => {
+          const newPage = prevPage + 1;
+          onLoadMore(newPage * resultsPerPage);
+          return newPage;
+        });
+      }
+    }, { threshold: 0.5 });
+
+    // Observe the last job element
+    if (lastJobElementRef.current) {
+      observer.current.observe(lastJobElementRef.current);
+    }
+
+    return () => {
+      if (observer.current) {
+        observer.current.disconnect();
+      }
+    };
+  }, [jobs, hasMore, loading, onLoadMore, resultsPerPage]);
+
   if (jobs.length === 0) {
     return (
       <div className="bg-white p-8 rounded-lg shadow-md text-center">
@@ -18,9 +59,24 @@ const JobList: React.FC<JobListProps> = ({ jobs }) => {
 
   return (
     <div className="space-y-4">
-      {jobs.map((job) => (
-        <JobCard key={job.id} job={job} />
+      {jobs.map((job, index) => (
+        <div key={job.id} ref={index === jobs.length - 1 ? lastJobElementRef : null}>
+          <JobCard job={job} />
+        </div>
       ))}
+      
+      {loading && (
+        <div className="flex justify-center items-center py-4">
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+        </div>
+      )}
+      
+      {!hasMore && jobs.length > 0 && (
+        <div className="text-center py-6 bg-gray-50 rounded-lg mt-6">
+          <p className="text-gray-600 font-medium">You've reached the end of the job listings</p>
+          <p className="text-sm text-gray-500 mt-1">No more jobs match your current search criteria</p>
+        </div>
+      )}
     </div>
   );
 };

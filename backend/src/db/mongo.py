@@ -79,10 +79,9 @@ class DatabaseOperations:
             JobModel.query.country_code == query_params.country_code,
             JobModel.query.country == query_params.country,
             JobModel.query.job_title == query_params.job_title,
-            JobModel.query.results_wanted == query_params.results_wanted,
             JobModel.query.job_type == query_params.job_type,
             JobModel.query.is_remote == query_params.is_remote,
-            JobModel.query.distance == query_params.distance,
+            JobModel.query.distance <= query_params.distance,
             JobModel.date_posted >= date_posted
         ).to_list()
 

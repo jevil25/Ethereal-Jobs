@@ -21,6 +21,9 @@ export const getJobs = async (params: GetJobsRequest): Promise<JobData[]> => {
   }
   cancelTokenSource = axios.CancelToken.source();
 
+  if (!params.results_wanted)
+    params.results_wanted = 10;
+
   const response = await axios.get(constructServerUrlFromPath("/jobs"), {
     params,
     cancelToken: cancelTokenSource.token,

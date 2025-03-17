@@ -9,9 +9,12 @@ import { useSearchParams } from "react-router-dom";
 
 const JobSearch: React.FC = () => {
   const [, setSearchParams] = useSearchParams();
+  const [results_wanted, setResultsWanted] = useState<number>(10);
   const [jobs, setJobs] = useState<JobData[]>([]);
   const [filteredJobs, setFilteredJobs] = useState<JobData[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [hasMore, setHasMore] = useState<boolean>(true);
+  const [lastSearchParams, setLastSearchParams] = useState<any>(null);
   const [filters, setFilters] = useState({
     is_remote: false,
     job_type: "",
@@ -29,6 +32,7 @@ const JobSearch: React.FC = () => {
     job_title: string;
     recruiters: string;
     job_type: string;
+    results_wanted?: number;
   }) => {
     if (!params.job_title) {
       toaster.error("Please enter a job title");
@@ -48,12 +52,29 @@ const JobSearch: React.FC = () => {
         newParams.set("job_title", params.job_title);
         newParams.set("recruiters", params.recruiters);
         newParams.set("job_type", params.job_type);
+        newParams.set("results_wanted", results_wanted.toString());
         return newParams.toString();
       });
 
+      // Reset state for new search
+      setJobs([]);
+      setFilteredJobs([]);
+      setHasMore(true);
+      setResultsWanted(10);
+      setLastSearchParams(params);
+
       try {
         setLoading(true);
+        params.results_wanted = results_wanted;
         const data = await getJobs(params);
+        
+        // Check if we've reached the end of available jobs
+        if (data.length < results_wanted) {
+          setHasMore(false);
+        } else {
+          setHasMore(true);
+        }
+        
         setJobs(data);
         const jobsFiltered = data.filter(
           (job) =>
@@ -69,6 +90,35 @@ const JobSearch: React.FC = () => {
         toaster.success("Jobs fetched successfully");
       }
     }, 300);
+  };
+
+  const handleLoadMore = async (newResultsWanted: number) => {
+    if (!lastSearchParams || loading || !hasMore) return;
+    
+    setLoading(true);
+    setResultsWanted(newResultsWanted);
+    
+    try {
+      const params = { ...lastSearchParams, results_wanted: newResultsWanted };
+      const data = await getJobs(params);
+      
+      // Check if we've reached the end
+      if (data.length < newResultsWanted) {
+        setHasMore(false);
+      }
+      
+      setJobs(data);
+      const jobsFiltered = data.filter(
+        (job) =>
+          (!filters.salary_min || job.min_amount >= filters.salary_min) &&
+          (!filters.salary_max || job.max_amount <= filters.salary_max),
+      );
+      setFilteredJobs(jobsFiltered);
+    } catch (error) {
+      toaster.error(`Error loading more jobs: ${error}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleFilterChange = (
@@ -93,10 +143,10 @@ const JobSearch: React.FC = () => {
     setSearchParams(new URLSearchParams(stringifiedFilters).toString());
     const jobsFiltered = jobs.filter((job) => {
       const res =
-        (!newFilters.is_remote || job.is_remote) &&
-        (!newFilters.job_type || job.job_type === newFilters.job_type) &&
-        (!newFilters.salary_min || job.min_amount >= newFilters.salary_min) &&
-        (!newFilters.salary_max || job.max_amount <= newFilters.salary_max);
+        (!overAllFilters.is_remote || job.is_remote) &&
+        (!overAllFilters.job_type || job.job_type === overAllFilters.job_type) &&
+        (!overAllFilters.salary_min || job.min_amount >= overAllFilters.salary_min) &&
+        (!overAllFilters.salary_max || job.max_amount <= overAllFilters.salary_max);
       return res;
     });
     setFilteredJobs(jobsFiltered);
@@ -126,16 +176,12 @@ const JobSearch: React.FC = () => {
           />
         </div>
         <div className="w-full md:w-3/4">
-          {loading ? (
-            <div className="flex justify-center items-center h-64 flex-col">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-              <p className="text-gray-600 mt-2">
-                Searching from multiple job boards, may take few seconds
-              </p>
-            </div>
-          ) : (
-            <JobList jobs={filteredJobs} />
-          )}
+          <JobList 
+            jobs={filteredJobs} 
+            loading={loading} 
+            onLoadMore={handleLoadMore} 
+            hasMore={hasMore} 
+          />
         </div>
       </div>
     </div>

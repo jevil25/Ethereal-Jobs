@@ -2,6 +2,7 @@ export interface LinkedInProfile {
   name: string;
   profile_url: string;
   vanity_name: string;
+  company: string;
 }
 
 export interface JobData {

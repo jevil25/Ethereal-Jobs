@@ -8,6 +8,7 @@ from email.mime.text import MIMEText
 from email.utils import formatdate
 from dotenv import load_dotenv
 from pydantic import BaseModel
+import resend
 
 load_dotenv()
 
@@ -112,6 +113,45 @@ class EmailSender:
             )
             return False
         
+    def send_email_resend(
+        self,
+        email_service: EmailService,
+    ) -> bool:
+        sender_email = self.config.from_email
+
+        msg = MIMEMultipart()
+        local_part, domain_part = sender_email.split("@")
+        encoded_domain = idna.encode(domain_part).decode("utf-8")
+        encoded_sender_email = f"{local_part}@{encoded_domain}"
+
+        msg["From"] = f"{self.config.display_name} <{encoded_sender_email}>"
+        msg["To"] = email_service.recipient
+        msg["Subject"] = email_service.template_data.subject
+        msg["Date"] = formatdate(localtime=True)
+
+        html_body = self.get_templates(email_service.template_name.value).substitute(
+            **email_service.template_data.__dict__
+        )
+
+        msg.attach(MIMEText(html_body, "html", "utf-8"))
+
+        try:
+            resend.api_key = os.getenv("RESEND_API_KEY")
+            r = resend.Emails.send({
+                "from": os.getenv("RESEND_EMAIL"),
+                "to": email_service.recipient,
+                "subject": email_service.template_data.subject,
+                "html": html_body
+            })
+            return True
+        except Exception as e:
+            print(
+                "SMTP issue, couldn't send email to %s. Error: %s",
+                email_service.recipient,
+                str(e),
+            )
+            return False
+    
 def send_verification_email(email:str, token: str, name: str):
     frontend_url = os.getenv("FRONTEND_URL")
     verification_link = f"{frontend_url}/verify-email?token={token}"
@@ -121,7 +161,7 @@ def send_verification_email(email:str, token: str, name: str):
         template_data=EmailVerificationEmail(verification_link=verification_link, name=name)
     )
     email_sender = EmailSender()
-    email_sender.send_email(email_service)
+    email_sender.send_email_resend(email_service)
 
 def send_password_reset_email(email:str, token: str, name: str):
     frontend_url = os.getenv("FRONTEND_URL")
@@ -132,4 +172,4 @@ def send_password_reset_email(email:str, token: str, name: str):
         template_data=ResetPasswordEmail(reset_link=reset_link, name=name)
     )
     email_sender = EmailSender()
-    email_sender.send_email(email_service)
+    email_sender.send_email_resend(email_service)

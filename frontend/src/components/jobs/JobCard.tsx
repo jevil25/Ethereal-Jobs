@@ -26,11 +26,14 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
     };
 
     if (job.min_amount && job.max_amount) {
-      return `${formatAmount(job.min_amount)} - ${formatAmount(job.max_amount)} per ${job.interval || "month"}`;
+      if (job.min_amount === job.max_amount) {
+        return `${formatAmount(job.min_amount)} ${job.interval || "per month"}`;
+      }
+      return `${formatAmount(job.min_amount)} - ${formatAmount(job.max_amount)} ${job.interval || "per month"}`;
     } else if (job.min_amount) {
-      return `From ${formatAmount(job.min_amount)} per ${job.interval || "month"}`;
+      return `From ${formatAmount(job.min_amount)} ${job.interval || "per month"}`;
     } else if (job.max_amount) {
-      return `Up to ${formatAmount(job.max_amount)} per ${job.interval || "month"}`;
+      return `Up to ${formatAmount(job.max_amount)} ${job.interval || "per month"}`;
     }
   };
 
