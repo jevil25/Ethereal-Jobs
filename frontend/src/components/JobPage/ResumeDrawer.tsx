@@ -21,8 +21,6 @@ const ResumeDrawer = ({ isOpen, setIsOpen, jobId }: ResumeDrawerProps) => {
         resumeData,
         setIsMainResume,
         setJobId,
-        isLoading,
-        saveStatus,
         updateResumeSection,
         generateResume,
         downloadOptimizedResume,
