@@ -24,8 +24,10 @@ export const useResumeUpload = (
             ...parsedData,
             resumeFile: file,
           });
+          setIsParsing(false);
           return true;
         }
+        setIsParsing(false);
         return false;
       } catch (error) {
         console.error("Error parsing resume:", error);
@@ -39,6 +41,7 @@ export const useResumeUpload = (
 
   return {
     resumeFile,
+    setResumeFile,
     isParsing,
     handleResumeUpload,
   };

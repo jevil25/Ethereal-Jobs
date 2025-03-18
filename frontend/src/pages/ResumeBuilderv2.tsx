@@ -49,13 +49,14 @@ const ResumeEditor: React.FC = () => {
     downloadOptimizedResume,
   } = useResumeData();
 
-  const { resumeFile, isParsing, handleResumeUpload } = useResumeUpload(
+  const { resumeFile, isParsing, handleResumeUpload, setResumeFile } = useResumeUpload(
     controllerRef.current,
     (data) => setResumeData((prev) => ({ ...prev, ...data })),
   );
 
   const uploadResume = async (file: File | null) => {
     await handleResumeUpload(file);
+    setOpenUploadResumeModal(false);
   };
 
   // Handle responsive sidebar
@@ -127,7 +128,10 @@ const ResumeEditor: React.FC = () => {
               <Button
                 variant="jobify"
                 className="flex items-center gap-2 text-xs md:text-sm w-full"
-                onClick={() => setOpenUploadResumeModal(true)}
+                onClick={() => {
+                  setResumeFile(null);
+                  setOpenUploadResumeModal(true)
+                }}
               >
                 <Upload size={16} />
                 Import Resume

@@ -11,84 +11,114 @@ import {
 import { constructServerUrlFromPath } from "../utils/helper";
 import axios, { CancelTokenSource } from "axios";
 import { userRefresh } from "./user";
+import showToast from "../components/ui/toast";
 
 // get /jobs
 let cancelTokenSource: CancelTokenSource | null = null;
 
 export const getJobs = async (params: GetJobsRequest): Promise<JobData[]> => {
-  if (cancelTokenSource) {
-    cancelTokenSource.cancel("Operation canceled due to new request.");
+  try {
+    if (cancelTokenSource) {
+      cancelTokenSource.cancel("Operation canceled due to new request.");
+    }
+    cancelTokenSource = axios.CancelToken.source();
+
+    if (!params.results_wanted) params.results_wanted = 10;
+
+    const response = await axios.get(constructServerUrlFromPath("/jobs"), {
+      params,
+      cancelToken: cancelTokenSource.token,
+    });
+
+    return response.data as JobData[];
+  } catch (error: any) {
+    showToast("Error fetching jobs: " + (error.message || "Unknown error"), "error");
+    throw error;
   }
-  cancelTokenSource = axios.CancelToken.source();
-
-  if (!params.results_wanted)
-    params.results_wanted = 10;
-
-  const response = await axios.get(constructServerUrlFromPath("/jobs"), {
-    params,
-    cancelToken: cancelTokenSource.token,
-  });
-
-  return response.data as JobData[];
 };
 
 export const getJob = async (jobId: string): Promise<JobData> => {
-  const response = await axios.get(constructServerUrlFromPath(`/job/${jobId}`));
-  return response.data as JobData;
-}
+  try {
+    const response = await axios.get(constructServerUrlFromPath(`/job/${jobId}`));
+    return response.data as JobData;
+  } catch (error: any) {
+    showToast("Error fetching job: " + (error.message || "Unknown error"), "error");
+    throw error;
+  }
+};
 
 // get /job/:id/linkedin/profile
 export const getLinkedInProfilesForJob = async (
   jobId: string,
   getNew: boolean = false,
 ): Promise<JobDataWithLinkedInProfiles> => {
-  const response = await axios.get(
-    constructServerUrlFromPath(`/job/${jobId}/linkedin/profile?get_new=${getNew}`),
-  );
-  console.log(response.data);
-  return response.data as JobDataWithLinkedInProfiles;
+  try {
+    const response = await axios.get(
+      constructServerUrlFromPath(`/job/${jobId}/linkedin/profile?get_new=${getNew}`),
+    );
+    console.log(response.data);
+    return response.data as JobDataWithLinkedInProfiles;
+  } catch (error: any) {
+    showToast("Error fetching LinkedIn profiles: " + (error.message || "Unknown error"), "error");
+    throw error;
+  }
 };
 
 // get /generate/linkedin/message/:resumeId
 export const generateLinkedInMessage = async (
   params: LinkedInGenerateMessageRequest,
 ): Promise<LinkedInGenerateMessageResponse> => {
-  const response = await axios.get(
-    constructServerUrlFromPath(`/generate/linkedin/message/${params.email}`),
-    { params },
-  );
-  if (
-    response.data &&
-    response.data.detail &&
-    response.data.detail === "Token expired"
-  ) {
-    await userRefresh();
-    await axios.get(
+  try {
+    const response = await axios.get(
       constructServerUrlFromPath(`/generate/linkedin/message/${params.email}`),
       { params },
     );
+    if (
+      response.data &&
+      response.data.detail &&
+      response.data.detail === "Token expired"
+    ) {
+      await userRefresh();
+      return await axios.get(
+        constructServerUrlFromPath(`/generate/linkedin/message/${params.email}`),
+        { params },
+      ).then(res => res.data as LinkedInGenerateMessageResponse);
+    }
+    return response.data as LinkedInGenerateMessageResponse;
+  } catch (error: any) {
+    showToast("Error generating LinkedIn message: " + (error.message || "Unknown error"), "error");
+    throw error;
   }
-  return response.data as LinkedInGenerateMessageResponse;
 };
 
 // get /search/suggestions/job_title
 export const getSearchSuggestions = async (
   params: AutoSuggestionsRequest,
 ): Promise<AutoSuggestionsResponse> => {
-  const response = await axios.get(
-    constructServerUrlFromPath("/search/suggestions/job_title"),
-    { params },
-  );
-  return response.data as AutoSuggestionsResponse;
+  try {
+    const response = await axios.get(
+      constructServerUrlFromPath("/search/suggestions/job_title"),
+      { params },
+    );
+    return response.data as AutoSuggestionsResponse;
+  } catch (error: any) {
+    showToast("Error fetching search suggestions: " + (error.message || "Unknown error"), "error");
+    throw error;
+  }
 };
 
 // get /search/suggestions/location
 export const getLocationSuggestions = async (
   params: AutoSuggestionsRequestLocation,
 ): Promise<AutoSuggestionsLocationResponse> => {
-  const response = await axios.get(
-    constructServerUrlFromPath("/search/suggestions/location"),
-    { params },
-  );
-  return response.data as AutoSuggestionsLocationResponse;
+  try {
+    const response = await axios.get(
+      constructServerUrlFromPath("/search/suggestions/location"),
+      { params },
+    );
+    return response.data as AutoSuggestionsLocationResponse;
+  } catch (error: any) {
+    showToast("Error fetching location suggestions: " + (error.message || "Unknown error"), "error");
+    throw error;
+  }
 };

@@ -1,7 +1,8 @@
 import React, { useState, useRef } from "react";
 import { Label } from "../ui/label";
 import { Button } from "../ui/button";
-import { Upload, File, CheckCircle2, X, Loader2 } from "lucide-react";
+import { Upload, File, X, Loader2 } from "lucide-react";
+import showToast from "../ui/toast";
 
 export interface ResumeUploadCardProps {
   file: File | null;
@@ -29,12 +30,12 @@ const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({
     const maxSize = 5 * 1024 * 1024; // 5MB
 
     if (!validTypes.includes(selectedFile.type)) {
-      alert("Please upload a PDF or Word document.");
+      showToast("Please upload a PDF or Word document.", "error");
       return;
     }
 
     if (selectedFile.size > maxSize) {
-      alert("File size should be less than 5MB.");
+      showToast("File size too large. Max size is 5MB.", "error");
       return;
     }
     setIsUploaded(true);
@@ -84,15 +85,16 @@ const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({
     }
   };
 
+  const triggerFileInput = () => {
+    fileInputRef.current?.click();
+  };
+
   const removeFile = () => {
     controller.abort();
     updateFile(null);
     setIsUploaded(false);
   };
 
-  const getFileExtension = (filename: string) => {
-    return filename.slice(((filename.lastIndexOf(".") - 1) >>> 0) + 2);
-  };
 
   const renderUploadArea = () => (
     <div
@@ -105,7 +107,7 @@ const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({
       onDragLeave={handleDragLeave}
       onDragOver={handleDragOver}
       onDrop={handleDrop}
-      onClick={() => fileInputRef.current?.click()}
+      onClick={triggerFileInput}
     >
       <div className="flex flex-col items-center justify-center space-y-2">
         <Upload className="h-12 w-12 text-gray-400" />
@@ -124,6 +126,10 @@ const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({
       </div>
     </div>
   );
+
+  if (!isParsing && file) {
+    return null;
+  }
 
   return (
     <div className="space-y-4">
@@ -160,32 +166,13 @@ const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({
                   <X className="h-4 w-4" />
                 </Button>
               </div>
-              <div className="flex justify-center items-center w-full h-12 text-center">
+              <div className="flex justify-center items-center w-full text-center">
                 <Loader2 className="w-12 animate-spin text-blue-500" />
-                Parsing your resume, please wait...
+                  <div className="h-20">
+                    Parsing your resume, please wait...
+                    This normally takes about 10 seconds.
+                  </div>
               </div>
-            </div>
-          ) : !isParsing && file ? (
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <CheckCircle2 className="h-5 w-5 text-green-500" />
-                <div>
-                  <p className="font-medium text-gray-700">{file.name}</p>
-                  <p className="text-sm text-gray-500">
-                    {(file.size / 1024 / 1024).toFixed(2)} MB •{" "}
-                    {getFileExtension(file.name).toUpperCase()}
-                  </p>
-                </div>
-              </div>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={removeFile}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <X className="h-4 w-4" />
-              </Button>
             </div>
           ) : null}
         </div>

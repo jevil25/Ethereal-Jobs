@@ -11,7 +11,7 @@ import { ExperienceSection } from "./Sections/ExperienceSection";
 import { EducationSection } from "./Sections/EducationSection";
 import { ProjectsSection } from "./Sections/projectsSection";
 import { CertificationsSection } from "./Sections/CertificationsSection";
-import toast from "react-hot-toast";
+import showToast from "../ui/toast";
 
 interface ResumeContentProps {
   name: string | undefined;
@@ -120,9 +120,8 @@ const ResumeContent = ({
             key={Date.now()}
             initialValue={name || ""}
             onSave={(_value: string) => { 
-                console.log("Name can only be edited in settings page");
-                toast.error("Name can only be edited in settings page") }}
-          />
+              showToast("Name can be editted in settings page", "error")
+            }}/>
         </h1>
         <p className="text-gray-600 text-lg">
           <EditableText

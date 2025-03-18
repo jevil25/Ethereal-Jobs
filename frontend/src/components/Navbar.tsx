@@ -50,7 +50,7 @@ const NavBar = () => {
   };
 
   const getTextColor = (isActive = false) => {
-    let baseColor = isScrolled ? "text-gray-700" : "text-gray-800";
+    const baseColor = isScrolled ? "text-gray-700" : "text-gray-800";
     return isActive ? `${baseColor} font-medium` : baseColor;
   };
 

@@ -53,6 +53,9 @@ const EditableText: React.FC<EditableTextProps> = ({
       if (editableRef.current) {
         editableRef.current.textContent = initialValue;
       }
+    }else{
+      const newValue = editableRef.current?.textContent || "";
+      onSave(newValue);
     }
   };
 

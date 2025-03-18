@@ -21,7 +21,7 @@ import axios from "axios";
 import { useAuth } from "./providers/useAuth";
 import VerifyEmailPage from "./pages/verify-email";
 import OnboardingFlow from "./pages/OnBoarding";
-import { Toaster } from "./components/ui/sonner";
+import { Toaster } from "react-hot-toast";
 
 // needed for axios to send cookies
 axios.defaults.withCredentials = true;
@@ -31,13 +31,13 @@ function App() {
     <>
       <div className="App">
         <main className="">
+          <Toaster />
           <Router>
             <AuthProvider>
               <AppContent />
             </AuthProvider>
           </Router>
         </main>
-        <Toaster />
       </div>
     </>
   );
