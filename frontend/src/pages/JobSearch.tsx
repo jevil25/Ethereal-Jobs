@@ -10,6 +10,7 @@ import { useSearchParams } from "react-router-dom";
 const JobSearch: React.FC = () => {
   const [, setSearchParams] = useSearchParams();
   const [results_wanted, setResultsWanted] = useState<number>(10);
+  const [increaseCounter, setIncreaseCounter] = useState<number>(0);
   const [jobs, setJobs] = useState<JobData[]>([]);
   const [filteredJobs, setFilteredJobs] = useState<JobData[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -34,6 +35,7 @@ const JobSearch: React.FC = () => {
     job_type: string;
     results_wanted?: number;
   }) => {
+    setIncreaseCounter(increaseCounter + 10);
     if (!params.job_title) {
       toaster.error("Please enter a job title");
       return;
@@ -81,7 +83,17 @@ const JobSearch: React.FC = () => {
             (!filters.salary_min || job.min_amount >= filters.salary_min) &&
             (!filters.salary_max || job.max_amount <= filters.salary_max),
         );
-        setFilteredJobs(jobsFiltered);
+        const uniqueJobs = jobsFiltered.filter(
+          (job, index, self) =>
+            index ===
+            self.findIndex(
+              (t) =>
+                t.title === job.title &&
+                t.company === job.company &&
+                t.date_posted === job.date_posted,
+            ),
+        );
+        setFilteredJobs(uniqueJobs);
         setLoading(false);
       } catch (error) {
         setLoading(false);
@@ -176,7 +188,7 @@ const JobSearch: React.FC = () => {
           />
         </div>
         <div className="w-full md:w-3/4">
-          <JobList 
+          <JobList
             jobs={filteredJobs} 
             loading={loading} 
             onLoadMore={handleLoadMore} 

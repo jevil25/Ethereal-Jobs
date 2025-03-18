@@ -54,14 +54,12 @@ async def get_jobs(
     yesterday = str(date.today() - timedelta(days=1))
     cached_jobs = await db_ops.get_jobs_from_db(query_params, yesterday)
 
-    if len(cached_jobs) > 10:
+    if len(cached_jobs) > 10 and len(cached_jobs) >= results_wanted:
         json_response = [job.model_dump() for job in cached_jobs]
         json_response = sorted(
             json_response,
             key=lambda x: (
-                float(x.get("min_amount", 0) or 0),
-                float(x.get("max_amount", 0) or 0),
-                x.get("date_posted", ""),
+                str(x.get("date_posted", "")),
                 x.get("title", "")
             ),
             reverse=True
@@ -84,7 +82,7 @@ async def get_jobs(
         query_params.country,
         query_params.job_title,
         recruiters_list,
-        query_params.results_wanted,
+        query_params.results_wanted if query_params.results_wanted > 50 else 50,
         query_params.job_type,
         query_params.is_remote,
         query_params.distance
@@ -121,9 +119,7 @@ async def get_jobs(
     jobs = sorted(
         jobs,
         key=lambda x: (
-            float(x.get("min_amount", 0) or 0),
-            float(x.get("max_amount", 0) or 0),
-            x.get("date_posted", ""),
+            str(x.get("date_posted", "")),
             x.get("title", "")
         ),
         reverse=True

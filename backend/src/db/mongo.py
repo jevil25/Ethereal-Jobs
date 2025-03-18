@@ -82,7 +82,8 @@ class DatabaseOperations:
             JobModel.query.job_type == query_params.job_type,
             JobModel.query.is_remote == query_params.is_remote,
             JobModel.query.distance <= query_params.distance,
-            JobModel.date_posted >= date_posted
+            JobModel.date_posted >= date_posted,
+            sort=[("date_posted", -1)]
         ).to_list()
 
     async def update_jobs(self, jobs: List[JobModel], query_params: JobQuery):
@@ -584,4 +585,31 @@ class DatabaseOperations:
             AiOptimzedResumeModel.job_id == job_id
         )
         return ai_optimized_resume
+    
+    async def get_jobs_count(self, query_params: JobQuery, min_date: str) -> int:
+        """
+        Get the number of jobs in the database.
+        """
+        return await JobModel.find(
+            JobModel.query.city == query_params.city,
+            JobModel.query.country_code == query_params.country_code,
+            JobModel.query.country == query_params.country,
+            JobModel.query.job_title == query_params.job_title,
+            JobModel.query.job_type == query_params.job_type,
+            JobModel.query.is_remote == query_params.is_remote,
+            JobModel.query.distance <= query_params.distance,
+            JobModel.date_posted >= min_date
+        ).count()
+    
+    async def get_jobs_from_db_paginated(self, query_params: JobQuery, min_date: str, skip: int, limit: int) -> List[JobModel]:
+        return await JobModel.find(
+            JobModel.query.city == query_params.city,
+            JobModel.query.country_code == query_params.country_code,
+            JobModel.query.country == query_params.country,
+            JobModel.query.job_title == query_params.job_title,
+            JobModel.query.job_type == query_params.job_type,
+            JobModel.query.is_remote == query_params.is_remote,
+            JobModel.query.distance <= query_params.distance,
+            JobModel.date_posted >= min_date
+        ).skip(skip).limit(limit).to_list()
     

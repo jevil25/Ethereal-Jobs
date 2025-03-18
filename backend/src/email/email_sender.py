@@ -2,6 +2,7 @@ import enum
 import os
 import smtplib
 import string
+import uuid
 import idna
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -117,31 +118,39 @@ class EmailSender:
         self,
         email_service: EmailService,
     ) -> bool:
-        sender_email = self.config.from_email
-
-        msg = MIMEMultipart()
-        local_part, domain_part = sender_email.split("@")
+        local_part, domain_part = os.getenv('RESEND_EMAIL').split("@")
         encoded_domain = idna.encode(domain_part).decode("utf-8")
         encoded_sender_email = f"{local_part}@{encoded_domain}"
-
-        msg["From"] = f"{self.config.display_name} <{encoded_sender_email}>"
-        msg["To"] = email_service.recipient
-        msg["Subject"] = email_service.template_data.subject
-        msg["Date"] = formatdate(localtime=True)
-
         html_body = self.get_templates(email_service.template_name.value).substitute(
             **email_service.template_data.__dict__
         )
 
-        msg.attach(MIMEText(html_body, "html", "utf-8"))
+        text = ""
+        template_path: str = os.path.join(
+            os.path.dirname(__file__),
+            "templates",
+            email_service.template_name.value.split(".")[0]+".txt",
+        )
+        with open(template_path, "r") as file:
+            text = file.read()
+        
+        text = string.Template(text).substitute(
+            **email_service.template_data.__dict__
+        )
 
         try:
             resend.api_key = os.getenv("RESEND_API_KEY")
-            r = resend.Emails.send({
-                "from": os.getenv("RESEND_EMAIL"),
+            print(F"send from {self.config.display_name} <{encoded_sender_email}>")
+            print(f"send email to {email_service.recipient}")
+            resend.Emails.send({
+                "from": f"{self.config.display_name} <{encoded_sender_email}>",
                 "to": email_service.recipient,
                 "subject": email_service.template_data.subject,
-                "html": html_body
+                "html": html_body,
+                "text": text,
+                "headers": {
+                    'X-Entity-Ref-ID': uuid.uuid4().hex,
+                }
             })
             return True
         except Exception as e:

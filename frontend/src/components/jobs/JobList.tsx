@@ -4,12 +4,12 @@ import { JobData } from "../../types/data";
 
 interface JobListProps {
   jobs: JobData[];
-  loading?: boolean;
+  loading: boolean;
   onLoadMore: (results: number) => void;
   hasMore: boolean;
 }
 
-const JobList: React.FC<JobListProps> = ({ jobs, loading = false, onLoadMore, hasMore }) => {
+const JobList: React.FC<JobListProps> = ({ jobs, loading, onLoadMore, hasMore }) => {
   const [,setPage] = useState<number>(1);
   const [resultsPerPage,] = useState<number>(10);
   const observer = useRef<IntersectionObserver | null>(null);
@@ -48,10 +48,18 @@ const JobList: React.FC<JobListProps> = ({ jobs, loading = false, onLoadMore, ha
     };
   }, [jobs, hasMore, loading, onLoadMore, resultsPerPage]);
 
+  if (loading && jobs.length === 0) {
+    return(
+      <div className="flex justify-center items-center py-4">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
   if (jobs.length === 0) {
     return (
       <div className="bg-white p-8 rounded-lg shadow-md text-center">
-        <h2 className="text-xl font-semibold mb-2">No jobs found</h2>
+        <h2 className="text-xl font-semibold mb-2">{loading ? "Loading jobs..." : "No jobs found"}</h2>
         <p className="text-gray-600">Try adjusting your search criteria</p>
       </div>
     );
@@ -65,16 +73,15 @@ const JobList: React.FC<JobListProps> = ({ jobs, loading = false, onLoadMore, ha
         </div>
       ))}
       
-      {loading && (
-        <div className="flex justify-center items-center py-4">
-          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
-        </div>
-      )}
-      
-      {!hasMore && jobs.length > 0 && (
+      {!loading && !hasMore && jobs.length > 0 && (
         <div className="text-center py-6 bg-gray-50 rounded-lg mt-6">
           <p className="text-gray-600 font-medium">You've reached the end of the job listings</p>
           <p className="text-sm text-gray-500 mt-1">No more jobs match your current search criteria</p>
+        </div>
+      )}
+      {loading && (
+        <div className="flex justify-center items-center py-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
         </div>
       )}
     </div>

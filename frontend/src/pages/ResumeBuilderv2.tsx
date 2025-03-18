@@ -91,7 +91,7 @@ const ResumeEditor: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-6 max-w-5xl mt-6 md:mt-12">
+    <div className="container mx-auto px-4 py-6 max-w-5xl mt-12 md:mt-18">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
@@ -160,7 +160,7 @@ const ResumeEditor: React.FC = () => {
                 <DialogTitle className="text-lg font-semibold mb-2">
                   Generating Resume
                 </DialogTitle>
-                <Loader2 className="h-12 w-12 animate-spin text-primary" />
+                <Loader2 className="h-12 w-12 animate-spin text-blue-500" />
                 Please wait while we generate your resume...
               </DialogContent>
             </Dialog>

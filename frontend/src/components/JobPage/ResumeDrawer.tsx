@@ -64,7 +64,7 @@ const ResumeDrawer = ({ isOpen, setIsOpen, jobId }: ResumeDrawerProps) => {
                             <DialogTitle className="text-lg font-semibold mb-2">
                             Generating Resume
                             </DialogTitle>
-                            <Loader2 className="h-12 w-12 animate-spin text-primary" />
+                            <Loader2 className="h-12 w-12 animate-spin  text-blue-500" />
                             Please wait while we generate your resume...
                         </DialogContent>
                     </Dialog>
