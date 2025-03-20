@@ -58,6 +58,7 @@ async function RequireAuth({
   console.log(user);
 
   if (!user) {
+    console.log("no user");
     return <Navigate to="/?login=true&feature-box=true" replace />;
   }
 
