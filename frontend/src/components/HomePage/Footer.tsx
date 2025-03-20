@@ -8,7 +8,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="space-y-4">
-            <h3 className="text-xl font-bold text-gray-900">Jobify</h3>
+            <h3 className="text-xl font-bold text-gray-900">Etheral Jobs</h3>
             <p className="text-gray-600">
               AI-powered job search platform connecting talented professionals
               with their dream careers.
@@ -164,7 +164,7 @@ const Footer = () => {
         <div className="border-t border-gray-200 mt-12 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="text-sm text-gray-600">
-              © {new Date().getFullYear()} Jobify. All rights reserved.
+              © {new Date().getFullYear()} Etheral Jobs. All rights reserved.
             </div>
             <div className="flex space-x-6 text-sm text-gray-600">
               <Link to="/privacy" className="hover:text-blue-600">

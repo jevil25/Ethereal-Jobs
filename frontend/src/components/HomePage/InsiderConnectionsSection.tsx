@@ -109,7 +109,7 @@ const InsiderConnectionsSection = () => {
           <div className="text-center">
             <Button
               onClick={() => navigate("/jobs")}
-              variant={"jobify"}
+              variant={"Etheral Jobs"}
               size={"xxl"}
               className="rounded-4xl"
             >

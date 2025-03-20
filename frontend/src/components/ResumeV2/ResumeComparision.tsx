@@ -4,6 +4,7 @@ import ViewToggle from "./ViewToggle";
 import ResumeContent from "./ResumeContent";
 import { compareData } from "./compareUtils";
 import { FormData } from "../../api/types";
+import { Button } from "../ui/button";
 
 interface ResumeComparisonProps {
   name: string | undefined;
@@ -14,6 +15,8 @@ interface ResumeComparisonProps {
     data: FormData[K],
     isOptimized: boolean,
   ) => void;
+  showGeneratedResume: boolean;
+  startResumeGeneration: (regenerate?: boolean) => Promise<void>
 }
 
 const ResumeComparison = ({
@@ -21,6 +24,8 @@ const ResumeComparison = ({
   originalResume,
   optimizedResume,
   updateResumeSection,
+  showGeneratedResume,
+  startResumeGeneration,
 }: ResumeComparisonProps) => {
   const [viewMode, setViewMode] = React.useState<
     "split" | "optimized" | "original"
@@ -88,6 +93,21 @@ const ResumeComparison = ({
                   </span>
                   Optimized Resume
                 </h2>
+                {!showGeneratedResume ? (
+                  <div className="p-4 bg-gray-100 text-gray-600 text-center rounded-lg">
+                    <div>
+                    Your optimized resume is not available yet. Please generate
+                    it first.
+                    </div>
+                    <Button
+                      className="mt-4"
+                      variant="Etheral Jobs"
+                      onClick={() => startResumeGeneration(false)}
+                    >
+                      Generate Resume
+                    </Button>
+                  </div>
+                ) : (
                 <div className="border border-gray-300 rounded-lg overflow-hidden shadow-sm">
                   <ResumeContent
                     name={name}
@@ -97,6 +117,7 @@ const ResumeComparison = ({
                     updateResumeSection={updateResumeSection}
                   />
                 </div>
+                )}
               </div>
             </div>
           ) : viewMode === "optimized" ? (

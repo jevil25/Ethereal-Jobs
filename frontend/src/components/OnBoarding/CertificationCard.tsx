@@ -185,7 +185,7 @@ const CertificationCard: React.FC<CertificationCardProps> = ({
             <Button variant="outline" onClick={resetForm}>
               Cancel
             </Button>
-            <Button variant="jobify" onClick={saveCertification}>
+            <Button variant="Etheral Jobs" onClick={saveCertification}>
               {isEditing ? "Update Certification" : "Add Certification"}
             </Button>
           </div>

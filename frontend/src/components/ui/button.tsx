@@ -19,7 +19,7 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
-        jobify:
+        "Etheral Jobs":
           "bg-gradient-to-r from-indigo-600 to-blue-500 hover:from-indigo-500 hover:to-blue-400 text-white font-semibold py-3 px-8 shadow-md hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 rounded-md border-0 focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 disabled:opacity-70 disabled:pointer-events-none",
       },
       size: {
@@ -46,7 +46,7 @@ export interface ButtonProps
     | "outline"
     | "ghost"
     | "link"
-    | "jobify"
+    | "Etheral Jobs"
     | "destructive"
     | "secondary";
   size?: "sm" | "lg" | "xl" | "xxl" | "icon";

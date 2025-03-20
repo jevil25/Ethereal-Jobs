@@ -126,7 +126,7 @@ const ResumeEditor: React.FC = () => {
           {!editMode && (
             <label htmlFor="resume-upload" className="flex-1 md:flex-none">
               <Button
-                variant="jobify"
+                variant="Etheral Jobs"
                 className="flex items-center gap-2 text-xs md:text-sm w-full"
                 onClick={() => {
                   setResumeFile(null);
@@ -140,7 +140,7 @@ const ResumeEditor: React.FC = () => {
           )}
           {!editMode && !showGeneratedResume && (
             <Button
-              variant="jobify"
+              variant="Etheral Jobs"
               className="flex items-center gap-2 text-xs md:text-sm flex-1 md:flex-none"
               onClick={() => startResumeGeneration(false)}
             >
@@ -150,7 +150,7 @@ const ResumeEditor: React.FC = () => {
           )}
           {!editMode && showGeneratedResume && (
             <Button
-              variant="jobify"
+              variant="Etheral Jobs"
               className="flex items-center gap-2 text-xs md:text-sm flex-1 md:flex-none"
               onClick={() => startResumeGeneration(true)}
             >
@@ -273,6 +273,8 @@ const ResumeEditor: React.FC = () => {
                 originalResume={resumeData}
                 optimizedResume={generatedResume}
                 updateResumeSection={updateResumeSection}
+                showGeneratedResume={showGeneratedResume}
+                startResumeGeneration={startResumeGeneration}
               />
             ) : (
               <ResumeTabs

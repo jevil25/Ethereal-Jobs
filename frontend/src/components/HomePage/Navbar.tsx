@@ -72,13 +72,13 @@ const Navbar = () => {
         >
           <img
             src={logo}
-            alt="Jobify Logo"
+            alt="Etheral Jobs Logo"
             className="w-10 h-10 md:w-14 md:h-14"
           />
           <span
             className={`text-lg md:text-xl font-bold ${isScrolled ? "text-gray-800" : "text-gray-900"}`}
           >
-            Jobify
+            Ethereal Jobs
           </span>
         </div>
 
@@ -124,7 +124,7 @@ const Navbar = () => {
                   type="button"
                   className="px-4 py-2 rounded-full text-sm font-medium hover:cursor-pointer"
                   onClick={handleLogout}
-                  variant="jobify"
+                  variant="Etheral Jobs"
                 >
                   Logout
                 </Button>
@@ -135,7 +135,7 @@ const Navbar = () => {
               <Button onClick={() => handleAuthClick(true)} variant={"outline"}>
                 Sign In
               </Button>
-              <Button onClick={() => handleAuthClick(false)} variant={"jobify"}>
+              <Button onClick={() => handleAuthClick(false)} variant={"Etheral Jobs"}>
                 Sign Up
               </Button>
             </div>

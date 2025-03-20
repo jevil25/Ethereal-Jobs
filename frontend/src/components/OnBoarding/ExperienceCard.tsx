@@ -264,7 +264,7 @@ const ExperienceCard: React.FC<ExperienceCardProps> = ({
             <Button variant="outline" onClick={resetForm}>
               Cancel
             </Button>
-            <Button variant="jobify" onClick={saveExperience}>
+            <Button variant="Etheral Jobs" onClick={saveExperience}>
               {isEditing ? "Update Experience" : "Add Experience"}
             </Button>
           </div>

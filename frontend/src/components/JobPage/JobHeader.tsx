@@ -51,7 +51,7 @@ const JobHeader: React.FC<{ job: JobData }> = ({ job }) => {
         </div>
         {job?.url && (
           <Button 
-            variant="jobify" 
+            variant="Etheral Jobs" 
             size="lg" 
             className="px-5 py-2"
             onClick={() => window.open(job.url, '_blank')}

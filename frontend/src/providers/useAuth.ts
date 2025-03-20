@@ -10,8 +10,6 @@ interface AuthContextType {
   refreshUser: () => Promise<void>;
 }
 
-export const useAuth = () => useContext(AuthContext);
-
 export const AuthContext = createContext<AuthContextType>({
   user: null,
   isAuthenticated: false,
@@ -20,3 +18,5 @@ export const AuthContext = createContext<AuthContextType>({
   logout: () => {},
   refreshUser: async () => {},
 });
+
+export const useAuth = () => useContext(AuthContext);

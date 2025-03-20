@@ -99,7 +99,7 @@ const HiringManagersSection: React.FC<{
               </svg>
             </div>
             <div className="ml-2 text-gray-600 font-semibold">
-              Jobify has gathered these for you!
+              Etheral Jobs has gathered these for you!
             </div>
           </div>
 
@@ -112,14 +112,14 @@ const HiringManagersSection: React.FC<{
               Get Customized Message
             </Button>
             <Button
-              variant="jobify"
+              variant="Etheral Jobs"
               className=""
               onClick={() => setOpenResumeRightDrawer(true)}
             >
               Get Job Specific Resume
             </Button>
             <Button
-              variant="jobify"
+              variant="Etheral Jobs"
               className=""
               onClick={() => fetchLinkedInProfiles(hasLinkedInProfiles)}
             >

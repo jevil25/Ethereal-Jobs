@@ -34,8 +34,10 @@ import {
 } from "../api/resume";
 import { debounce } from "lodash";
 import { useSearchParams } from "react-router-dom";
+import { useAuth } from "../providers/useAuth";
 
 const OnboardingFlow: React.FC = () => {
+  const { refreshUser } = useAuth();
   const controllerRef = useRef(new AbortController());
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
@@ -263,6 +265,7 @@ const OnboardingFlow: React.FC = () => {
 
   const handleSubmit = async () => {
     await onComplete();
+    refreshUser();
     navigate("/jobs?onboardingcompleted=true");
   };
 
@@ -319,7 +322,7 @@ const OnboardingFlow: React.FC = () => {
 
             <Button
               onClick={handleNext}
-              variant="jobify"
+              variant="Etheral Jobs"
               disabled={isParsingResume}
             >
               {currentStep === steps.length - 1 ? "Complete" : "Next"}

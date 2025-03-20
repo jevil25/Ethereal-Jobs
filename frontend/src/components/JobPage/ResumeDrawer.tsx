@@ -19,6 +19,7 @@ const ResumeDrawer = ({ isOpen, setIsOpen, jobId }: ResumeDrawerProps) => {
     const {
         generatedResume,
         resumeData,
+        showGeneratedResume,
         setIsMainResume,
         setJobId,
         updateResumeSection,
@@ -38,6 +39,11 @@ const ResumeDrawer = ({ isOpen, setIsOpen, jobId }: ResumeDrawerProps) => {
       }
 
       const { user } = useAuth();
+
+      const generateResumeFunc = () => {
+        setIsParsing(true);
+        return handleResumeGeneration();
+      }
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetContent className="w-full sm:max-w-xl md:max-w-3xl lg:max-w-4xl xl:max-w-6xl overflow-y-auto">
@@ -54,6 +60,8 @@ const ResumeDrawer = ({ isOpen, setIsOpen, jobId }: ResumeDrawerProps) => {
                     optimizedResume={generatedResume}
                     originalResume={resumeData}
                     updateResumeSection={updateResumeSection}
+                    showGeneratedResume={showGeneratedResume}
+                    startResumeGeneration={generateResumeFunc}
                 />
             </div>
 
@@ -75,10 +83,7 @@ const ResumeDrawer = ({ isOpen, setIsOpen, jobId }: ResumeDrawerProps) => {
                 <Button 
                     variant="outline" 
                     className="flex items-center gap-2"
-                    onClick={() => {
-                        setIsParsing(true);
-                        handleResumeGeneration();
-                    }}
+                    onClick={() => generateResumeFunc()}
                 >
                     <RefreshCw className="h-4 w-4" />
                     Regenerate

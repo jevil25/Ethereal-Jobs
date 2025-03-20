@@ -78,7 +78,7 @@ const FeaturesSection = () => {
           </p>
           <Button
             onClick={() => navigate("/jobs")}
-            variant={"jobify"}
+            variant={"Etheral Jobs"}
             size={"xxl"}
             className="rounded-4xl"
           >

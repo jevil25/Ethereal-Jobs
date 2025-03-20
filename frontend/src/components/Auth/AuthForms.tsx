@@ -290,7 +290,7 @@ const AuthForms: React.FC<AuthFormsProps> = ({
           {isForgotPassword
             ? "Reset Password"
             : isSignIn
-              ? "Sign In to Jobify"
+              ? "Sign In to Etheral Jobs"
               : "Create an Account"}
         </h2>
 
@@ -398,7 +398,7 @@ const AuthForms: React.FC<AuthFormsProps> = ({
                 type="submit"
                 className={`w-full py-3 text-white rounded-full transition-colors text-base ${isLoading ? "opacity-70 cursor-not-allowed" : ""}`}
                 disabled={isLoading}
-                variant={"jobify"}
+                variant={"Etheral Jobs"}
               >
                 {isLoading ? (
                   <span>Processing...</span>
@@ -428,7 +428,7 @@ const AuthForms: React.FC<AuthFormsProps> = ({
 
               <Button
                 type="submit"
-                variant={"jobify"}
+                variant={"Etheral Jobs"}
                 className={`w-full py-3 text-white rounded-full transition-colors ${isLoading ? "opacity-70 cursor-not-allowed" : ""}`}
                 disabled={isLoading}
               >

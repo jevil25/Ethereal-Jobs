@@ -36,7 +36,7 @@ const HeroSection = ({ navigate }: HeroSectionProps) => {
         <div className="flex flex-col gap-4 justify-center items-center">
           <Button
             onClick={() => navigate("/jobs")}
-            variant={"jobify"}
+            variant={"Etheral Jobs"}
             size={"xxl"}
             className="rounded-4xl"
           >

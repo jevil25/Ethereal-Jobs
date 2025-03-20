@@ -51,7 +51,7 @@ const ResumeSection = () => {
 
             <Button
               onClick={() => navigate("/resume")}
-              variant={"jobify"}
+              variant={"Etheral Jobs"}
               size={"xxl"}
               className="rounded-4xl"
             >

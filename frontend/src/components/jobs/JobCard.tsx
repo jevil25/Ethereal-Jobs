@@ -97,7 +97,7 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
           <Calendar className="h-4 w-4 mr-1" />
           Posted: {new Date(job.date_posted).toLocaleDateString()}
         </span>
-        <Button onClick={(e) => redirectToJobPage(e)} variant="jobify" className="group">
+        <Button onClick={(e) => redirectToJobPage(e)} variant="Etheral Jobs" className="group">
           Apply Now <ArrowRight className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
         </Button>
       </CardFooter>

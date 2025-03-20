@@ -65,13 +65,13 @@ const NavBar = () => {
         <Link to="/" className="flex items-center space-x-2">
           <img
             src={logo}
-            alt="Jobify Logo"
+            alt="Etheral Jobs Logo"
             className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12"
           />
           <span
             className={`text-base sm:text-lg md:text-xl font-bold ${getTextColor()}`}
           >
-            Jobify
+            Ethereal Jobs
           </span>
         </Link>
       </div>
@@ -158,7 +158,7 @@ const NavBar = () => {
               <Button variant="outline" size="sm" className="hidden sm:flex">
                 <Link to="/login">Sign In</Link>
               </Button>
-              <Button variant="jobify" size="sm">
+              <Button variant="Etheral Jobs" size="sm">
                 <Link to="/signup">Sign Up</Link>
               </Button>
             </div>
@@ -215,7 +215,7 @@ const NavBar = () => {
                 <Button variant="outline" className="w-full justify-center">
                   <Link to="/login" className="w-full text-center">Sign In</Link>
                 </Button>
-                <Button variant="jobify" className="w-full justify-center">
+                <Button variant="Etheral Jobs" className="w-full justify-center">
                   <Link to="/signup" className="w-full text-center">Sign Up</Link>
                 </Button>
               </div>
