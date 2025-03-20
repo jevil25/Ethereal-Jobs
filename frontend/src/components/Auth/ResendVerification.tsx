@@ -24,6 +24,9 @@ const ResendVerification = ({
       setSuccessMessage(null);
 
       const response = await resendVerificationEmail({ email: resendEmail });
+      if (!response){
+        return setError("An unexpected error occurred. Please try again later.");
+      }
 
       if (response.is_valid) {
         setSuccessMessage(

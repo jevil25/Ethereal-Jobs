@@ -26,6 +26,9 @@ const VerifyEmailPage: React.FC = () => {
 
       try {
         const response = await verifyEmail({ token: emailToken });
+        if (!response){
+          return setError("An unexpected error occurred. Please try again later.");
+        }
         if (response.message == "Email already verified") {
           setSuccessMessage(
             "Email already verified! Redirecting to sign in...",
