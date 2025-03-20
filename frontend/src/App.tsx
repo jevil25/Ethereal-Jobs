@@ -53,9 +53,7 @@ async function RequireAuth({
   location: Location;
   searchParams: URLSearchParams;
 }) {
-  const { user, refreshUser } = useAuth();
-
-  await refreshUser();
+  const { user } = useAuth();
 
   if (!user) {
     return <Navigate to="/?login=true&feature-box=true" replace />;

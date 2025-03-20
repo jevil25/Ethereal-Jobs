@@ -17,6 +17,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setIsLoading(true);
     try {
       const result = await userMe();
+      console.log(result);
       if (!result.needsLogin && result.user) {
         setUser(result.user);
         setError(null);
