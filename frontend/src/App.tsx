@@ -53,7 +53,9 @@ function RequireAuth({
   location: Location;
   searchParams: URLSearchParams;
 }) {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
+
+  refreshUser();
 
   if (!user) {
     return <Navigate to="/?login=true&feature-box=true" replace />;
