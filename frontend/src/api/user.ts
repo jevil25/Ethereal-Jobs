@@ -77,11 +77,19 @@ export const userMe = async () => {
         };
       }
       return {
+        user: null,
+        message: "User not found. Please sign in again.",
+        needsLogin: true,
+      };
+    } else if (errorMessage == "User not logged in") {
+      return {
+        user: null,
         message: "User not found. Please sign in again.",
         needsLogin: true,
       };
     }
     return {
+      user: null,
       message: "User not found. Please sign in again.",
       needsLogin: true,
     };
