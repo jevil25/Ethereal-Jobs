@@ -44,7 +44,7 @@ function App() {
 }
 
 // Create a wrapper component that can be used for each protected route
-function RequireAuth({
+async function RequireAuth({
   children,
   location,
   searchParams,
@@ -55,7 +55,7 @@ function RequireAuth({
 }) {
   const { user, refreshUser } = useAuth();
 
-  refreshUser();
+  await refreshUser();
 
   if (!user) {
     return <Navigate to="/?login=true&feature-box=true" replace />;
