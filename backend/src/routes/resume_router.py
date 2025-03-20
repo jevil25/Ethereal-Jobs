@@ -16,7 +16,7 @@ app = APIRouter(prefix="/resume")
 db_ops = DatabaseOperations()
 templates = Jinja2Templates(directory=os.path.join(os.getcwd(),"src/templates"))
 
-@app.get("/")
+@app.get("")
 @is_user_logged_in
 async def get_resume(request: Request):
     email = request.state.user.email
@@ -35,7 +35,7 @@ async def get_resume(request: Request):
         resume_dict.pop(field)
     return JSONResponse(content=resume_dict, media_type="application/json")
 
-@app.post("/")
+@app.post("")
 @is_user_logged_in
 async def update_onboarding(request: Request, data: ResumeUpdate):
     user: User = request.state.user
