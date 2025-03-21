@@ -107,15 +107,15 @@ async def refresh(request: Request):
     for field in fields_to_exclude:
         user_dict.pop(field)
     response = JSONResponse(content={"message": "Token refreshed", "is_valid": True, "is_exists": True, "user": user_dict})
-    response.set_cookie(key="access_token", value=access_token, httponly=False if is_https else True, secure=is_https)
+    response.set_cookie(key="access_token", value=access_token, httponly=is_https, secure=is_https, samesite='none')
     return response
 
 
 @app.post('/logout')
 def logout():
     response = JSONResponse(content={"message": "Logout successful"})
-    response.delete_cookie(key="access_token")
-    response.delete_cookie(key="refresh_token")
+    response.delete_cookie(key="access_token", secure=is_https, samesite='none')
+    response.delete_cookie(key="refresh_token", secure=is_https, samesite='none')
     return response
 
 @app.post('/reset-password')
