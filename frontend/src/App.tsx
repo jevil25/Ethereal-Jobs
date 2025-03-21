@@ -54,14 +54,12 @@ function RequireAuth({
   searchParams: URLSearchParams;
 }) {
   const { user } = useAuth();
-
-  if (!user) {
+  console.log(user);
+  if (!user || user === null) {
     return <Navigate to="/?login=true&feature-box=true" replace />;
   }
 
   const onboardingCompleted = searchParams.get("onboardingcompleted");
-  console.log(onboardingCompleted);
-  console.log(location.pathname);
   if (location.pathname === "/jobs" && onboardingCompleted === "true") {
     return <>{children}</>;
   }
