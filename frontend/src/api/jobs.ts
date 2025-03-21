@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { JobData, JobDataWithLinkedInProfiles } from "../types/data";
 import {
   GetJobsRequest,

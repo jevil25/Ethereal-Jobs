@@ -186,6 +186,8 @@ export const useResumeData = () => {
   // Personal info field update handler
   const handlePersonalInfoEdit = useCallback(
     (field: keyof FormData["personalInfo"], value: string, isOptimizedResume: boolean = false) => {
+      console.log("field", field, value);
+      console.log("isOptimizedResume", isOptimizedResume);
       if (isOptimizedResume) {
         setGeneratedResume((prev) => ({
           ...prev,

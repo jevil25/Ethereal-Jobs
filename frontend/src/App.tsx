@@ -22,6 +22,7 @@ import { useAuth } from "./providers/useAuth";
 import VerifyEmailPage from "./pages/verify-email";
 import OnboardingFlow from "./pages/OnBoarding";
 import { Toaster } from "react-hot-toast";
+import ProfilePage from "./pages/profile";
 
 // needed for axios to send cookies
 axios.defaults.withCredentials = true;
@@ -114,6 +115,13 @@ function AppContent() {
           element={
             <RequireAuth location={location} searchParams={searchParams}>
               <OnboardingFlow />
+            </RequireAuth>
+          }
+        />
+        <Route path="/profile"
+          element={
+            <RequireAuth location={location} searchParams={searchParams}>
+              <ProfilePage />
             </RequireAuth>
           }
         />

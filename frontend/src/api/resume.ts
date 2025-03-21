@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import axios from "axios";
 import { constructServerUrlFromPath } from "../utils/helper";
 import {
@@ -127,7 +128,6 @@ export const getResume = async (
     }
     return undefined;
   } catch (error) {
-    showToast("Failed to fetch AI-generated resume. Please try again.", "error");
     return undefined;
   }
 };
@@ -179,7 +179,6 @@ export const updateGeneratedResume = async (
     }
     return undefined;
   } catch (error) {
-    showToast("Failed to update AI-generated resume. Please try again.", "error");
     return undefined;
   }
 };

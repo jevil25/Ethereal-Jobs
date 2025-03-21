@@ -9,6 +9,7 @@ import CertificationTab from "./CertificationTab";
 import JobPreferencesTab from "./JobPreferencesTab";
 
 interface ResumeTabsProps {
+  handleNameChange: (name: string) => Promise<void>;
   activeTab: string;
   setActiveTab: (tab: string) => void;
   resumeData: FormData;
@@ -24,6 +25,7 @@ interface ResumeTabsProps {
 }
 
 const ResumeTabs = ({
+  handleNameChange,
   activeTab,
   setActiveTab,
   resumeData,
@@ -48,6 +50,7 @@ const ResumeTabs = ({
 
       <TabsContent value="personal" className="p-6">
         <PersonalInfoTab
+          handleNameChange={handleNameChange}
           personalInfo={resumeData.personalInfo}
           handlePersonalInfoEdit={handlePersonalInfoEdit}
         />

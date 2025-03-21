@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   UserSigninRequest,
   UserSigninResponse,
@@ -180,5 +181,29 @@ export const verifyEmail = async (
   } catch (error) {
     showToast("Error verifying email. Please try again.", "error");
     return null;
+  }
+};
+
+// post /user/update-name
+export const updateName = async (name: string): Promise<User | undefined> => {
+  try {
+    const response = await axios.post(
+      constructServerUrlFromPath("/user/update-name"),
+      { name },
+    );
+    if (response.data.detail === "Token expired") {
+      await userRefresh();
+      return await axios.post(
+        constructServerUrlFromPath("/user/update-name"),
+        { name },
+      ).then(res => res.data.is_success);
+    }
+    if(response.data.is_updated){
+      return response.data.user;
+    }
+    return undefined;
+  } catch (error) {
+    showToast("Error updating name. Please try again.", "error");
+    return undefined;
   }
 };

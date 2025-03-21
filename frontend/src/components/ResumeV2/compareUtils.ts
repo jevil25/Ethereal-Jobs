@@ -4,14 +4,6 @@ const compareArrays = (original: string[], updated: string[]) => {
     // Create frequency maps instead of simple Sets
     const originalFreq = new Map();
     const updatedFreq = new Map();
-
-    if (!original || !updated) {
-        return {
-            removed: original,
-            added: updated,
-            unchanged: [],
-        };
-    }
     
     // Count occurrences in original array
     original.forEach(item => {
