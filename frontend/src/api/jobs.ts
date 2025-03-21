@@ -29,6 +29,17 @@ export const getJobs = async (params: GetJobsRequest): Promise<JobData[]> => {
       params,
       cancelToken: cancelTokenSource.token,
     });
+    if (
+      response.data &&
+      response.data.detail &&
+      response.data.detail === "Token expired"
+    ) {
+      await userRefresh();
+      return await axios.get(constructServerUrlFromPath("/jobs"), {
+        params,
+        cancelToken: cancelTokenSource.token,
+      }).then(res => res.data as JobData[]);
+    }
 
     return response.data as JobData[];
   } catch (error: any) {
@@ -40,6 +51,14 @@ export const getJobs = async (params: GetJobsRequest): Promise<JobData[]> => {
 export const getJob = async (jobId: string): Promise<JobData> => {
   try {
     const response = await axios.get(constructServerUrlFromPath(`/job/${jobId}`));
+    if (
+      response.data &&
+      response.data.detail &&
+      response.data.detail === "Token expired"
+    ) {
+      await userRefresh();
+      return await axios.get(constructServerUrlFromPath(`/job/${jobId}`)).then(res => res.data as JobData);
+    }
     return response.data as JobData;
   } catch (error: any) {
     showToast("Error fetching job: " + (error.message || "Unknown error"), "error");
@@ -56,7 +75,16 @@ export const getLinkedInProfilesForJob = async (
     const response = await axios.get(
       constructServerUrlFromPath(`/job/${jobId}/linkedin/profile?get_new=${getNew}`),
     );
-    console.log(response.data);
+    if (
+      response.data &&
+      response.data.detail &&
+      response.data.detail === "Token expired"
+    ) {
+      await userRefresh();
+      return await axios.get(
+        constructServerUrlFromPath(`/job/${jobId}/linkedin/profile?get_new=${getNew}`),
+      ).then(res => res.data as JobDataWithLinkedInProfiles);
+    }
     return response.data as JobDataWithLinkedInProfiles;
   } catch (error: any) {
     showToast("Error fetching LinkedIn profiles: " + (error.message || "Unknown error"), "error");
@@ -100,6 +128,17 @@ export const getSearchSuggestions = async (
       constructServerUrlFromPath("/search/suggestions/job_title"),
       { params },
     );
+    if (
+      response.data &&
+      response.data.detail &&
+      response.data.detail === "Token expired"
+    ) {
+      await userRefresh();
+      return await axios.get(
+        constructServerUrlFromPath("/search/suggestions/job_title"),
+        { params },
+      ).then(res => res.data as AutoSuggestionsResponse);
+    }
     return response.data as AutoSuggestionsResponse;
   } catch (error: any) {
     showToast("Error fetching search suggestions: " + (error.message || "Unknown error"), "error");
@@ -116,6 +155,18 @@ export const getLocationSuggestions = async (
       constructServerUrlFromPath("/search/suggestions/location"),
       { params },
     );
+    if (
+      response.data &&
+      response.data.detail &&
+      response.data.detail === "Token expired"
+    ) {
+      await userRefresh();
+      return await axios.get(
+        constructServerUrlFromPath("/search/suggestions/location"),
+        { params },
+      ).then(res => res.data as AutoSuggestionsLocationResponse
+      );
+    }
     return response.data as AutoSuggestionsLocationResponse;
   } catch (error: any) {
     showToast("Error fetching location suggestions: " + (error.message || "Unknown error"), "error");

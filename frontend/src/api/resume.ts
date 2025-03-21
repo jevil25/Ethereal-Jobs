@@ -46,6 +46,10 @@ export const updateResumeDetails = async (
 export const getResumeDetails = async (): Promise<customFormData> => {
   try {
     const response = await axios.get(constructServerUrlFromPath(`/resume`));
+    if (response.data.detail === "Token expired") {
+      await userRefresh();
+      return await axios.get(constructServerUrlFromPath(`/resume`)).then(res => res.data as customFormData);
+    }
     return response.data as customFormData;
   } catch (error) {
     showToast("Failed to fetch resume details. Please try again.", "error");
@@ -72,6 +76,19 @@ export const extractResume = async (
         signal: controller?.signal,
       },
     );
+    if (response.data.detail === "Token expired") {
+      await userRefresh();
+      return await axios.post(
+        constructServerUrlFromPath(`/extract/resume`),
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          signal: controller?.signal,
+        },
+      ).then(res => res.data as customFormData);
+    }
     if (response.data.is_success) {
       return response.data.extracted_data as customFormData;
     }
@@ -95,6 +112,16 @@ export const getResume = async (
         signal: signal,
       },
     );
+    if (response.data.detail === "Token expired") {
+      await userRefresh();
+      return await axios.get(
+        constructServerUrlFromPath(`/resume/ai/generate`),
+        {
+          params: data,
+          signal: signal,
+        },
+      ).then(res => res.data as GenerateAiGetResumeResponse);
+    }
     if (response.data.is_success) {
       return response.data as GenerateAiGetResumeResponse;
     }
@@ -114,6 +141,13 @@ export const generateResume = async (
       constructServerUrlFromPath(`/resume/ai/generate`),
       data,
     );
+    if (response.data.detail === "Token expired") {
+      await userRefresh();
+      return await axios.post(
+        constructServerUrlFromPath(`/resume/ai/generate`),
+        data,
+      ).then(res => res.data as GenerateAiResumeResponse);
+    }
     if (response.data.is_success) {
       return response.data as GenerateAiResumeResponse;
     }
@@ -133,6 +167,13 @@ export const updateGeneratedResume = async (
       constructServerUrlFromPath(`/resume/ai/update`),
       data,
     );
+    if (response.data.detail === "Token expired") {
+      await userRefresh();
+      return await axios.post(
+        constructServerUrlFromPath(`/resume/ai/update`),
+        data,
+      ).then(res => res.data as GenerateAiResumeResponse);
+    }
     if (response.data.is_success) {
       return response.data as GenerateAiResumeResponse;
     }
@@ -148,13 +189,23 @@ export const DownloadResume = async (
   data: DownloadResumeRequest,
 ): Promise<void> => {
   try {
-    const response = await axios.post(
+    let response = await axios.post(
       constructServerUrlFromPath(`/resume/download`),
       data,
       {
         responseType: "blob",
       },
     );
+    if (response.data.detail === "Token expired") {
+      await userRefresh();
+      response = await axios.post(
+        constructServerUrlFromPath(`/resume/download`),
+        data,
+        {
+          responseType: "blob",
+        },
+      );
+    }
     const url = window.URL.createObjectURL(new Blob([response.data]));
     const link = document.createElement("a");
     link.href = url;
