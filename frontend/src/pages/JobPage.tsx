@@ -12,9 +12,9 @@ import { Separator } from "../components/ui/separator";
 import { ChevronLeft } from "lucide-react";
 import MessageDialog from "../components/JobPage/MessageDialog";
 import HiringManagersSection from "../components/JobPage/HiringManagerSection";
-import JobHeader from "../components/JobPage/JobHeader";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { useAuth } from "../providers/useAuth";
+import JobCard from "../components/jobs/JobCard";
 
 // Main Component
 const JobPage: React.FC = () => {
@@ -103,7 +103,7 @@ const JobPage: React.FC = () => {
       <Button variant="ghost" className="mb-6" onClick={(e) => { 
         e.preventDefault();
         e.currentTarget.focus();
-        navigate(-2) 
+        history.back();
         }}>
         <ChevronLeft className="h-4 w-4 mr-2" />
         Back to Jobs
@@ -113,7 +113,7 @@ const JobPage: React.FC = () => {
         <>
           <Card className="mb-6">
             <CardContent className="pt-6">
-              <JobHeader job={job} />
+              <JobCard job={job} />
 
               <Separator className="my-6" />
 

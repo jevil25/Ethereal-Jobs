@@ -35,6 +35,15 @@ export interface JobData {
   company_revenue: string;
   company_description: string;
   has_linkedIn_profiles: boolean;
+  match_score: number;
+  missing_skills: string[];
+  matched_skills: string[];
+  job_required_years: number;
+  salary_with_currency: string;
+  tfidf_similarity: number;
+  semantic_similarity: number;
+  skill_match_score: number;
+  experience_match_score: number;
 }
 
 export interface JobDataWithLinkedInProfiles extends JobData {

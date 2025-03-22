@@ -84,10 +84,7 @@ async def get_ai_resume(request: Request, is_main_resume: bool, job_id: Optional
 @is_user_logged_in
 async def update_ai_resume(request: Request, data: AIResumeSave):
     user: User = request.state.user
-    if data.is_main_resume:
-        ai_resume = await db_ops.add_ai_optimized_resume(user.email, data.data.model_dump(), data.is_main_resume, data.job_id)
-    else:
-        return JSONResponse(content={"message": "Cannot update AI optimized resume", "is_success": False}, media_type="application/json", status_code=200)
+    ai_resume = await db_ops.add_ai_optimized_resume(user.email, data.data.model_dump(), data.is_main_resume, data.job_id)
     ai_resume = ai_resume.model_dump()
     fields_to_remove = ["id", "updatedAt", "createdAt"]
     for field in fields_to_remove:
@@ -107,8 +104,6 @@ async def download_resume(request: Request, data: DownloadResume):
     else:
         resume = await db_ops.get_user_resume(user.email)
         filename = f"{user.name}_resume.pdf" if user.name else "resume.pdf"
-    print(filename)
-    print(resume)
     rendered_template = templates.TemplateResponse(template, {
         "request": request,
         "email": user.email,

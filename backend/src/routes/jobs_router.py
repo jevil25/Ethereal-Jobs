@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 from typing import List, Dict, Optional
 from datetime import date, timedelta
 from jobspy import JobType
+from src.utils.resume_job_matcher import get_job_details
 from src.decorators.auth import is_user_logged_in
 from src.db.model import JobModel, JobQuery
 from src.api.jobs import get_jobs_api_response
@@ -15,17 +16,20 @@ app = APIRouter()
 db_ops = DatabaseOperations()
 
 @app.get("/jobs")
+@is_user_logged_in
 async def get_jobs(
+    request: Request,
     city: str,
     country_code: str,
     country: str,
     job_title: str,
     recruiters: str = "",
-    results_wanted: int = Query(default=10, ge=1, le=200),
+    results_wanted: int = Query(default=40, ge=1, le=200),
     job_type: Optional[str] = None,
     is_remote: Optional[bool] = None,
     distance: Optional[int] = Query(default=None, ge=0, le=100)
 ) -> List[Dict]:
+    user: User = request.state.user
     if not all([city, country_code, country, job_title]):
         raise HTTPException(status_code=400, detail="Missing required parameters")
 
@@ -65,6 +69,8 @@ async def get_jobs(
             reverse=True
         )
         json_response = json_response[:results_wanted]
+        json_response = await get_job_details(db_ops, user, json_response, job_title)
+
         fields_to_remove = ["query", "createdAt", "updatedAt"]
         for job in json_response:
             for field in fields_to_remove:
@@ -129,6 +135,8 @@ async def get_jobs(
         reverse=True
     )
     json_response = json_response[:results_wanted]
+    json_response = await get_job_details(db_ops, user, json_response, job_title)
+
     fields_to_remove = ["query", "createdAt", "updatedAt"]
     for job in json_response:
         for field in fields_to_remove:
@@ -159,7 +167,9 @@ async def get_job(request: Request, job_id: str) -> Dict:
     for field in fields_to_remove:
         job_dict.pop(field)
     job_dict["has_linkedIn_profiles"] = has_linkedIn_profiles
-    
+
+    json_response = await get_job_details(db_ops, user, [job_dict], job_dict["title"])
+    job_dict = json_response[0]
     return JSONResponse(content=job_dict, media_type="application/json")
 
 @app.get("/job/{job_id}/linkedin/profile")

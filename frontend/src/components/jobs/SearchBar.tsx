@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "../ui/select";
 import { useResumeData } from "../ResumeV2/hooks/useResumeData";
+import { JobData } from "../../types/data";
 
 interface SearchBarProps {
   onSearch: (params: {
@@ -31,9 +32,10 @@ interface SearchBarProps {
     salary_min: number;
     salary_max: number;
   };
+  jobs: JobData[];
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ onSearch, filters }) => {
+const SearchBar: React.FC<SearchBarProps> = ({ onSearch, filters, jobs}) => {
   const countries = getNames();
 
   const [searchParams] = useSearchParams();
@@ -56,6 +58,9 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, filters }) => {
       searchParams.get("country") &&
       searchParams.get("job_title")
     ) {
+      if (jobs.length > 0) {
+        setInitialLoadDone(true);
+      }
       const countryCode = getCode(
         country
           .split(" ")

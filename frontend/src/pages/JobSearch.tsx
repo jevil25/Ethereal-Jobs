@@ -77,7 +77,7 @@ const JobSearch: React.FC = () => {
       setJobs([]);
       setFilteredJobs([]);
       setHasMore(true);
-      setResultsWanted(10);
+      setResultsWanted(30);
       setLastSearchParams(params);
 
       try {
@@ -196,7 +196,7 @@ const JobSearch: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">Job Search</h1>
-      <SearchBar onSearch={handleSearch} filters={filters} />
+      <SearchBar onSearch={handleSearch} filters={filters} jobs={filteredJobs} />
       <div className="flex flex-col md:flex-row gap-6 mt-6">
         <div className="w-full md:w-1/4">
           <JobFilters

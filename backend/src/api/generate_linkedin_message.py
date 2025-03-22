@@ -1,7 +1,7 @@
 from datetime import datetime
 import os
 from typing import Dict, List
-from src.db.model import Experience, ResumeModel
+from src.db.model import Experience, Project, ResumeModel
 from src.logger import logger
 # from transformers import pipeline, set_seed, AutoModelForCausalLM, AutoTokenizer
 from google import genai
@@ -46,13 +46,14 @@ class EnhancedLinkedInMessageGenerator:
     keep it short, dont halucinate, try to reason if any data is not right in place and avoid any unnecessary fluff
     keep it short like 2-3 lines
     ignore any sentence that is having [some variable] since those data is missing and should be ignored
+    mention the role 1 are referring for
 
     here is my resume:
     [Sender_Name] is a [YOE] professional currently working as a [Current_Work].
     They have experience in [Skills] and have recently developed [Current_Project].
     [Achievement_Context]
 
-    I am ssking referral for [Target_Role] at [Company] to [Name].
+    I am asking referral for [Target_Role] at [Company] to [Name].
 """
 
     def format_experience(self, experience: List[Experience]) -> str:
@@ -72,18 +73,13 @@ class EnhancedLinkedInMessageGenerator:
                  if isinstance(skill, dict) and 'skill' in skill]
         return ", ".join(skills)
 
-    def get_achievement_context(self, resume: Dict) -> str:
+    def get_achievement_context(self, resume: list[Project]) -> str:
         """Generate achievement context from projects or work experience"""
         context = []
         
-        if resume.get('projects'):
-            latest_project = resume['projects'][0]
-            context.append(f"I recently developed {latest_project['project']}, {latest_project['descriptions'][0].lower()}")
-            
-        if resume.get('educations'):
-            education = resume['educations'][0]
-            if education.get('gpa'):
-                context.append(f"I graduated with a {education['degree']} with a GPA of {education['gpa']}")
+        if resume:
+            latest_project = resume[0]
+            context.append(f"I recently developed {latest_project.title}, {latest_project.description}, and {latest_project.technologies}")
                 
         return " ".join(context)
 
@@ -169,7 +165,7 @@ class EnhancedLinkedInMessageGenerator:
             current_experience = self.format_experience(params.experience)
             key_skills = ",".join(params.skills)
             years_of_experience = self.format_years_of_experience(params.experience)
-            # achievement_context = self.get_achievement_context(params.projects)
+            achievement_context = self.get_achievement_context(params.projects)
             
             # Fill template with dynamic content
             message_context = {
@@ -179,8 +175,6 @@ class EnhancedLinkedInMessageGenerator:
                 '[YOE]': years_of_experience,
                 '[Skills]': key_skills,
                 '[Current_Work]': current_experience,
-                # '[Achievement_Context]': achievement_context,
-                # '[Current_Project]': resume.get('projects', [{'project': 'various development projects'}])[0]['project'],
                 '[Sender_Name]': name,
             }
             base_message = self.prompt
