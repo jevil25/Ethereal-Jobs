@@ -9,6 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
+import { motion, AnimatePresence } from "framer-motion";
 import PersonalInfoCard from "../components/OnBoarding/PersonalInfoCard";
 import ExperienceCard, {
   Experience,
@@ -41,15 +42,20 @@ const OnboardingFlow: React.FC = () => {
   const controllerRef = useRef(new AbortController());
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
+  const [direction, setDirection] = useState(0); // -1 for previous, 1 for next
   const [firstGetDone, setFirstGetDone] = useState(false);
   const [firstStepCheckDone, setFirstStepCheckDone] = useState(false);
   const [isParsingResume, setIsParsingResume] = useState(false);
+  const [transitionComplete, setTransitionComplete] = useState(true);
   const [formData, setFormData] = useState<FormData>({
     personalInfo: {
       headline: "",
       location: "",
       phone: "",
       website: "",
+      github_url: "",
+      linkedin_url: "",
+      about_me: "",
     },
     experience: [] as Experience[],
     education: [] as Education[],
@@ -104,7 +110,9 @@ const OnboardingFlow: React.FC = () => {
         resumeFile: file,
       }));
 
-      // Automatically move to the next step
+      // Automatically move to the next step with animation
+      setDirection(1);
+      setTransitionComplete(false);
       setCurrentStep(1);
     } catch (error) {
       console.error("Error parsing resume:", error);
@@ -250,6 +258,8 @@ const OnboardingFlow: React.FC = () => {
 
   const handleNext = () => {
     if (currentStep < steps.length - 1) {
+      setDirection(1);
+      setTransitionComplete(false);
       setCurrentStep(currentStep + 1);
     } else {
       // Submit data and complete onboarding
@@ -259,6 +269,8 @@ const OnboardingFlow: React.FC = () => {
 
   const handlePrevious = () => {
     if (currentStep > 0) {
+      setDirection(-1);
+      setTransitionComplete(false);
       setCurrentStep(currentStep - 1);
     }
   };
@@ -270,66 +282,128 @@ const OnboardingFlow: React.FC = () => {
   };
 
   const handleSkip = () => {
-    // For resume upload step, just go to next step
+    // For resume upload step, just go to next step with animation
     if (currentStep === 0) {
+      setDirection(1);
+      setTransitionComplete(false);
       setCurrentStep(1);
     }
   };
 
+  // Animation variants
+  const variants = {
+    enter: (direction: number) => ({
+      x: direction > 0 ? 200 : -200,
+      opacity: 0,
+    }),
+    center: {
+      x: 0,
+      opacity: 1,
+    },
+    exit: (direction: number) => ({
+      x: direction < 0 ? 200 : -200,
+      opacity: 0,
+    }),
+  };
+
+  // Card header animations
+  const headerVariants = {
+    initial: { opacity: 0, y: -20 },
+    animate: { opacity: 1, y: 0, transition: { delay: 0.2 } },
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50 p-4">
-      <Card className="w-full max-w-xl shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold">
-            {steps[currentStep].title}
-          </CardTitle>
-          <CardDescription>{steps[currentStep].description}</CardDescription>
-        </CardHeader>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.3 }}
+        className="w-full max-w-xl"
+      >
+        <Card className="w-full shadow-lg">
+          <motion.div
+            variants={headerVariants}
+            initial="initial"
+            animate="animate"
+            key={`header-${currentStep}`}
+          >
+            <CardHeader>
+              <CardTitle className="text-2xl font-bold">
+                {steps[currentStep].title}
+              </CardTitle>
+              <CardDescription>
+                {steps[currentStep].description}
+              </CardDescription>
+            </CardHeader>
+          </motion.div>
 
-        <OnboardingProgress
-          currentStep={currentStep}
-          totalSteps={steps.length}
-        />
+          <OnboardingProgress
+            currentStep={currentStep}
+            totalSteps={steps.length}
+          />
 
-        <CardContent className="p-6">
-          {steps[currentStep].component}
-        </CardContent>
-
-        <CardFooter className="flex justify-between p-6 pt-0">
-          <div>
-            {currentStep > 0 && (
-              <Button
-                onClick={handlePrevious}
-                variant="outline"
-                className="mr-2"
-              >
-                Previous
-              </Button>
-            )}
-          </div>
-
-          <div className="ml-auto">
-            {currentStep === 0 && (
-              <Button
-                onClick={handleSkip}
-                variant="outline"
-                className="mr-2"
-                disabled={isParsingResume}
-              >
-                Skip
-              </Button>
-            )}
-
-            <Button
-              onClick={handleNext}
-              variant="Etheral Jobs"
-              disabled={isParsingResume}
+          <CardContent className="p-6 overflow-hidden">
+            <AnimatePresence
+              mode="wait"
+              initial={false}
+              custom={direction}
+              onExitComplete={() => setTransitionComplete(true)}
             >
-              {currentStep === steps.length - 1 ? "Complete" : "Next"}
-            </Button>
-          </div>
-        </CardFooter>
-      </Card>
+              <motion.div
+                key={currentStep}
+                custom={direction}
+                variants={variants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{
+                  x: { type: "spring", stiffness: 300, damping: 30 },
+                  opacity: { duration: 0.2 },
+                }}
+                className="w-full"
+              >
+                {steps[currentStep].component}
+              </motion.div>
+            </AnimatePresence>
+          </CardContent>
+
+          <CardFooter className="flex justify-between p-6 pt-0">
+            <div>
+              {currentStep > 0 && (
+                <Button
+                  onClick={handlePrevious}
+                  variant="outline"
+                  className="mr-2"
+                  disabled={!transitionComplete || isParsingResume}
+                >
+                  Previous
+                </Button>
+              )}
+            </div>
+
+            <div className="ml-auto">
+              {currentStep === 0 && (
+                <Button
+                  onClick={handleSkip}
+                  variant="outline"
+                  className="mr-2"
+                  disabled={!transitionComplete || isParsingResume}
+                >
+                  Skip
+                </Button>
+              )}
+
+              <Button
+                onClick={handleNext}
+                variant="Etheral Jobs"
+                disabled={!transitionComplete || isParsingResume}
+              >
+                {currentStep === steps.length - 1 ? "Complete" : "Next"}
+              </Button>
+            </div>
+          </CardFooter>
+        </Card>
+      </motion.div>
     </div>
   );
 };

@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 import os
 
 from src.email.email_sender import send_verification_email, send_password_reset_email
-from src.db.model import User, UserLogin, ResetPassword, UserUpdatePassword
+from src.db.model import User, UserLogin, ResetPassword, UserUpdateName, UserUpdatePassword
 from src.utils.jwttoken import create_access_token, create_refresh_token, verify_token
 from src.utils.hashing import Hash
 from fastapi import status, APIRouter
@@ -147,3 +147,17 @@ async def update_password(token:str, request:UserUpdatePassword):
     if not success:
         return JSONResponse(content={"message": "Invalid token", "is_valid": False, "is_expired": False})
     return JSONResponse(content={"message": "Password updated successfully", "is_valid": True, "is_expired": False})
+
+@app.post('/update-name')
+@is_user_logged_in
+async def update_name(request:Request, data:UserUpdateName):
+    user: User = request.state.user
+    name = data.name
+    user, success = await db_ops.update_user_name(user.email, name)
+    if not success:
+        return JSONResponse(content={"message": "Name not updated", "is_updated": False})
+    user_dict = user.__dict__
+    fields_to_exclude = ["id", "password", "updatedAt", "createdAt"]
+    for field in fields_to_exclude:
+        user_dict.pop(field)
+    return JSONResponse(content={"message": "Name updated successfully", "is_updated": True, "user": user_dict})

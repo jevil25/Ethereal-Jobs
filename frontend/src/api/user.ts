@@ -193,12 +193,11 @@ export const updateName = async (name: string): Promise<User | undefined> => {
     );
     if (response.data.detail === "Token expired") {
       await userRefresh();
-      return await axios.post(
-        constructServerUrlFromPath("/user/update-name"),
-        { name },
-      ).then(res => res.data.is_success);
+      return await axios
+        .post(constructServerUrlFromPath("/user/update-name"), { name })
+        .then((res) => res.data.is_success);
     }
-    if(response.data.is_updated){
+    if (response.data.is_updated) {
       return response.data.user;
     }
     return undefined;

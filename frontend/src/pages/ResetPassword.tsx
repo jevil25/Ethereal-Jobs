@@ -32,8 +32,10 @@ const ResetPasswordPage: React.FC = () => {
         const response = await checkIfResetPasswordTokenIsValid({
           token: resetToken,
         });
-        if (!response){
-          return setError("An unexpected error occurred. Please try again later.");
+        if (!response) {
+          return setError(
+            "An unexpected error occurred. Please try again later.",
+          );
         }
         if (response.is_expired || !response.is_valid) {
           return setError("Reset link has expired. Please request a new one.");
@@ -85,8 +87,10 @@ const ResetPasswordPage: React.FC = () => {
         token,
         password: formData.newPassword,
       });
-      if (!response){
-        return setError("An unexpected error occurred. Please try again later.");
+      if (!response) {
+        return setError(
+          "An unexpected error occurred. Please try again later.",
+        );
       }
 
       if (response.is_valid) {

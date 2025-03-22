@@ -38,10 +38,11 @@ export const ExperienceSection: React.FC<ExperienceSectionProps> = ({
     }
 
     const updateDescription = (i: number, value: string) => {
-        const updatedDescription = [...experiences];
-        const descriptionArray = updatedDescription[index].description.split("\n");
-        descriptionArray[i] = value;
-        onUpdate(index, "description", descriptionArray.join("\n"));
+      const updatedDescription = [...experiences];
+      const descriptionArray =
+        updatedDescription[index].description.split("\n");
+      descriptionArray[i] = value;
+      onUpdate(index, "description", descriptionArray.join("\n"));
     };
 
     return (

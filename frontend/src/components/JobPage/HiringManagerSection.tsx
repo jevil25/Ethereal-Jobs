@@ -33,8 +33,16 @@ const HiringManagersSection: React.FC<{
   linkedInProfiles: LinkedInProfile[];
   hasLinkedInProfiles: boolean;
   gettingLinkedInProfiles: boolean;
-}> = ({ job, handleMessageGeneration, fetchLinkedInProfiles, linkedInProfiles, hasLinkedInProfiles, gettingLinkedInProfiles }) => {
-  const [openResumeRightDrawer, setOpenResumeRightDrawer] = React.useState(false);
+}> = ({
+  job,
+  handleMessageGeneration,
+  fetchLinkedInProfiles,
+  linkedInProfiles,
+  hasLinkedInProfiles,
+  gettingLinkedInProfiles,
+}) => {
+  const [openResumeRightDrawer, setOpenResumeRightDrawer] =
+    React.useState(false);
 
   useEffect(() => {
     if (hasLinkedInProfiles && linkedInProfiles.length === 0) {
@@ -43,19 +51,35 @@ const HiringManagersSection: React.FC<{
   }, [hasLinkedInProfiles]);
 
   useEffect(() => {
-    const priorityTitles = ["recruit", "hiring", "hire", "talent", "manager", "staffing", "specialist"];
-  
+    const priorityTitles = [
+      "recruit",
+      "hiring",
+      "hire",
+      "talent",
+      "manager",
+      "staffing",
+      "specialist",
+    ];
+
     linkedInProfiles.sort((a, b) => {
       const aCompany = a.company.toLowerCase();
       const bCompany = b.company.toLowerCase();
-  
-      const aTitlePriority = priorityTitles.some((title) => a.company.toLowerCase().includes(title)) ? 1 : 0;
-      const bTitlePriority = priorityTitles.some((title) => a.company.toLowerCase().includes(title)) ? 1 : 0;
-  
+
+      const aTitlePriority = priorityTitles.some((title) =>
+        a.company.toLowerCase().includes(title),
+      )
+        ? 1
+        : 0;
+      const bTitlePriority = priorityTitles.some((title) =>
+        a.company.toLowerCase().includes(title),
+      )
+        ? 1
+        : 0;
+
       if (aTitlePriority !== bTitlePriority) {
         return bTitlePriority - aTitlePriority;
       }
-  
+
       if (aCompany === bCompany) {
         return 0;
       }
@@ -65,11 +89,10 @@ const HiringManagersSection: React.FC<{
       if (bCompany === job.company.toLowerCase()) {
         return 1;
       }
-  
+
       return aCompany.localeCompare(bCompany);
     });
   }, [linkedInProfiles, job.company]);
-  
 
   const renderResumeInDrawer = () => {
     if (!openResumeRightDrawer) return null;
@@ -123,7 +146,9 @@ const HiringManagersSection: React.FC<{
               className=""
               onClick={() => fetchLinkedInProfiles(hasLinkedInProfiles)}
             >
-              {!hasLinkedInProfiles ? "Get LinkedIn Profiles" : "Refresh LinkedIn Profiles"}
+              {!hasLinkedInProfiles
+                ? "Get LinkedIn Profiles"
+                : "Refresh LinkedIn Profiles"}
             </Button>
           </div>
 
@@ -132,28 +157,29 @@ const HiringManagersSection: React.FC<{
           </h2>
           {!gettingLinkedInProfiles && linkedInProfiles.length === 0 && (
             <p className="text-sm text-gray-600">
-              {
-                !hasLinkedInProfiles
-                  ? "Click the button above to get LinkedIn profiles of hiring managers from this company."
-                  :
-                  "We couldn't find any LinkedIn profiles of hiring managers from this company. You can try again later with the refresh button."
-              }
+              {!hasLinkedInProfiles
+                ? "Click the button above to get LinkedIn profiles of hiring managers from this company."
+                : "We couldn't find any LinkedIn profiles of hiring managers from this company. You can try again later with the refresh button."}
             </p>
           )}
           {!gettingLinkedInProfiles && linkedInProfiles.length > 0 && (
             <>
               <p className="text-sm text-gray-600">
-                Our backend system has found LinkedIn profiles of hiring managers from{" "}
-                {job.company}.
+                Our backend system has found LinkedIn profiles of hiring
+                managers from {job.company}.
               </p>
               <p className="text-sm text-gray-600 mb-4">
-                Note: We do not verify the hiring managers. Please be cautious while
-                contacting them.
+                Note: We do not verify the hiring managers. Please be cautious
+                while contacting them.
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {linkedInProfiles.map((profile, index) => (
-                  <LinkedInProfileCard key={index} profile={profile} index={index} />
+                  <LinkedInProfileCard
+                    key={index}
+                    profile={profile}
+                    index={index}
+                  />
                 ))}
               </div>
             </>
@@ -161,14 +187,12 @@ const HiringManagersSection: React.FC<{
           {gettingLinkedInProfiles && (
             <div>
               <Loader2 className="h-12 w-12 animate-spin text-blue-500" />
-              <div>
-                Please wait while we fetch LinkedIn profiles for you...
-              </div>
+              <div>Please wait while we fetch LinkedIn profiles for you...</div>
             </div>
           )}
         </CardContent>
       </Card>
-      
+
       {renderResumeInDrawer()}
     </>
   );

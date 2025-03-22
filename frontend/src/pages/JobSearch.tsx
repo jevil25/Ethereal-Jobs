@@ -23,14 +23,14 @@ const JobSearch: React.FC = () => {
     recruiters: string;
     job_type: string;
     results_wanted?: number;
-}>({
+  }>({
     city: "",
     country_code: "",
     country: "",
     job_title: "",
     recruiters: "",
     job_type: "",
-});
+  });
   const [filters, setFilters] = useState({
     is_remote: false,
     job_type: "",
@@ -84,14 +84,14 @@ const JobSearch: React.FC = () => {
         setLoading(true);
         params.results_wanted = results_wanted;
         const data = await getJobs(params);
-        
+
         // Check if we've reached the end of available jobs
         if (data.length < results_wanted) {
           setHasMore(false);
         } else {
           setHasMore(true);
         }
-        
+
         setJobs(data);
         const jobsFiltered = data.filter(
           (job) =>
@@ -121,19 +121,19 @@ const JobSearch: React.FC = () => {
 
   const handleLoadMore = async (newResultsWanted: number) => {
     if (!lastSearchParams || loading || !hasMore) return;
-    
+
     setLoading(true);
     setResultsWanted(newResultsWanted);
-    
+
     try {
       const params = { ...lastSearchParams, results_wanted: newResultsWanted };
       const data = await getJobs(params);
-      
+
       // Check if we've reached the end
       if (data.length < newResultsWanted) {
         setHasMore(false);
       }
-      
+
       setJobs(data);
       const jobsFiltered = data.filter(
         (job) =>
@@ -171,9 +171,12 @@ const JobSearch: React.FC = () => {
     const jobsFiltered = jobs.filter((job) => {
       const res =
         (!overAllFilters.is_remote || job.is_remote) &&
-        (!overAllFilters.job_type || job.job_type === overAllFilters.job_type) &&
-        (!overAllFilters.salary_min || job.min_amount >= overAllFilters.salary_min) &&
-        (!overAllFilters.salary_max || job.max_amount <= overAllFilters.salary_max);
+        (!overAllFilters.job_type ||
+          job.job_type === overAllFilters.job_type) &&
+        (!overAllFilters.salary_min ||
+          job.min_amount >= overAllFilters.salary_min) &&
+        (!overAllFilters.salary_max ||
+          job.max_amount <= overAllFilters.salary_max);
       return res;
     });
     setFilteredJobs(jobsFiltered);
@@ -191,7 +194,7 @@ const JobSearch: React.FC = () => {
   }, []);
 
   return (
-    <div className="container mx-auto px-4 py-8 mt-12 md:mt-18">
+    <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">Job Search</h1>
       <SearchBar onSearch={handleSearch} filters={filters} />
       <div className="flex flex-col md:flex-row gap-6 mt-6">
@@ -204,10 +207,10 @@ const JobSearch: React.FC = () => {
         </div>
         <div className="w-full md:w-3/4">
           <JobList
-            jobs={filteredJobs} 
-            loading={loading} 
-            onLoadMore={handleLoadMore} 
-            hasMore={hasMore} 
+            jobs={filteredJobs}
+            loading={loading}
+            onLoadMore={handleLoadMore}
+            hasMore={hasMore}
           />
         </div>
       </div>

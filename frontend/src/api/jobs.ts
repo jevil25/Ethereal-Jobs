@@ -36,33 +36,45 @@ export const getJobs = async (params: GetJobsRequest): Promise<JobData[]> => {
       response.data.detail === "Token expired"
     ) {
       await userRefresh();
-      return await axios.get(constructServerUrlFromPath("/jobs"), {
-        params,
-        cancelToken: cancelTokenSource.token,
-      }).then(res => res.data as JobData[]);
+      return await axios
+        .get(constructServerUrlFromPath("/jobs"), {
+          params,
+          cancelToken: cancelTokenSource.token,
+        })
+        .then((res) => res.data as JobData[]);
     }
 
     return response.data as JobData[];
   } catch (error: any) {
-    showToast("Error fetching jobs: " + (error.message || "Unknown error"), "error");
+    showToast(
+      "Error fetching jobs: " + (error.message || "Unknown error"),
+      "error",
+    );
     throw error;
   }
 };
 
 export const getJob = async (jobId: string): Promise<JobData> => {
   try {
-    const response = await axios.get(constructServerUrlFromPath(`/job/${jobId}`));
+    const response = await axios.get(
+      constructServerUrlFromPath(`/job/${jobId}`),
+    );
     if (
       response.data &&
       response.data.detail &&
       response.data.detail === "Token expired"
     ) {
       await userRefresh();
-      return await axios.get(constructServerUrlFromPath(`/job/${jobId}`)).then(res => res.data as JobData);
+      return await axios
+        .get(constructServerUrlFromPath(`/job/${jobId}`))
+        .then((res) => res.data as JobData);
     }
     return response.data as JobData;
   } catch (error: any) {
-    showToast("Error fetching job: " + (error.message || "Unknown error"), "error");
+    showToast(
+      "Error fetching job: " + (error.message || "Unknown error"),
+      "error",
+    );
     throw error;
   }
 };
@@ -74,7 +86,9 @@ export const getLinkedInProfilesForJob = async (
 ): Promise<JobDataWithLinkedInProfiles> => {
   try {
     const response = await axios.get(
-      constructServerUrlFromPath(`/job/${jobId}/linkedin/profile?get_new=${getNew}`),
+      constructServerUrlFromPath(
+        `/job/${jobId}/linkedin/profile?get_new=${getNew}`,
+      ),
     );
     if (
       response.data &&
@@ -82,13 +96,20 @@ export const getLinkedInProfilesForJob = async (
       response.data.detail === "Token expired"
     ) {
       await userRefresh();
-      return await axios.get(
-        constructServerUrlFromPath(`/job/${jobId}/linkedin/profile?get_new=${getNew}`),
-      ).then(res => res.data as JobDataWithLinkedInProfiles);
+      return await axios
+        .get(
+          constructServerUrlFromPath(
+            `/job/${jobId}/linkedin/profile?get_new=${getNew}`,
+          ),
+        )
+        .then((res) => res.data as JobDataWithLinkedInProfiles);
     }
     return response.data as JobDataWithLinkedInProfiles;
   } catch (error: any) {
-    showToast("Error fetching LinkedIn profiles: " + (error.message || "Unknown error"), "error");
+    showToast(
+      "Error fetching LinkedIn profiles: " + (error.message || "Unknown error"),
+      "error",
+    );
     throw error;
   }
 };
@@ -108,14 +129,22 @@ export const generateLinkedInMessage = async (
       response.data.detail === "Token expired"
     ) {
       await userRefresh();
-      return await axios.get(
-        constructServerUrlFromPath(`/generate/linkedin/message/${params.email}`),
-        { params },
-      ).then(res => res.data as LinkedInGenerateMessageResponse);
+      return await axios
+        .get(
+          constructServerUrlFromPath(
+            `/generate/linkedin/message/${params.email}`,
+          ),
+          { params },
+        )
+        .then((res) => res.data as LinkedInGenerateMessageResponse);
     }
     return response.data as LinkedInGenerateMessageResponse;
   } catch (error: any) {
-    showToast("Error generating LinkedIn message: " + (error.message || "Unknown error"), "error");
+    showToast(
+      "Error generating LinkedIn message: " +
+        (error.message || "Unknown error"),
+      "error",
+    );
     throw error;
   }
 };
@@ -135,14 +164,19 @@ export const getSearchSuggestions = async (
       response.data.detail === "Token expired"
     ) {
       await userRefresh();
-      return await axios.get(
-        constructServerUrlFromPath("/search/suggestions/job_title"),
-        { params },
-      ).then(res => res.data as AutoSuggestionsResponse);
+      return await axios
+        .get(constructServerUrlFromPath("/search/suggestions/job_title"), {
+          params,
+        })
+        .then((res) => res.data as AutoSuggestionsResponse);
     }
     return response.data as AutoSuggestionsResponse;
   } catch (error: any) {
-    showToast("Error fetching search suggestions: " + (error.message || "Unknown error"), "error");
+    showToast(
+      "Error fetching search suggestions: " +
+        (error.message || "Unknown error"),
+      "error",
+    );
     throw error;
   }
 };
@@ -162,15 +196,19 @@ export const getLocationSuggestions = async (
       response.data.detail === "Token expired"
     ) {
       await userRefresh();
-      return await axios.get(
-        constructServerUrlFromPath("/search/suggestions/location"),
-        { params },
-      ).then(res => res.data as AutoSuggestionsLocationResponse
-      );
+      return await axios
+        .get(constructServerUrlFromPath("/search/suggestions/location"), {
+          params,
+        })
+        .then((res) => res.data as AutoSuggestionsLocationResponse);
     }
     return response.data as AutoSuggestionsLocationResponse;
   } catch (error: any) {
-    showToast("Error fetching location suggestions: " + (error.message || "Unknown error"), "error");
+    showToast(
+      "Error fetching location suggestions: " +
+        (error.message || "Unknown error"),
+      "error",
+    );
     throw error;
   }
 };

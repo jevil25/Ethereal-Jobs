@@ -16,7 +16,7 @@ interface ResumeComparisonProps {
     isOptimized: boolean,
   ) => void;
   showGeneratedResume: boolean;
-  startResumeGeneration: (regenerate?: boolean) => Promise<void>
+  startResumeGeneration: (regenerate?: boolean) => Promise<void>;
 }
 
 const ResumeComparison = ({
@@ -34,6 +34,10 @@ const ResumeComparison = ({
   // Pre-compute all diffs to pass to the ResumeContent component
   const diffs = React.useMemo(() => {
     return {
+      aboutMeDiff: compareData.compareBulletPoints(
+        originalResume.personalInfo.about_me,
+        optimizedResume.personalInfo.about_me,
+      ),
       skillsDiff: compareData.compareArrays(
         originalResume.skills,
         optimizedResume.skills,
@@ -56,7 +60,7 @@ const ResumeComparison = ({
       certificationsDiff: compareData.compareObjectArrays(
         originalResume.certifications,
         optimizedResume.certifications,
-        (item) => item.name,
+        (item) => `${item.description}`,
       ),
     };
   }, [originalResume, optimizedResume]);
@@ -96,8 +100,8 @@ const ResumeComparison = ({
                 {!showGeneratedResume ? (
                   <div className="p-4 bg-gray-100 text-gray-600 text-center rounded-lg">
                     <div>
-                    Your optimized resume is not available yet. Please generate
-                    it first.
+                      Your optimized resume is not available yet. Please
+                      generate it first.
                     </div>
                     <Button
                       className="mt-4"
@@ -108,15 +112,15 @@ const ResumeComparison = ({
                     </Button>
                   </div>
                 ) : (
-                <div className="border border-gray-300 rounded-lg overflow-hidden shadow-sm">
-                  <ResumeContent
-                    name={name}
-                    resumeData={optimizedResume}
-                    diffs={diffs}
-                    isOptimized={true}
-                    updateResumeSection={updateResumeSection}
-                  />
-                </div>
+                  <div className="border border-gray-300 rounded-lg overflow-hidden shadow-sm">
+                    <ResumeContent
+                      name={name}
+                      resumeData={optimizedResume}
+                      diffs={diffs}
+                      isOptimized={true}
+                      updateResumeSection={updateResumeSection}
+                    />
+                  </div>
                 )}
               </div>
             </div>
@@ -170,11 +174,11 @@ const ResumeComparison = ({
               </div>
               <div className="border rounded-lg overflow-hidden">
                 <ResumeContent
-                    name={name}
-                    resumeData={originalResume}
-                    diffs={diffs}
-                    isOptimized={false}
-                    updateResumeSection={updateResumeSection}
+                  name={name}
+                  resumeData={originalResume}
+                  diffs={diffs}
+                  isOptimized={false}
+                  updateResumeSection={updateResumeSection}
                 />
               </div>
             </div>

@@ -1,24 +1,21 @@
 import React from "react";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-
-export interface PersonalInfoData {
-  headline: string;
-  location: string;
-  phone: string;
-  website: string;
-}
+import { PersonalInfo } from "../../api/types";
+import { Textarea } from "../ui/textarea";
 
 interface PersonalInfoCardProps {
-  data: PersonalInfoData;
-  updateData: (data: PersonalInfoData) => void;
+  data: PersonalInfo;
+  updateData: (data: PersonalInfo) => void;
 }
 
 const PersonalInfoCard: React.FC<PersonalInfoCardProps> = ({
   data,
   updateData,
 }) => {
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     const { name, value } = e.target;
     updateData({
       ...data,
@@ -29,7 +26,17 @@ const PersonalInfoCard: React.FC<PersonalInfoCardProps> = ({
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="headline">Professional Headline</Label>
+        <Label htmlFor="about_me">About me</Label>
+        <Textarea
+          id="about_me"
+          name="about_me"
+          placeholder="e.g., Highly motivated software engineer with 5+ years of experience"
+          value={data.about_me}
+          onChange={handleChange}
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="headline">Looking for Job Title</Label>
         <Input
           id="headline"
           name="headline"
@@ -63,13 +70,36 @@ const PersonalInfoCard: React.FC<PersonalInfoCardProps> = ({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="website">Website or LinkedIn Profile</Label>
+        <Label htmlFor="website">Website</Label>
         <Input
           id="website"
           name="website"
           type="url"
           placeholder="e.g., https://linkedin.com/in/yourprofile"
           value={data.website}
+          onChange={handleChange}
+        />
+      </div>
+      {/* make linkedin and guthub */}
+      <div className="space-y-2">
+        <Label htmlFor="linkedin_url">LinkedIn</Label>
+        <Input
+          id="linkedin_url"
+          name="linkedin_url"
+          type="url"
+          placeholder="e.g., https://linkedin.com/in/yourprofile"
+          value={data.linkedin_url}
+          onChange={handleChange}
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="github_url">GitHub</Label>
+        <Input
+          id="github_url"
+          name="github_url"
+          type="url"
+          placeholder="e.g., https://github.com/yourprofile"
+          value={data.github_url}
           onChange={handleChange}
         />
       </div>

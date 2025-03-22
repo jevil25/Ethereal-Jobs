@@ -1,47 +1,47 @@
 // Utility functions for comparing resume data
 
 const compareArrays = (original: string[], updated: string[]) => {
-    // Create frequency maps instead of simple Sets
-    const originalFreq = new Map();
-    const updatedFreq = new Map();
-    
-    // Count occurrences in original array
-    original.forEach(item => {
-      originalFreq.set(item, (originalFreq.get(item) || 0) + 1);
-    });
-    
-    // Count occurrences in updated array
-    updated.forEach(item => {
-      updatedFreq.set(item, (updatedFreq.get(item) || 0) + 1);
-    });
-    
-    // Calculate removed items (in original but not in updated or fewer occurrences)
-    const removed = original.filter(item => {
-      const originalCount = originalFreq.get(item);
-      const updatedCount = updatedFreq.get(item) || 0;
-      return originalCount > updatedCount;
-    });
-    
-    // Calculate added items (in updated but not in original or more occurrences)
-    const added = updated.filter(item => {
-      const originalCount = originalFreq.get(item) || 0;
-      const updatedCount = updatedFreq.get(item);
-      return updatedCount > originalCount;
-    });
-    
-    // Calculate unchanged items (equal number of occurrences)
-    const unchanged = original.filter(item => {
-      const originalCount = originalFreq.get(item);
-      const updatedCount = updatedFreq.get(item) || 0;
-      return originalCount === updatedCount;
-    });
-        
-    return {
-      removed,
-      added,
-      unchanged,
-    };
+  // Create frequency maps instead of simple Sets
+  const originalFreq = new Map();
+  const updatedFreq = new Map();
+
+  // Count occurrences in original array
+  original.forEach((item) => {
+    originalFreq.set(item, (originalFreq.get(item) || 0) + 1);
+  });
+
+  // Count occurrences in updated array
+  updated.forEach((item) => {
+    updatedFreq.set(item, (updatedFreq.get(item) || 0) + 1);
+  });
+
+  // Calculate removed items (in original but not in updated or fewer occurrences)
+  const removed = original.filter((item) => {
+    const originalCount = originalFreq.get(item);
+    const updatedCount = updatedFreq.get(item) || 0;
+    return originalCount > updatedCount;
+  });
+
+  // Calculate added items (in updated but not in original or more occurrences)
+  const added = updated.filter((item) => {
+    const originalCount = originalFreq.get(item) || 0;
+    const updatedCount = updatedFreq.get(item);
+    return updatedCount > originalCount;
+  });
+
+  // Calculate unchanged items (equal number of occurrences)
+  const unchanged = original.filter((item) => {
+    const originalCount = originalFreq.get(item);
+    const updatedCount = updatedFreq.get(item) || 0;
+    return originalCount === updatedCount;
+  });
+
+  return {
+    removed,
+    added,
+    unchanged,
   };
+};
 
 // Helper to compare array objects by a key field
 const compareObjectArrays = <T extends Record<string, any>>(

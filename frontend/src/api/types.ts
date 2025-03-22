@@ -10,7 +10,7 @@ interface GetJobsRequest {
   country: string;
   job_title: string;
   recruiters: string;
-  job_type: string; 
+  job_type: string;
   results_wanted?: number;
 }
 
@@ -161,6 +161,9 @@ interface PersonalInfo {
   location: string;
   phone: string;
   website: string;
+  linkedin_url: string;
+  github_url: string;
+  about_me: string;
 }
 
 interface JobPreferences {

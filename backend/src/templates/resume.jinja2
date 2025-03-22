@@ -7,97 +7,106 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            line-height: 1.4;
+            line-height: 1.3;
             margin: 0;
             padding: 4px 8px;
             max-width: 100%;
             color: #222;
-            font-size: 10.5pt;
+            font-size: 9.5pt; /* Reduced from 10.5pt */
         }
         h1 {
-            font-size: 18pt;
+            font-size: 16pt; /* Reduced from 18pt */
             text-align: center;
-            margin: 0 0 3px 0;
+            margin: 0 0 2px 0; /* Reduced bottom margin */
             letter-spacing: 0.5px;
         }
         h2 {
-            font-size: 12pt;
+            font-size: 11pt; /* Reduced from 12pt */
             border-bottom: 1px solid #555;
-            padding-bottom: 2px;
-            margin: 8px 0 4px 0;
+            padding-bottom: 1px; /* Reduced padding */
+            margin: 6px 0 3px 0; /* Reduced margins */
             text-transform: uppercase;
             font-weight: 700;
             letter-spacing: 0.5px;
         }
         header {
             text-align: center;
-            margin-bottom: 6px;
-            padding-bottom: 2px;
+            margin-bottom: 4px; /* Reduced from 6px */
+            padding-bottom: 1px; /* Reduced padding */
             border-bottom: 0.5px solid #ddd;
         }
         .contact-info {
-            margin: 3px 0;
-            font-size: 9.5pt;
+            margin: 2px 0; /* Reduced from 3px */
+            font-size: 8.5pt; /* Reduced from 9.5pt */
         }
         .section {
-            margin-bottom: 8px;
+            margin-bottom: 6px; /* Reduced from 8px */
         }
         .entry {
-            margin-bottom: 6px;
+            margin-bottom: 4px; /* Reduced from 6px */
         }
         .entry-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 2px;
+            margin-bottom: 1px; /* Reduced from 2px */
         }
         .title {
             font-weight: bold;
-            font-size: 10.5pt;
+            font-size: 9.5pt; /* Reduced from 10.5pt */
         }
         .company, .institution {
             font-weight: bold;
-            font-size: 10.5pt;
+            font-size: 9.5pt; /* Reduced from 10.5pt */
         }
         .date {
             color: #444;
-            font-size: 9.5pt;
+            font-size: 8.5pt; /* Reduced from 9.5pt */
             font-weight: 500;
         }
         .location {
             font-style: italic;
             color: #444;
-            font-size: 9.5pt;
+            font-size: 8.5pt; /* Reduced from 9.5pt */
         }
         ul {
-            margin: 3px 0;
-            padding-left: 17px;
+            margin: 2px 0; /* Reduced from 3px */
+            padding-left: 15px; /* Reduced from 17px */
         }
         li {
-            margin-bottom: 3px;
+            margin-bottom: 2px; /* Reduced from 3px */
             padding-left: 0;
-            line-height: 1.3;
+            line-height: 1.25; /* Reduced from 1.3 */
         }
         li:last-child {
             margin-bottom: 0;
         }
         p {
-            margin: 3px 0;
+            margin: 2px 0; /* Reduced from 3px */
         }
         .skills-list {
-            margin: 3px 0;
+            margin: 2px 0; /* Reduced from 3px */
             padding: 0;
-            line-height: 1.4;
+            line-height: 1.3; /* Reduced from 1.4 */
         }
         a {
             color: #222;
             text-decoration: none;
         }
         .summary {
-            line-height: 1.4;
+            line-height: 1.3; /* Reduced from 1.4 */
+        }
+        .social-links {
+            margin: 2px 0;
+            font-size: 8.5pt;
+        }
+        .about-me {
+            font-size: 9pt;
+            line-height: 1.3;
+            margin: 3px 0;
         }
         @media print {
             body {
-                padding: 0.15in 0.2in;
+                padding: 0.1in 0.15in; /* Reduced padding */
                 margin: 0;
             }
             @page {
@@ -117,9 +126,21 @@
     <header>
         <h1>{{ name }}</h1>
         <div class="contact-info">
-            {{ personalInfo.location }}{% if personalInfo.phone %} | {{ personalInfo.phone }}{% endif %}{% if email %} | {{ email }}{% endif %}{% if personalInfo.website %} | {{ personalInfo.website }}{% endif %}
+            {{ personalInfo.location }}
+            {% if personalInfo.phone %} | {{ personalInfo.phone }}{% endif %}
+            {% if email %} | <a href="mailto:{{ email }}">{{ email }}</a>{% endif %}
+            {% if personalInfo.website %} | <a href="{{ personalInfo.website }}">{{ personalInfo.website }}</a>{% endif %}
+            {% if personalInfo.github_url %} | <a href="{{ personalInfo.github_url }}">GitHub</a>{% endif %}
+            {% if personalInfo.linkedin_url %} | <a href="{{ personalInfo.linkedin_url }}">LinkedIn</a>{% endif %}
         </div>
     </header>
+
+    {% if personalInfo.about_me %}
+    <div class="section">
+        <h2>About Me</h2>
+        <p class="about-me">{{ personalInfo.about_me }}</p>
+    </div>
+    {% endif %}
 
     <div class="section">
         <h2>Professional Summary</h2>

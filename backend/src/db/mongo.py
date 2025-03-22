@@ -613,3 +613,11 @@ class DatabaseOperations:
             JobModel.date_posted >= min_date
         ).skip(skip).limit(limit).to_list()
     
+    async def update_user_name(self, email: str, name: str):
+        user = await User.find_one({"email": email})
+        if user:
+            user.name = name
+            user = await user.save()
+            return user, True
+        return None, False
+    

@@ -107,6 +107,7 @@ async def download_resume(request: Request, data: DownloadResume):
         filename = f"{user.name}_resume.pdf" if user.name else "resume.pdf"
     rendered_template = templates.TemplateResponse(template, {
         "request": request,
+        "email": user.email,
         "name": user.name,
         "personalInfo": resume.personalInfo,
         "experience": resume.experience,

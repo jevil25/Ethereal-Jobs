@@ -49,7 +49,9 @@ export const getResumeDetails = async (): Promise<customFormData> => {
     const response = await axios.get(constructServerUrlFromPath(`/resume`));
     if (response.data.detail === "Token expired") {
       await userRefresh();
-      return await axios.get(constructServerUrlFromPath(`/resume`)).then(res => res.data as customFormData);
+      return await axios
+        .get(constructServerUrlFromPath(`/resume`))
+        .then((res) => res.data as customFormData);
     }
     return response.data as customFormData;
   } catch (error) {
@@ -79,16 +81,14 @@ export const extractResume = async (
     );
     if (response.data.detail === "Token expired") {
       await userRefresh();
-      return await axios.post(
-        constructServerUrlFromPath(`/extract/resume`),
-        formData,
-        {
+      return await axios
+        .post(constructServerUrlFromPath(`/extract/resume`), formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
           signal: controller?.signal,
-        },
-      ).then(res => res.data as customFormData);
+        })
+        .then((res) => res.data as customFormData);
     }
     if (response.data.is_success) {
       return response.data.extracted_data as customFormData;
@@ -115,13 +115,12 @@ export const getResume = async (
     );
     if (response.data.detail === "Token expired") {
       await userRefresh();
-      return await axios.get(
-        constructServerUrlFromPath(`/resume/ai/generate`),
-        {
+      return await axios
+        .get(constructServerUrlFromPath(`/resume/ai/generate`), {
           params: data,
           signal: signal,
-        },
-      ).then(res => res.data as GenerateAiGetResumeResponse);
+        })
+        .then((res) => res.data as GenerateAiGetResumeResponse);
     }
     if (response.data.is_success) {
       return response.data as GenerateAiGetResumeResponse;
@@ -143,10 +142,9 @@ export const generateResume = async (
     );
     if (response.data.detail === "Token expired") {
       await userRefresh();
-      return await axios.post(
-        constructServerUrlFromPath(`/resume/ai/generate`),
-        data,
-      ).then(res => res.data as GenerateAiResumeResponse);
+      return await axios
+        .post(constructServerUrlFromPath(`/resume/ai/generate`), data)
+        .then((res) => res.data as GenerateAiResumeResponse);
     }
     if (response.data.is_success) {
       return response.data as GenerateAiResumeResponse;
@@ -169,10 +167,9 @@ export const updateGeneratedResume = async (
     );
     if (response.data.detail === "Token expired") {
       await userRefresh();
-      return await axios.post(
-        constructServerUrlFromPath(`/resume/ai/update`),
-        data,
-      ).then(res => res.data as GenerateAiResumeResponse);
+      return await axios
+        .post(constructServerUrlFromPath(`/resume/ai/update`), data)
+        .then((res) => res.data as GenerateAiResumeResponse);
     }
     if (response.data.is_success) {
       return response.data as GenerateAiResumeResponse;

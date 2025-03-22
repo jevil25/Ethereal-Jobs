@@ -31,7 +31,7 @@ function App() {
   return (
     <>
       <div className="App">
-        <main className="">
+        <main className="py-18 md:py-24 bg-gray-50">
           <Toaster />
           <Router>
             <AuthProvider>
@@ -118,7 +118,8 @@ function AppContent() {
             </RequireAuth>
           }
         />
-        <Route path="/profile"
+        <Route
+          path="/profile"
           element={
             <RequireAuth location={location} searchParams={searchParams}>
               <ProfilePage />

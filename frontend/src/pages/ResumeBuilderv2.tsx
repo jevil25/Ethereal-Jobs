@@ -49,10 +49,10 @@ const ResumeEditor: React.FC = () => {
     downloadOptimizedResume,
   } = useResumeData();
 
-  const { resumeFile, isParsing, handleResumeUpload, setResumeFile } = useResumeUpload(
-    controllerRef.current,
-    (data) => setResumeData((prev) => ({ ...prev, ...data })),
-  );
+  const { resumeFile, isParsing, handleResumeUpload, setResumeFile } =
+    useResumeUpload(controllerRef.current, (data) =>
+      setResumeData((prev) => ({ ...prev, ...data })),
+    );
 
   const uploadResume = async (file: File | null) => {
     await handleResumeUpload(file);
@@ -70,6 +70,10 @@ const ResumeEditor: React.FC = () => {
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
+  };
+
+  const handleNameChange = async (name: string) => {
+    console.log("Name changed to:", name);
   };
 
   const startResumeGeneration = async (regenerate = false) => {
@@ -92,7 +96,7 @@ const ResumeEditor: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-6 max-w-5xl mt-12 md:mt-18">
+    <div className="container mx-auto px-4 py-6 max-w-5xl">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
@@ -130,7 +134,7 @@ const ResumeEditor: React.FC = () => {
                 className="flex items-center gap-2 text-xs md:text-sm w-full"
                 onClick={() => {
                   setResumeFile(null);
-                  setOpenUploadResumeModal(true)
+                  setOpenUploadResumeModal(true);
                 }}
               >
                 <Upload size={16} />
@@ -278,6 +282,7 @@ const ResumeEditor: React.FC = () => {
               />
             ) : (
               <ResumeTabs
+                handleNameChange={handleNameChange}
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
                 resumeData={resumeData}

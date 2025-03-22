@@ -135,7 +135,10 @@ const Navbar = () => {
               <Button onClick={() => handleAuthClick(true)} variant={"outline"}>
                 Sign In
               </Button>
-              <Button onClick={() => handleAuthClick(false)} variant={"Etheral Jobs"}>
+              <Button
+                onClick={() => handleAuthClick(false)}
+                variant={"Etheral Jobs"}
+              >
                 Sign Up
               </Button>
             </div>

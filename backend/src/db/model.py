@@ -194,6 +194,9 @@ class ResetPassword(BaseModel):
 class UserUpdatePassword(BaseModel):
     password: str
 
+class UserUpdateName(BaseModel):
+    name: str
+
 class UserAuth(BaseModel):
     username: str
     email: str
@@ -223,6 +226,9 @@ class PersonalInfo(BaseModel):
     location: str
     phone: str
     website: str
+    linkedin_url: str
+    github_url: str
+    about_me: str
 
 class JobPreferences(BaseModel):
     jobTypes: List[str]

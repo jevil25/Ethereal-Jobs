@@ -46,10 +46,10 @@ export function DiffSection<T>({
             className="mb-5 border-l-4 border-blue-400 pl-3"
           >
             {renderItem(
-                isOptimized ? updated : original,
-                "modified",
-                index,
-                isOptimized ? original : updated,
+              isOptimized ? updated : original,
+              "modified",
+              index,
+              isOptimized ? original : updated,
             )}
           </div>
         ))}

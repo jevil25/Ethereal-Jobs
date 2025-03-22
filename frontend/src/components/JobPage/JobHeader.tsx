@@ -17,7 +17,7 @@ const JobHeader: React.FC<{ job: JobData }> = ({ job }) => {
     return new Date(dateString).toLocaleDateString("en-IN", {
       day: "2-digit",
       month: "2-digit",
-      year: "numeric"
+      year: "numeric",
     });
   };
 
@@ -27,7 +27,9 @@ const JobHeader: React.FC<{ job: JobData }> = ({ job }) => {
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
           <h1 className="text-2xl font-bold text-gray-900">{job?.title}</h1>
-          <h2 className="text-lg text-gray-700 font-medium mt-1">{job?.company}</h2>
+          <h2 className="text-lg text-gray-700 font-medium mt-1">
+            {job?.company}
+          </h2>
         </div>
         {job.company_logo && (
           <img
@@ -50,11 +52,11 @@ const JobHeader: React.FC<{ job: JobData }> = ({ job }) => {
           )}
         </div>
         {job?.url && (
-          <Button 
-            variant="Etheral Jobs" 
-            size="lg" 
+          <Button
+            variant="Etheral Jobs"
+            size="lg"
             className="px-5 py-2"
-            onClick={() => window.open(job.url, '_blank')}
+            onClick={() => window.open(job.url, "_blank")}
           >
             Apply Now <ExternalLink className="ml-1 h-4 w-4" />
           </Button>
@@ -68,12 +70,12 @@ const JobHeader: React.FC<{ job: JobData }> = ({ job }) => {
             {job.job_type}
           </Badge>
         )}
-        
+
         <Badge variant="outline" className="flex items-center px-3 py-1">
           <Calendar className="h-4 w-4 mr-1" />
           Posted: {formatDate(job?.date_posted as string)}
         </Badge>
-        
+
         {job?.min_amount && job?.max_amount && (
           <Badge variant="outline" className="flex items-center px-3 py-1">
             <DollarSign className="h-4 w-4 mr-1" />

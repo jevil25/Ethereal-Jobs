@@ -20,8 +20,11 @@ import { useAuth } from "../providers/useAuth";
 const JobPage: React.FC = () => {
   const navigate = useNavigate();
   const [job, setJob] = useState<JobData>();
-  const [linkedInProfiles, setLinkedInProfiles] = useState<LinkedInProfile[]>([]);
-  const [gettingLinkedInProfiles, setGettingLinkedInProfiles] = useState<boolean>(false);
+  const [linkedInProfiles, setLinkedInProfiles] = useState<LinkedInProfile[]>(
+    [],
+  );
+  const [gettingLinkedInProfiles, setGettingLinkedInProfiles] =
+    useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [generatedMessage, setGeneratedMessage] = useState<string>("");
   const [generatingMessage, setGeneratingMessage] = useState<boolean>(false);
@@ -54,17 +57,19 @@ const JobPage: React.FC = () => {
     if (job) {
       setGettingLinkedInProfiles(true);
       const profiles = await getLinkedInProfilesForJob(job.id, getNew);
-      if (profiles.is_success){
+      if (profiles.is_success) {
         console.log(profiles.linkedin_profiles);
         setLinkedInProfiles(profiles.linkedin_profiles);
       }
       setGettingLinkedInProfiles(false);
     }
-  }
+  };
 
   const handleMessageGeneration = async (newMessage: boolean = false) => {
     if (linkedinName === "" && linkedInProfiles.length === 0) {
-      setLinkedinName(linkedInProfiles.length > 0 ? linkedInProfiles[0].name || "" : "");
+      setLinkedinName(
+        linkedInProfiles.length > 0 ? linkedInProfiles[0].name || "" : "",
+      );
     }
     setGeneratingMessage(true);
     setModalOpen(true);
@@ -94,7 +99,7 @@ const JobPage: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4 mt-12 md:mt-18">
+    <div className="container mx-auto py-8 px-4">
       <Button variant="ghost" className="mb-6" onClick={() => navigate(-1)}>
         <ChevronLeft className="h-4 w-4 mr-2" />
         Back to Jobs
@@ -107,7 +112,7 @@ const JobPage: React.FC = () => {
               <JobHeader job={job} />
 
               <Separator className="my-6" />
-        
+
               <HiringManagersSection
                 job={job}
                 handleMessageGeneration={handleMessageGeneration}

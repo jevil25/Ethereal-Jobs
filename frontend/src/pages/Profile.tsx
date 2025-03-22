@@ -1,11 +1,11 @@
-import { useState } from 'react';
-import { useAuth } from '../providers/useAuth';
-import { updateName } from '../api/user';
-import { Input } from '../components/ui/input';
-import { Button } from '../components/ui/button';
-import { FormData } from '../api/types';
-import { useResumeData } from '../components/ResumeV2/hooks/useResumeData';
-import { 
+import { useState } from "react";
+import { useAuth } from "../providers/useAuth";
+import { updateName } from "../api/user";
+import { Input } from "../components/ui/input";
+import { Button } from "../components/ui/button";
+import { FormData } from "../api/types";
+import { useResumeData } from "../components/ResumeV2/hooks/useResumeData";
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -13,24 +13,36 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogTitle
-} from '../components/ui/alert-dialog';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import toast from '../components/ui/toast';
-import ResumeTabs from '../components/ResumeV1/ResumeTabs';
-import { useWindowSize } from '../components/ResumeV2/hooks/useWindowSize';
-import { Menu } from 'lucide-react';
+  AlertDialogTitle,
+} from "../components/ui/alert-dialog";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import toast from "../components/ui/toast";
+import ResumeTabs from "../components/ResumeV1/ResumeTabs";
+import { useWindowSize } from "../components/ResumeV2/hooks/useWindowSize";
+import { Menu } from "lucide-react";
 
 const ProfilePage = () => {
   const { user, logout } = useAuth();
-  const [name, setName] = useState(user?.name || '');
+  const [name, setName] = useState(user?.name || "");
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [activeTab, setActiveTab] = useState<string>('personal');
+  const [activeTab, setActiveTab] = useState<string>("personal");
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [nameSaveStatus, setNameSaveStatus] = useState<"saved" | "saving" | "error">("saved");
-  const { updateResumeSection, handlePersonalInfoEdit, saveStatus, resumeData } = useResumeData();
+  const [nameSaveStatus, setNameSaveStatus] = useState<
+    "saved" | "saving" | "error"
+  >("saved");
+  const {
+    updateResumeSection,
+    handlePersonalInfoEdit,
+    saveStatus,
+    resumeData,
+  } = useResumeData();
 
   useWindowSize((width) => {
     if (width < 768) {
@@ -39,7 +51,7 @@ const ProfilePage = () => {
       setSidebarOpen(true);
     }
   });
-  
+
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
@@ -80,15 +92,15 @@ const ProfilePage = () => {
       toast("Account deleted successfully.", "success");
       logout();
     } catch (error) {
-        console.error("Error deleting account:", error);
-        toast("Failed to delete account. Please try again.", "error");
+      console.error("Error deleting account:", error);
+      toast("Failed to delete account. Please try again.", "error");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto p-4 space-y-6 mt-16 md:mt-32">
+    <div className="w-full max-w-6xl mx-auto p-4 space-y-6">
       <Card className="shadow-sm">
         <CardHeader className="pb-2">
           <CardTitle>Profile Information</CardTitle>
@@ -96,7 +108,9 @@ const ProfilePage = () => {
         <CardContent>
           <div className="grid grid-cols-2 gap-8">
             <div>
-              <p className="text-sm font-medium text-gray-500 mb-1">Full Name</p>
+              <p className="text-sm font-medium text-gray-500 mb-1">
+                Full Name
+              </p>
               {isEditing ? (
                 <Input
                   value={name}
@@ -109,18 +123,20 @@ const ProfilePage = () => {
               )}
             </div>
             <div className="flex justify-end items-start">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="sm"
                 onClick={isEditing ? handleSaveName : () => setIsEditing(true)}
                 disabled={isLoading}
               >
-                {isEditing ? 'Save' : 'Edit Name'}
+                {isEditing ? "Save" : "Edit Name"}
               </Button>
             </div>
           </div>
           <div className="mt-6">
-            <p className="text-sm font-medium text-gray-500 mb-1">Email Address</p>
+            <p className="text-sm font-medium text-gray-500 mb-1">
+              Email Address
+            </p>
             <p className="text-lg">{user?.email}</p>
           </div>
         </CardContent>
@@ -157,9 +173,13 @@ const ProfilePage = () => {
                   ].map((section) => (
                     <Button
                       key={section.id}
-                      variant={activeTab === section.id ? "Etheral Jobs" : "ghost"}
+                      variant={
+                        activeTab === section.id ? "Etheral Jobs" : "ghost"
+                      }
                       className={`justify-start rounded-none text-left py-3 px-4 ${
-                        activeTab === section.id ? "text-primary-foreground" : ""
+                        activeTab === section.id
+                          ? "text-primary-foreground"
+                          : ""
                       }`}
                       onClick={() => {
                         setActiveTab(section.id);
@@ -185,32 +205,32 @@ const ProfilePage = () => {
           ) : resumeData ? (
             <Card className="shadow-sm h-full">
               <CardHeader className="pb-2">
-              <div className="mt-4 text-right">
-                <span
-                className={`text-sm ${
-                    saveStatus === "saved" && nameSaveStatus === "saved"
-                    ? "text-green-600"
-                    : saveStatus === "saving" || nameSaveStatus === "saving"
-                        ? "text-yellow-600"
-                        : "text-red-600"
-                }`}
-                >
-                {saveStatus === "saved" && nameSaveStatus === "saved"
-                    ? "✓ All changes saved"
-                    : saveStatus === "saving" || nameSaveStatus === "saving"
-                    ? "Saving changes..."
-                    : "Error saving changes"}
-                </span>
-            </div>
+                <div className="mt-4 text-right">
+                  <span
+                    className={`text-sm ${
+                      saveStatus === "saved" && nameSaveStatus === "saved"
+                        ? "text-green-600"
+                        : saveStatus === "saving" || nameSaveStatus === "saving"
+                          ? "text-yellow-600"
+                          : "text-red-600"
+                    }`}
+                  >
+                    {saveStatus === "saved" && nameSaveStatus === "saved"
+                      ? "✓ All changes saved"
+                      : saveStatus === "saving" || nameSaveStatus === "saving"
+                        ? "Saving changes..."
+                        : "Error saving changes"}
+                  </span>
+                </div>
               </CardHeader>
               <CardContent>
                 <ResumeTabs
-                    handleNameChange={handleNameChange}
-                    activeTab={activeTab}
-                    handlePersonalInfoEdit={handlePersonalInfoEdit}
-                    resumeData={resumeData}
-                    updateResumeSection={handleUpdateResumeSection}
-                    setActiveTab={setActiveTab}
+                  handleNameChange={handleNameChange}
+                  activeTab={activeTab}
+                  handlePersonalInfoEdit={handlePersonalInfoEdit}
+                  resumeData={resumeData}
+                  updateResumeSection={handleUpdateResumeSection}
+                  setActiveTab={setActiveTab}
                 />
               </CardContent>
             </Card>
@@ -228,11 +248,11 @@ const ProfilePage = () => {
         </CardHeader>
         <CardContent>
           <p className="text-gray-600 mb-4">
-            Deleting your account will remove all your personal information, resumes, and preferences permanently.
-            This action cannot be undone.
+            Deleting your account will remove all your personal information,
+            resumes, and preferences permanently. This action cannot be undone.
           </p>
-          <Button 
-            variant="destructive" 
+          <Button
+            variant="destructive"
             onClick={() => setShowDeleteDialog(true)}
             disabled={isLoading}
           >
@@ -246,13 +266,13 @@ const ProfilePage = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete your account
-              and remove all associated data from our servers.
+              This action cannot be undone. This will permanently delete your
+              account and remove all associated data from our servers.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
-            <AlertDialogAction 
+            <AlertDialogAction
               onClick={handleDeleteAccount}
               disabled={isLoading}
               className="bg-red-600 hover:bg-red-700"

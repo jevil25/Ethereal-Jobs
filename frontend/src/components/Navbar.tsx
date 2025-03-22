@@ -78,8 +78,8 @@ const NavBar = () => {
 
       {/* Mobile Menu Button */}
       <div className="flex items-center lg:hidden">
-        <button 
-          className="p-2 ml-3 rounded-md hover:bg-gray-100" 
+        <button
+          className="p-2 ml-3 rounded-md hover:bg-gray-100"
           onClick={() => setIsOpen(!isOpen)}
           aria-label="Toggle menu"
         >
@@ -113,12 +113,12 @@ const NavBar = () => {
             Search Jobs
           </Link>
         </div>
-      
+
         {/* Auth Controls - Desktop */}
         <div className="flex items-center space-x-4">
           {isAuthenticated ? (
             <div className="relative">
-              <div 
+              <div
                 className="flex items-center space-x-2 cursor-pointer"
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
               >
@@ -128,17 +128,18 @@ const NavBar = () => {
                 <span className="text-sm hidden md:inline">
                   {user?.name?.split(" ")[0]}
                 </span>
-                {userMenuOpen ? 
-                  <ChevronUp size={16} className={getTextColor()} /> : 
+                {userMenuOpen ? (
+                  <ChevronUp size={16} className={getTextColor()} />
+                ) : (
                   <ChevronDown size={16} className={getTextColor()} />
-                }
+                )}
               </div>
-              
+
               {/* User Dropdown Menu */}
               {userMenuOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
-                  <Link 
-                    to="/profile" 
+                  <Link
+                    to="/profile"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     onClick={() => setUserMenuOpen(false)}
                   >
@@ -188,7 +189,7 @@ const NavBar = () => {
             >
               Search Jobs
             </Link>
-            
+
             {/* Auth Controls - Mobile */}
             {isAuthenticated ? (
               <div className="pt-2 border-t border-gray-200">
@@ -197,10 +198,7 @@ const NavBar = () => {
                     Signed in as {user.name}
                   </p>
                 )}
-                <Link
-                  to="/profile"
-                  className="block py-2 px-3 rounded-md"
-                >
+                <Link to="/profile" className="block py-2 px-3 rounded-md">
                   Profile
                 </Link>
                 <button
@@ -213,10 +211,17 @@ const NavBar = () => {
             ) : (
               <div className="flex flex-col space-y-3 pt-3 border-t border-gray-200">
                 <Button variant="outline" className="w-full justify-center">
-                  <Link to="/login" className="w-full text-center">Sign In</Link>
+                  <Link to="/login" className="w-full text-center">
+                    Sign In
+                  </Link>
                 </Button>
-                <Button variant="Etheral Jobs" className="w-full justify-center">
-                  <Link to="/signup" className="w-full text-center">Sign Up</Link>
+                <Button
+                  variant="Etheral Jobs"
+                  className="w-full justify-center"
+                >
+                  <Link to="/signup" className="w-full text-center">
+                    Sign Up
+                  </Link>
                 </Button>
               </div>
             )}

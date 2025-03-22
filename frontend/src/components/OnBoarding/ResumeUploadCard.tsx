@@ -95,7 +95,6 @@ const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({
     setIsUploaded(false);
   };
 
-
   const renderUploadArea = () => (
     <div
       className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
@@ -168,10 +167,10 @@ const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({
               </div>
               <div className="flex justify-center items-center w-full text-center">
                 <Loader2 className="w-12 animate-spin text-blue-500" />
-                  <div className="h-20">
-                    Parsing your resume, please wait...
-                    This normally takes about 10 seconds.
-                  </div>
+                <div className="h-20">
+                  Parsing your resume, please wait... This normally takes about
+                  10 seconds.
+                </div>
               </div>
             </div>
           ) : null}

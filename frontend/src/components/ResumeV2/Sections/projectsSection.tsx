@@ -8,7 +8,11 @@ interface ProjectsSectionProps {
   projects: Project[];
   projectsDiff: ReturnType<typeof compareData.compareObjectArrays<Project>>;
   isOptimized: boolean;
-  onUpdate: (index: number, field: keyof Project, value: string | string[]) => void;
+  onUpdate: (
+    index: number,
+    field: keyof Project,
+    value: string | string[],
+  ) => void;
 }
 
 export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
@@ -37,10 +41,11 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
     }
 
     const updateDescription = (i: number, value: string) => {
-        const updatedDescription = [...projects];
-        const descriptionArray = updatedDescription[index].description.split("\n");
-        descriptionArray[i] = value;
-        onUpdate(index, "description", descriptionArray.join("\n"));
+      const updatedDescription = [...projects];
+      const descriptionArray =
+        updatedDescription[index].description.split("\n");
+      descriptionArray[i] = value;
+      onUpdate(index, "description", descriptionArray.join("\n"));
     };
 
     return (
@@ -56,15 +61,17 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
           </div>
         </div>
         {project.technologies.length > 0 && (
-            <p className="text-gray-600 text-sm">
-                <EditableSkills
-                    key={Date.now()}
-                    diffInfo={{added: [], unchanged: project.technologies}}
-                    isOptimized={isOptimized}
-                    skills={project.technologies}
-                    onUpdate={(technologies: string[]) => onUpdate(index, "technologies", technologies)}
-                />
-            </p>
+          <p className="text-gray-600 text-sm">
+            <EditableSkills
+              key={Date.now()}
+              diffInfo={{ added: [], unchanged: project.technologies }}
+              isOptimized={isOptimized}
+              skills={project.technologies}
+              onUpdate={(technologies: string[]) =>
+                onUpdate(index, "technologies", technologies)
+              }
+            />
+          </p>
         )}
         {project.url && (
           <p className="text-gray-600 text-sm">

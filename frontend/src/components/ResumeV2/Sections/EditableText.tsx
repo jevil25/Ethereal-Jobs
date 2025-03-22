@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from "react";
 interface EditableTextProps {
   initialValue: string;
   onSave: (value: string) => void;
+  isEditable?: boolean;
   className?: string;
   multiline?: boolean;
   placeholder?: string;
@@ -11,6 +12,7 @@ interface EditableTextProps {
 const EditableText: React.FC<EditableTextProps> = ({
   initialValue,
   onSave,
+  isEditable = true,
   className = "",
   multiline = false,
   placeholder = "Click to edit",
@@ -18,60 +20,85 @@ const EditableText: React.FC<EditableTextProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [value, setValue] = useState(initialValue);
   const editableRef = useRef<HTMLDivElement>(null);
+  const shouldUpdateRef = useRef(false);
+  
+  useEffect(() => {
+    setValue(initialValue);
+  }, [initialValue]);
 
   useEffect(() => {
     if (isEditing && editableRef.current) {
       editableRef.current.focus();
+      
+      if (!shouldUpdateRef.current) {
+        const selection = window.getSelection();
+        const range = document.createRange();
+        if (editableRef.current.childNodes.length > 0) {
+          range.setStart(
+            editableRef.current.childNodes[0],
+            editableRef.current.textContent?.length || 0,
+          );
+          range.collapse(true);
+          selection?.removeAllRanges();
+          selection?.addRange(range);
+        }
+      }
     }
   }, [isEditing]);
 
   const handleClick = () => {
-    if (!isEditing) {
+    if (isEditable && !isEditing) {
       setIsEditing(true);
+      shouldUpdateRef.current = false;
     }
   };
 
   const handleBlur = () => {
     setIsEditing(false);
+    shouldUpdateRef.current = false;
+    if (!isEditable) return;
     const newValue = editableRef.current?.textContent || "";
-    if (newValue !== initialValue) {
-      setValue(newValue);
-      onSave(newValue);
-    }
+    setValue(newValue);
+    onSave(newValue);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (!isEditable) return;
     if (e.key === "Enter" && !multiline) {
       e.preventDefault();
       setIsEditing(false);
+      shouldUpdateRef.current = false;
       const newValue = editableRef.current?.textContent || "";
       setValue(newValue);
       onSave(newValue);
     } else if (e.key === "Escape") {
       e.preventDefault();
       setIsEditing(false);
+      shouldUpdateRef.current = false;
       if (editableRef.current) {
-        editableRef.current.textContent = initialValue;
+        editableRef.current.textContent = value;
       }
-    }else{
-      const newValue = editableRef.current?.textContent || "";
-      onSave(newValue);
     }
+  };
+
+  const handleInput = () => {
+    if (!isEditable) return;
+    shouldUpdateRef.current = true;
   };
 
   return (
     <div
       ref={editableRef}
-      contentEditable={isEditing}
+      contentEditable={isEditable && isEditing}
       onClick={handleClick}
       onBlur={handleBlur}
       onKeyDown={handleKeyDown}
+      onInput={handleInput}
       className={`
-        hover: cursor-text
         ${className}
-        ${isEditing ? "cursor-text bg-gray-100" : ""}
+        ${isEditing ? "cursor-text bg-gray-100" : "hover:cursor-text"}
         ${!value && !isEditing ? "text-gray-400 italic" : ""}
-        outline-none cursor-text rounded px-1 inline-block
+        outline-none rounded px-1 inline-block
       `}
       suppressContentEditableWarning={true}
     >

@@ -94,6 +94,7 @@ async def get_ai_optimized_resume(resume_data: ResumeModel, is_main_resume: bool
     {json_model_string}
 
     (must follow the json schema do not change the schema)
+    extract linkedin url or if profile name is present then generate linkedin url from profile name same for github if not present then keep it empty string
     directly start from personalInfo json level
     give all dates in yyyy-mm-dd format only, if end date is not present then it should be empty string
     Ensure the generated JSON is formatted properly and includes realistic and professional content.

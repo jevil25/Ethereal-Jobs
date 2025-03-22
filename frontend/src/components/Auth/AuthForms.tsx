@@ -70,8 +70,10 @@ const AuthForms: React.FC<AuthFormsProps> = ({
         email: formData.email,
       };
       const response = await sendPasswordResetEmail(param);
-      if (!response){
-        return setError("An unexpected error occurred. Please try again later.");
+      if (!response) {
+        return setError(
+          "An unexpected error occurred. Please try again later.",
+        );
       }
       if (response.is_valid && response.is_exists) {
         setSuccessMessage(
@@ -120,8 +122,10 @@ const AuthForms: React.FC<AuthFormsProps> = ({
           password: formData.password,
           provider: Provider.Custom,
         });
-        if (!response){
-          return setError("An unexpected error occurred. Please try again later.");
+        if (!response) {
+          return setError(
+            "An unexpected error occurred. Please try again later.",
+          );
         }
         if (response.is_valid) {
           setSuccessMessage("Sign in successful!");
@@ -166,8 +170,10 @@ const AuthForms: React.FC<AuthFormsProps> = ({
           name: formData.name,
           provider: Provider.Custom,
         });
-        if (!response){
-          return setError("An unexpected error occurred. Please try again later.");
+        if (!response) {
+          return setError(
+            "An unexpected error occurred. Please try again later.",
+          );
         }
 
         if (response.is_created) {
@@ -223,8 +229,10 @@ const AuthForms: React.FC<AuthFormsProps> = ({
             password: "",
             provider: Provider.Google,
           });
-          if (!response){
-            return setError("An unexpected error occurred. Please try again later.");
+          if (!response) {
+            return setError(
+              "An unexpected error occurred. Please try again later.",
+            );
           }
           if (response.is_valid) {
             setSuccessMessage("Sign in successful! Redirecting...");
@@ -255,8 +263,10 @@ const AuthForms: React.FC<AuthFormsProps> = ({
             name: user.displayName as string,
             provider: Provider.Google,
           });
-          if (!response){
-            return setError("An unexpected error occurred. Please try again later.");
+          if (!response) {
+            return setError(
+              "An unexpected error occurred. Please try again later.",
+            );
           }
           if (response.is_created) {
             setSuccessMessage(
