@@ -116,17 +116,25 @@ async def get_jobs(
     ) for job in serialized_jobs]
     await db_ops.update_jobs(job_models, query_params)
 
-    jobs = sorted(
-        jobs,
+    last_fivedays = str(date.today() - timedelta(days=5))
+    jobs = await db_ops.get_jobs_from_db(query_params, last_fivedays)
+
+    json_response = [job.model_dump() for job in jobs]
+    json_response = sorted(
+        json_response,
         key=lambda x: (
             str(x.get("date_posted", "")),
             x.get("title", "")
         ),
         reverse=True
     )
-    jobs = jobs[:results_wanted]
+    json_response = json_response[:results_wanted]
+    fields_to_remove = ["query", "createdAt", "updatedAt"]
+    for job in json_response:
+        for field in fields_to_remove:
+            job.pop(field)
     return JSONResponse(
-        content=[{k: v for k, v in job.items() if k != '_id'} for job in serialized_jobs],
+        content=json_response,
         media_type="application/json"
     )
 

@@ -172,6 +172,7 @@ interface JobPreferences {
   remotePreference: string;
   salaryExpectation: string;
   immediateStart: boolean;
+  country: string;
 }
 
 interface FormData {

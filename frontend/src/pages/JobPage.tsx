@@ -100,7 +100,11 @@ const JobPage: React.FC = () => {
 
   return (
     <div className="container mx-auto py-8 px-4">
-      <Button variant="ghost" className="mb-6" onClick={() => navigate(-1)}>
+      <Button variant="ghost" className="mb-6" onClick={(e) => { 
+        e.preventDefault();
+        e.currentTarget.focus();
+        navigate(-2) 
+        }}>
         <ChevronLeft className="h-4 w-4 mr-2" />
         Back to Jobs
       </Button>

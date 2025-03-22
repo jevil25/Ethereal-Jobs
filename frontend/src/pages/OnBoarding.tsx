@@ -68,6 +68,7 @@ const OnboardingFlow: React.FC = () => {
       remotePreference: "",
       salaryExpectation: "",
       immediateStart: false,
+      country: "",
     },
     resumeFile: null as File | null,
   });

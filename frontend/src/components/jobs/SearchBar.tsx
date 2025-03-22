@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { useResumeData } from "../ResumeV2/hooks/useResumeData";
 
 interface SearchBarProps {
   onSearch: (params: {
@@ -45,6 +46,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, filters }) => {
   const [locationSuggestions, setLocationSuggestions] = useState<string[]>([]);
   const [showLocationSuggestions, setShowLocationSuggestions] = useState(false);
   const [initialLoadDone, setInitialLoadDone] = useState(false);
+  const { resumeData } = useResumeData();
 
   // Handle initial load from search params
   useEffect(() => {
@@ -69,8 +71,32 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, filters }) => {
         job_type: filters.job_type,
       });
       setInitialLoadDone(true);
-    }
-  });
+    } else if (resumeData &&
+      resumeData.jobPreferences &&
+      resumeData.jobPreferences.country &&
+      resumeData.jobPreferences.locations &&
+      resumeData.jobPreferences.locations[0] &&
+      resumeData.jobPreferences.jobTypes &&
+      resumeData.jobPreferences.jobTypes[0]) {
+      const countryCode = getCode(
+        resumeData.jobPreferences.country
+          .split(" ")
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(" "),
+      );
+      setCity(resumeData.jobPreferences.locations[0]);
+      setCountry(resumeData.jobPreferences.country);
+      setJobTitle(resumeData.personalInfo.headline || "");
+      onSearch({
+        city: resumeData.jobPreferences.locations[0],
+        country_code: countryCode ? countryCode : "IN",
+        country: resumeData.jobPreferences.country,
+        job_title: resumeData.personalInfo.headline || "",
+        recruiters: "",
+        job_type: filters.job_type,
+      });
+    } 
+  }, [resumeData]);
 
   // Handle filter changes only - separate from form submission
   useEffect(() => {

@@ -236,6 +236,7 @@ class JobPreferences(BaseModel):
     remotePreference: str
     salaryExpectation: str
     immediateStart: bool
+    country: str
 
 class Experience(BaseModel):
     id: str

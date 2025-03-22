@@ -58,8 +58,11 @@ const JobList: React.FC<JobListProps> = ({
 
   if (loading && jobs.length === 0) {
     return (
-      <div className="flex justify-center items-center py-4">
+      <div className="flex justify-center items-center py-4 flex-row gap-2">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        <div>
+          Please wait while we load the jobs... this may take a few seconds
+        </div>
       </div>
     );
   }

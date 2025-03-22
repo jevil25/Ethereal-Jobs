@@ -32,6 +32,7 @@ export const useResumeData = () => {
       remotePreference: "",
       salaryExpectation: "",
       immediateStart: false,
+      country: "",
     },
     resumeFile: null,
   };
@@ -256,7 +257,8 @@ export const useResumeData = () => {
   const downloadRegularResume = useCallback(() => {
     DownloadResume({
       optimized: false,
-      is_main_resume: true,
+      is_main_resume: isMainResume,
+      job_id: jobId,
     });
   }, []);
 
@@ -264,7 +266,8 @@ export const useResumeData = () => {
     if (showGeneratedResume) {
       DownloadResume({
         optimized: true,
-        is_main_resume: true,
+        is_main_resume: isMainResume,
+        job_id: jobId,
       });
     }
   }, [showGeneratedResume]);

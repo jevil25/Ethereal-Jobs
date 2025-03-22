@@ -99,12 +99,16 @@ async def update_ai_resume(request: Request, data: AIResumeSave):
 async def download_resume(request: Request, data: DownloadResume):
     user: User = request.state.user
     template = "resume.jinja2"
+    if not data.is_main_resume and not data.job_id:
+        return JSONResponse(content={"message": "Job ID is required for non-main resume", "is_success": False}, media_type="application/json", status_code=200)
     if data.optimized:
         resume = await db_ops.get_ai_optimized_resume(user.email, data.is_main_resume, data.job_id)
         filename = f"{user.name}_optimized_resume.pdf" if user.name else "resume_optimized.pdf"
     else:
         resume = await db_ops.get_user_resume(user.email)
         filename = f"{user.name}_resume.pdf" if user.name else "resume.pdf"
+    print(filename)
+    print(resume)
     rendered_template = templates.TemplateResponse(template, {
         "request": request,
         "email": user.email,

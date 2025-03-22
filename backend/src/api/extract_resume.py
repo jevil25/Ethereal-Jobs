@@ -94,7 +94,7 @@ async def get_ai_optimized_resume(resume_data: ResumeModel, is_main_resume: bool
     {json_model_string}
 
     (must follow the json schema do not change the schema)
-    extract linkedin url or if profile name is present then generate linkedin url from profile name same for github if not present then keep it empty string
+    extract linkedin url, github url if not present then keep it empty string
     directly start from personalInfo json level
     give all dates in yyyy-mm-dd format only, if end date is not present then it should be empty string
     Ensure the generated JSON is formatted properly and includes realistic and professional content.
@@ -107,6 +107,7 @@ async def get_ai_optimized_resume(resume_data: ResumeModel, is_main_resume: bool
 
     Give the extracted information in json format only
     do not hallucinate the data keep it real
+    try to use words that will be good for ats and used in professional resumes
 
     The resume must be ats optimized, keep it concise and relevant to the {mode} provided.
     Tailor the resume to the {mode} by highlighting relevant skills and experience.

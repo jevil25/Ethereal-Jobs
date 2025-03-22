@@ -9,7 +9,7 @@ import { useSearchParams } from "react-router-dom";
 
 const JobSearch: React.FC = () => {
   const [, setSearchParams] = useSearchParams();
-  const [results_wanted, setResultsWanted] = useState<number>(10);
+  const [results_wanted, setResultsWanted] = useState<number>(30);
   const [increaseCounter, setIncreaseCounter] = useState<number>(0);
   const [jobs, setJobs] = useState<JobData[]>([]);
   const [filteredJobs, setFilteredJobs] = useState<JobData[]>([]);

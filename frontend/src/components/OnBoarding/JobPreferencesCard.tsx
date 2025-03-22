@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Checkbox } from "../ui/checkbox";
@@ -13,12 +13,15 @@ import {
   SelectValue,
 } from "../ui/select";
 
+import { getNames } from "country-list";
+
 export interface JobPreferences {
   jobTypes: string[];
   locations: string[];
   remotePreference: string;
   salaryExpectation: string;
   immediateStart: boolean;
+  country: string;
 }
 
 interface JobPreferencesCardProps {
@@ -30,7 +33,9 @@ const JobPreferencesCard: React.FC<JobPreferencesCardProps> = ({
   data,
   updateData,
 }) => {
-  const [newLocation, setNewLocation] = React.useState("");
+  const [newLocation, setNewLocation] = useState(data.locations[0] || "");
+  const [country, setCountry] = useState(data.country);
+  const countries = getNames();
 
   const jobTypeOptions = [
     "Full-time",
@@ -61,6 +66,21 @@ const JobPreferencesCard: React.FC<JobPreferencesCardProps> = ({
       });
     }
   };
+
+  const addCountry = (country: string) => {
+    updateData({
+      ...data,
+      country,
+    });
+  };
+
+  useEffect(() => {
+    if (country && !countries.includes(country)) {
+      return addCountry("");
+    }
+    addCountry(country);
+  }
+  , [countries, country]);
 
   const addLocation = (e: React.FormEvent) => {
     e.preventDefault();
@@ -119,6 +139,30 @@ const JobPreferencesCard: React.FC<JobPreferencesCardProps> = ({
             </Badge>
           ))}
         </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label
+          htmlFor="country"
+          className="text-sm font-medium text-gray-700"
+        >
+          Country
+        </Label>
+        <Select value={country} onValueChange={setCountry}>
+          <SelectTrigger
+            id="country"
+            className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white"
+          >
+            <SelectValue placeholder="Select a country" />
+          </SelectTrigger>
+          <SelectContent className="max-h-60 overflow-y-auto">
+            {countries.map((countryName) => (
+              <SelectItem key={countryName} value={countryName}>
+                {countryName}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="space-y-2">
