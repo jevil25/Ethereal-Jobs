@@ -1,90 +1,94 @@
 import { ApplicationStatus, FormData } from "../api/types";
 import { JobData, LinkedInProfile } from "../types/data";
 
-export const jobArray: JobData[] =[
-   {
-    "id": "job-123456",
-    "site": "JobBoard",
-    "url": "",
-    "job_url_direct": "",
-    "title": "Senior Software Engineer",
-    "company": "Tech Solutions Inc.",
-    "location": "San Francisco, CA",
-    "date_posted": "2025-02-15",
-    "job_type": "Full-time",
-    "salary_source": "Employer",
-    "interval": "yearly",
-    "min_amount": 120000,
-    "max_amount": 150000,
-    "currency": "USD",
-    "is_remote": true,
-    "job_level": "Senior",
-    "job_function": "Engineering",
-    "listing_type": "Direct",
-    "emails": "careers@techsolutions.com",
-    "description": "We are looking for a Senior Software Engineer with expertise in JavaScript and React to join our growing team...",
-    "company_industry": "Software Development",
-    "company_url": "https://techsolutions.com",
-    "company_logo": "https://techsolutions.com/logo.png",
-    "company_url_direct": "https://techsolutions.com/about",
-    "company_addresses": "123 Tech Street, San Francisco, CA 94105",
-    "company_num_employees": "50-200",
-    "company_revenue": "$10M-$50M",
-    "company_description": "Tech Solutions Inc. is a leading software development company specializing in web applications and cloud solutions.",
-    "has_linkedIn_profiles": true,
-    "match_score": 85.7,
-    "missing_skills": ["GraphQL", "AWS"],
-    "matched_skills": ["JavaScript", "React", "TypeScript", "Node.js"],
-    "job_required_years": 5,
-    "salary_with_currency": "$120,000 - $150,000 USD",
-    "tfidf_similarity": 12,
-    "semantic_similarity": 82.34,
-    "skill_match_score": 75.67,
-    "experience_match_score": 91.3,
-    "application_status": ApplicationStatus.Applied
+export const jobArray: JobData[] = [
+  {
+    id: "job-123456",
+    site: "JobBoard",
+    url: "",
+    job_url_direct: "",
+    title: "Senior Software Engineer",
+    company: "Tech Solutions Inc.",
+    location: "San Francisco, CA",
+    date_posted: "2025-02-15",
+    job_type: "Full-time",
+    salary_source: "Employer",
+    interval: "yearly",
+    min_amount: 120000,
+    max_amount: 150000,
+    currency: "USD",
+    is_remote: true,
+    job_level: "Senior",
+    job_function: "Engineering",
+    listing_type: "Direct",
+    emails: "careers@techsolutions.com",
+    description:
+      "We are looking for a Senior Software Engineer with expertise in JavaScript and React to join our growing team...",
+    company_industry: "Software Development",
+    company_url: "https://techsolutions.com",
+    company_logo: "https://techsolutions.com/logo.png",
+    company_url_direct: "https://techsolutions.com/about",
+    company_addresses: "123 Tech Street, San Francisco, CA 94105",
+    company_num_employees: "50-200",
+    company_revenue: "$10M-$50M",
+    company_description:
+      "Tech Solutions Inc. is a leading software development company specializing in web applications and cloud solutions.",
+    has_linkedIn_profiles: true,
+    match_score: 85.7,
+    missing_skills: ["GraphQL", "AWS"],
+    matched_skills: ["JavaScript", "React", "TypeScript", "Node.js"],
+    job_required_years: 5,
+    salary_with_currency: "$120,000 - $150,000 USD",
+    tfidf_similarity: 12,
+    semantic_similarity: 82.34,
+    skill_match_score: 75.67,
+    experience_match_score: 91.3,
+    application_status: ApplicationStatus.Applied,
   },
   {
-    "id": "job-123457",
-    "site": "JobBoard",
-    "url": "",
-    "job_url_direct": "",
-    "title": "Software Engineer",
-    "company": "Tech Solutions Inc.",
-    "location": "San Francisco, CA",
-    "date_posted": "2025-02-15",
-    "job_type": "Full-time",
-    "salary_source": "Employer",
-    "interval": "yearly",
-    "min_amount": 100000,
-    "max_amount": 120000,
-    "currency": "USD",
-    "is_remote": true,
-    "job_level": "Mid",
-    "job_function": "Engineering",
-    "listing_type": "Direct",
-    "emails": "",
-    "description": "We are looking for a Software Engineer with expertise in JavaScript and React to join our growing team...",
-    "company_industry": "Software Development",
-    "company_url": "https://techsolutions.com",
-    "company_logo": "https://techsolutions.com/logo.png",
-    "company_url_direct": "https://techsolutions.com/about",    
-    "company_addresses": "123 Tech Street, San Francisco, CA 94105",
-    "company_num_employees": "50-200",
-    "company_revenue": "$10M-$50M",
-    "company_description": "Tech Solutions Inc. is a leading software development company specializing in web applications and cloud solutions.", 
-    "has_linkedIn_profiles": true,
-    "match_score": 85.7,
-    "missing_skills": ["GraphQL", "AWS"],
-    "matched_skills": ["JavaScript", "React", "TypeScript", "Node.js"],
-    "job_required_years": 3,
-    "salary_with_currency": "$100,000 - $120,000 USD",
-    "tfidf_similarity": 12,
-    "semantic_similarity": 82.34,
-    "skill_match_score": 75.67,
-    "experience_match_score": 91.3,
-    "application_status": ApplicationStatus.Pending
+    id: "job-123457",
+    site: "JobBoard",
+    url: "",
+    job_url_direct: "",
+    title: "Software Engineer",
+    company: "Tech Solutions Inc.",
+    location: "San Francisco, CA",
+    date_posted: "2025-02-15",
+    job_type: "Full-time",
+    salary_source: "Employer",
+    interval: "yearly",
+    min_amount: 100000,
+    max_amount: 120000,
+    currency: "USD",
+    is_remote: true,
+    job_level: "Mid",
+    job_function: "Engineering",
+    listing_type: "Direct",
+    emails: "",
+    description:
+      "We are looking for a Software Engineer with expertise in JavaScript and React to join our growing team...",
+    company_industry: "Software Development",
+    company_url: "https://techsolutions.com",
+    company_logo: "https://techsolutions.com/logo.png",
+    company_url_direct: "https://techsolutions.com/about",
+    company_addresses: "123 Tech Street, San Francisco, CA 94105",
+    company_num_employees: "50-200",
+    company_revenue: "$10M-$50M",
+    company_description:
+      "Tech Solutions Inc. is a leading software development company specializing in web applications and cloud solutions.",
+    has_linkedIn_profiles: true,
+    match_score: 85.7,
+    missing_skills: ["GraphQL", "AWS"],
+    matched_skills: ["JavaScript", "React", "TypeScript", "Node.js"],
+    job_required_years: 3,
+    salary_with_currency: "$100,000 - $120,000 USD",
+    tfidf_similarity: 12,
+    semantic_similarity: 82.34,
+    skill_match_score: 75.67,
+    experience_match_score: 91.3,
+    application_status: ApplicationStatus.Pending,
   },
-]
+];
 
 export const resumeArray: FormData[] = [
   {
@@ -95,7 +99,8 @@ export const resumeArray: FormData[] = [
       website: "https://janedoe.dev",
       linkedin_url: "https://linkedin.com/in/janedoe",
       github_url: "https://github.com/janedoe",
-      about_me: "Passionate frontend developer with 7+ years of experience building responsive web applications."
+      about_me:
+        "Passionate frontend developer with 7+ years of experience building responsive web applications.",
     },
     experience: [
       {
@@ -106,7 +111,8 @@ export const resumeArray: FormData[] = [
         startDate: "2020-03-15",
         endDate: "",
         current: true,
-        description: "Led development of a customer-facing portal using React, TypeScript, and GraphQL. Implemented CI/CD pipeline reducing deployment time by 40%."
+        description:
+          "Led development of a customer-facing portal using React, TypeScript, and GraphQL. Implemented CI/CD pipeline reducing deployment time by 40%.",
       },
       {
         id: "exp2",
@@ -116,8 +122,9 @@ export const resumeArray: FormData[] = [
         startDate: "2017-06-01",
         endDate: "2020-03-01",
         current: false,
-        description: "Developed responsive UI components using Angular. Collaborated with UX team to implement design system."
-      }
+        description:
+          "Developed responsive UI components using Angular. Collaborated with UX team to implement design system.",
+      },
     ],
     education: [
       {
@@ -128,8 +135,8 @@ export const resumeArray: FormData[] = [
         startDate: "2013-09-01",
         endDate: "2017-05-15",
         current: false,
-        grade: "3.8 GPA"
-      }
+        grade: "3.8 GPA",
+      },
     ],
     projects: [
       {
@@ -137,35 +144,48 @@ export const resumeArray: FormData[] = [
         title: "E-commerce Dashboard",
         url: "https://github.com/janedoe/ecommerce-dashboard",
         technologies: ["React", "Redux", "Material UI", "Chart.js"],
-        description: "Dashboard for tracking sales metrics with customizable widgets and real-time data visualization."
+        description:
+          "Dashboard for tracking sales metrics with customizable widgets and real-time data visualization.",
       },
       {
         id: "proj2",
         title: "Task Management App",
         url: "https://github.com/janedoe/task-app",
         technologies: ["Vue.js", "Vuex", "Firebase"],
-        description: "Collaborative task management application with real-time updates and team workspaces."
-      }
+        description:
+          "Collaborative task management application with real-time updates and team workspaces.",
+      },
     ],
     certifications: [
       {
         id: "cert1",
         name: "AWS Certified Developer - Associate",
         description: "Certification for developing applications on AWS",
-        credentialUrl: "https://www.youracclaim.com/badges/12345"
-      }
+        credentialUrl: "https://www.youracclaim.com/badges/12345",
+      },
     ],
-    skills: ["JavaScript", "TypeScript", "React", "Vue.js", "Node.js", "GraphQL", "Jest", "Webpack", "CI/CD", "Git"],
+    skills: [
+      "JavaScript",
+      "TypeScript",
+      "React",
+      "Vue.js",
+      "Node.js",
+      "GraphQL",
+      "Jest",
+      "Webpack",
+      "CI/CD",
+      "Git",
+    ],
     jobPreferences: {
       jobTypes: ["Full-time", "Contract"],
       locations: ["San Francisco, CA", "Remote"],
       remotePreference: "Hybrid",
       salaryExpectation: "$120,000 - $150,000",
       immediateStart: true,
-      country: "United States"
+      country: "United States",
     },
     resumeFile: null,
-    no_resume_found: true
+    no_resume_found: true,
   },
   {
     personalInfo: {
@@ -175,7 +195,8 @@ export const resumeArray: FormData[] = [
       website: "https://janedoe.dev",
       linkedin_url: "https://linkedin.com/in/janedoe",
       github_url: "https://github.com/janedoe",
-      about_me: "Passionate frontend developer with 7+ years of experience building responsive web applications."
+      about_me:
+        "Passionate frontend developer with 7+ years of experience building responsive web applications.",
     },
     experience: [
       {
@@ -186,7 +207,8 @@ export const resumeArray: FormData[] = [
         startDate: "2021-01-10",
         endDate: "",
         current: true,
-        description: "Managing a team of 5 developers building data visualization tools using D3.js and React. Implemented accessibility improvements that increased WCAG compliance by 95%."
+        description:
+          "Managing a team of 5 developers building data visualization tools using D3.js and React. Implemented accessibility improvements that increased WCAG compliance by 95%.",
       },
       {
         id: "exp2",
@@ -196,8 +218,9 @@ export const resumeArray: FormData[] = [
         startDate: "2018-04-15",
         endDate: "2020-12-31",
         current: false,
-        description: "Built performant single-page applications using React and Next.js. Reduced load time by 60% through code splitting and lazy loading."
-      }
+        description:
+          "Built performant single-page applications using React and Next.js. Reduced load time by 60% through code splitting and lazy loading.",
+      },
     ],
     education: [
       {
@@ -208,7 +231,7 @@ export const resumeArray: FormData[] = [
         startDate: "2013-09-01",
         endDate: "2017-05-15",
         current: false,
-        grade: "3.8 GPA"
+        grade: "3.8 GPA",
       },
       {
         id: "edu2",
@@ -218,8 +241,8 @@ export const resumeArray: FormData[] = [
         startDate: "2021-09-01",
         endDate: "",
         current: true,
-        grade: "4.0 GPA"
-      }
+        grade: "4.0 GPA",
+      },
     ],
     projects: [
       {
@@ -227,73 +250,90 @@ export const resumeArray: FormData[] = [
         title: "Analytics Dashboard",
         url: "https://github.com/janedoe/analytics-dashboard",
         technologies: ["React", "TypeScript", "D3.js", "Firebase"],
-        description: "Real-time analytics dashboard with customizable metrics and data export features."
+        description:
+          "Real-time analytics dashboard with customizable metrics and data export features.",
       },
       {
         id: "proj2",
         title: "Portfolio Website Generator",
         url: "https://github.com/janedoe/portfolio-generator",
         technologies: ["Next.js", "Tailwind CSS", "Vercel"],
-        description: "Tool for developers to create customized portfolio websites from templates with minimal configuration."
-      }
+        description:
+          "Tool for developers to create customized portfolio websites from templates with minimal configuration.",
+      },
     ],
     certifications: [
       {
         id: "cert1",
         name: "AWS Certified Developer - Associate",
         description: "Certification for developing applications on AWS",
-        credentialUrl: "https://www.youracclaim.com/badges/12345"
+        credentialUrl: "https://www.youracclaim.com/badges/12345",
       },
       {
         id: "cert2",
         name: "Google Cloud Professional Developer",
-        description: "Professional certification for cloud application development",
-        credentialUrl: "https://www.credential.net/abcdef"
-      }
+        description:
+          "Professional certification for cloud application development",
+        credentialUrl: "https://www.credential.net/abcdef",
+      },
     ],
-    skills: ["JavaScript", "TypeScript", "React", "Vue.js", "Node.js", "GraphQL", "Jest", "Webpack", "CI/CD", "Git", "D3.js", "Next.js", "Tailwind CSS"],
+    skills: [
+      "JavaScript",
+      "TypeScript",
+      "React",
+      "Vue.js",
+      "Node.js",
+      "GraphQL",
+      "Jest",
+      "Webpack",
+      "CI/CD",
+      "Git",
+      "D3.js",
+      "Next.js",
+      "Tailwind CSS",
+    ],
     jobPreferences: {
       jobTypes: ["Full-time"],
       locations: ["San Francisco, CA", "New York, NY", "Remote"],
       remotePreference: "Full remote",
       salaryExpectation: "$140,000 - $180,000",
       immediateStart: false,
-      country: "United States"
+      country: "United States",
     },
     resumeFile: null,
-    no_resume_found: true
-  }
+    no_resume_found: true,
+  },
 ];
 
- export const linkedInProfiles: LinkedInProfile[] = [
+export const linkedInProfiles: LinkedInProfile[] = [
   {
     name: "Sarah Johnson",
     profile_url: "https://www.linkedin.com/in/sarahjohnson",
     vanity_name: "sarahjohnson",
-    company: "Microsoft"
+    company: "Microsoft",
   },
   {
     name: "David Chen",
     profile_url: "https://www.linkedin.com/in/davidchen",
     vanity_name: "davidchen",
-    company: "Google"
+    company: "Google",
   },
   {
     name: "Priya Patel",
     profile_url: "https://www.linkedin.com/in/priyapatel",
     vanity_name: "priyapatel",
-    company: "Amazon"
+    company: "Amazon",
   },
   {
     name: "Michael Rodriguez",
     profile_url: "https://www.linkedin.com/in/michaelrodriguez",
     vanity_name: "michaelrodriguez",
-    company: "Netflix"
+    company: "Netflix",
   },
   {
     name: "Emma Wilson",
     profile_url: "https://www.linkedin.com/in/emmawilson",
     vanity_name: "emmawilson",
-    company: "Apple"
-  }
+    company: "Apple",
+  },
 ];

@@ -149,9 +149,14 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ data, updateData }) => {
   };
 
   const getMissingFields = (exp: Project) => {
-    const requiredFields: (keyof Project)[] = ["title", "technologies", "description", "url"];
+    const requiredFields: (keyof Project)[] = [
+      "title",
+      "technologies",
+      "description",
+      "url",
+    ];
     return requiredFields.filter((field) => !exp[field]);
-  }
+  };
 
   return (
     <div className="space-y-4">

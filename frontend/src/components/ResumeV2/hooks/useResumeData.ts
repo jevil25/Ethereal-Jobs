@@ -94,7 +94,6 @@ export const useResumeData = () => {
           },
           signal,
         );
-        console.log("data", data);
         if (!data?.is_success) {
           setGeneratedResume(emptyResumeData);
           setShowGeneratedResume(false);
@@ -178,8 +177,6 @@ export const useResumeData = () => {
       data: FormData[K],
       isOptimizedResume: boolean,
     ) => {
-      console.log("section", section, data);
-      console.log("isOptimizedResume", isOptimizedResume);
       if (isOptimizedResume) {
         // Update only the AI-generated resume
         setGeneratedResume((prev) => ({
@@ -204,8 +201,6 @@ export const useResumeData = () => {
       value: string,
       isOptimizedResume: boolean = false,
     ) => {
-      console.log("field", field, value);
-      console.log("isOptimizedResume", isOptimizedResume);
       if (isOptimizedResume) {
         setGeneratedResume((prev) => ({
           ...prev,

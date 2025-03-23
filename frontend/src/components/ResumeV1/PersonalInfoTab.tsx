@@ -97,7 +97,9 @@ const PersonalInfoTab = ({
             type="text"
             className="w-full p-2 border rounded"
             value={personalInfo.linkedin_url}
-            onChange={(e) => handlePersonalInfoEdit("linkedin_url", e.target.value)}
+            onChange={(e) =>
+              handlePersonalInfoEdit("linkedin_url", e.target.value)
+            }
             placeholder="e.g., https://linkedin.com/in/yourprofile"
           />
         </div>
@@ -107,7 +109,9 @@ const PersonalInfoTab = ({
             type="text"
             className="w-full p-2 border rounded"
             value={personalInfo.github_url}
-            onChange={(e) => handlePersonalInfoEdit("github_url", e.target.value)}
+            onChange={(e) =>
+              handlePersonalInfoEdit("github_url", e.target.value)
+            }
             placeholder="e.g., https://github.com/yourprofile"
           />
         </div>

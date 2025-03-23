@@ -58,7 +58,6 @@ const JobPage: React.FC = () => {
       setGettingLinkedInProfiles(true);
       const profiles = await getLinkedInProfilesForJob(job.id, getNew);
       if (profiles.is_success) {
-        console.log(profiles.linkedin_profiles);
         setLinkedInProfiles(profiles.linkedin_profiles);
       }
       setGettingLinkedInProfiles(false);
@@ -101,11 +100,15 @@ const JobPage: React.FC = () => {
 
   return (
     <div className="container mx-auto py-8 px-4">
-      <Button variant="ghost" className="mb-6" onClick={(e) => { 
-        e.preventDefault();
-        e.currentTarget.focus();
-        history.back();
-        }}>
+      <Button
+        variant="ghost"
+        className="mb-6"
+        onClick={(e) => {
+          e.preventDefault();
+          e.currentTarget.focus();
+          history.back();
+        }}
+      >
         <ChevronLeft className="h-4 w-4 mr-2" />
         Back to Jobs
       </Button>

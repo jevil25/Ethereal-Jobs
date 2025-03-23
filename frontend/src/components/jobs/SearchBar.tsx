@@ -35,7 +35,7 @@ interface SearchBarProps {
   jobs: JobData[];
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ onSearch, filters, jobs}) => {
+const SearchBar: React.FC<SearchBarProps> = ({ onSearch, filters, jobs }) => {
   const countries = getNames();
 
   const [searchParams] = useSearchParams();
@@ -76,14 +76,15 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, filters, jobs}) => {
         job_type: filters.job_type,
       });
       setInitialLoadDone(true);
-    } else if (resumeData &&
+    } else if (
+      resumeData &&
       resumeData.jobPreferences &&
       resumeData.jobPreferences.country &&
       resumeData.jobPreferences.locations &&
       resumeData.jobPreferences.locations[0] &&
       resumeData.jobPreferences.jobTypes &&
-      resumeData.jobPreferences.jobTypes[0]) {
-        console.log(resumeData);
+      resumeData.jobPreferences.jobTypes[0]
+    ) {
       const countryCode = getCode(
         resumeData.jobPreferences.country
           .split(" ")
@@ -101,7 +102,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, filters, jobs}) => {
         recruiters: "",
         job_type: filters.job_type,
       });
-    } 
+    }
   }, [resumeData]);
 
   // Handle filter changes only - separate from form submission

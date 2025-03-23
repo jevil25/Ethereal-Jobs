@@ -20,16 +20,18 @@ const JobList: React.FC<JobListProps> = ({
   const observer = useRef<IntersectionObserver | null>(null);
   const lastJobElementRef = useRef<HTMLDivElement | null>(null);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
-  const [loadingMessage, setLoadingMessage] = useState<string>("Please wait while we load the jobs... this may take a few seconds");
+  const [loadingMessage, setLoadingMessage] = useState<string>(
+    "Please wait while we load the jobs... this may take a few seconds",
+  );
 
   // Function to load more jobs
   const loadMoreJobs = () => {
     if (isLoadingMore || !hasMore || loading) return;
-    
+
     setIsLoadingMore(true);
     const newPage = page + 1;
     setPage(newPage);
-    
+
     // Call the onLoadMore prop
     onLoadMore(newPage * resultsPerPage);
   };

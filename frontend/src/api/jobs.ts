@@ -51,6 +51,7 @@ export const getJobs = async (params: GetJobsRequest): Promise<JobData[]> => {
     //   "Error fetching jobs: " + (error.message || "Unknown error"),
     //   "error",
     // );
+    console.error("Error fetching jobs: " + (error.message || "Unknown error"));
     throw error;
   }
 };
@@ -215,7 +216,10 @@ export const getLocationSuggestions = async (
 };
 
 // post /job/application_status/update
-export const applicationStatusUpdate = async (jobId: string, ApplicationStatus: ApplicationStatus ): Promise<void> => {
+export const applicationStatusUpdate = async (
+  jobId: string,
+  ApplicationStatus: ApplicationStatus,
+): Promise<void> => {
   try {
     const response = await axios.post(
       constructServerUrlFromPath(`/job/application_status/update`),
@@ -261,7 +265,7 @@ export const getAppliedJobs = async (): Promise<JobData[]> => {
           return res.data as JobData[];
         });
     }
-    if (response.data.message === "No applied jobs found")  {
+    if (response.data.message === "No applied jobs found") {
       return [];
     }
     return response.data as JobData[];

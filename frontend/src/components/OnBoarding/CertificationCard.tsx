@@ -93,7 +93,11 @@ const CertificationCard: React.FC<CertificationCardProps> = ({
   };
 
   const getMissingFields = (exp: Certification) => {
-    const requiredFields: (keyof Certification)[] = ["name", "credentialUrl", "description"];
+    const requiredFields: (keyof Certification)[] = [
+      "name",
+      "credentialUrl",
+      "description",
+    ];
     return requiredFields.filter((field) => !exp[field]);
   };
 
@@ -142,12 +146,12 @@ const CertificationCard: React.FC<CertificationCardProps> = ({
                   )}
                 </CardContent>
                 {getMissingFields(cert).length > 0 && (
-                    <CardFooter className="flex justify-end">
-                      <div className="text-xs font-medium text-red-500">
-                        Missing fields: {getMissingFields(cert).join(", ")}
-                      </div>
-                    </CardFooter>
-                  )}
+                  <CardFooter className="flex justify-end">
+                    <div className="text-xs font-medium text-red-500">
+                      Missing fields: {getMissingFields(cert).join(", ")}
+                    </div>
+                  </CardFooter>
+                )}
               </Card>
             ))}
         </div>

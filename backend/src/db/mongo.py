@@ -556,7 +556,6 @@ class DatabaseOperations:
             AiOptimzedResumeModel.is_main_resume == is_main_resume,
             AiOptimzedResumeModel.job_id == job_id
         )
-        print(ai_optimized_resume)
         if not ai_optimized_resume:
             ai_optimized_resume = AiOptimzedResumeModel(
                 email=email,
@@ -579,7 +578,6 @@ class DatabaseOperations:
             ai_optimized_resume.certifications = resume_data["certifications"]
             ai_optimized_resume.skills = resume_data["skills"]
             ai_optimized_resume.jobPreferences = resume_data["jobPreferences"]
-            print("saving")
             ai_optimized_resume = await ai_optimized_resume.save()
         return ai_optimized_resume
     

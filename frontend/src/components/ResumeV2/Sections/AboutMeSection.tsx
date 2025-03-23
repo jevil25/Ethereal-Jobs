@@ -3,7 +3,7 @@ import EditableText from "./EditableText";
 
 interface AboutMeProps {
   aboutMe: string;
-  aboutMeDiff: { removed: string[]; added: string[]; unchanged: string[]; };
+  aboutMeDiff: { removed: string[]; added: string[]; unchanged: string[] };
   isOptimized: boolean;
   onSave: (value: string) => void;
 }
@@ -33,11 +33,11 @@ export const AboutMeSection: React.FC<AboutMeProps> = ({
     <DiffSection<string>
       title="About Me"
       items={aboutMe ? [aboutMe] : []}
-      diffInfo={{ 
-        added: aboutMeDiff.added, 
-        removed: aboutMeDiff.removed, 
+      diffInfo={{
+        added: aboutMeDiff.added,
+        removed: aboutMeDiff.removed,
         unchanged: aboutMeDiff.unchanged,
-        modified: []
+        modified: [],
       }}
       isOptimized={isOptimized}
       renderItem={renderAboutMe}

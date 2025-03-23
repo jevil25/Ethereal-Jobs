@@ -21,7 +21,7 @@ const EditableText: React.FC<EditableTextProps> = ({
   const [value, setValue] = useState(initialValue);
   const editableRef = useRef<HTMLDivElement>(null);
   const shouldUpdateRef = useRef(false);
-  
+
   useEffect(() => {
     setValue(initialValue);
   }, [initialValue]);
@@ -29,7 +29,7 @@ const EditableText: React.FC<EditableTextProps> = ({
   useEffect(() => {
     if (isEditing && editableRef.current) {
       editableRef.current.focus();
-      
+
       if (!shouldUpdateRef.current) {
         const selection = window.getSelection();
         const range = document.createRange();

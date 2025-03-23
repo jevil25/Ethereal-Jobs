@@ -129,12 +129,19 @@ const ExperienceCard: React.FC<ExperienceCardProps> = ({
   };
 
   const getMissingFields = (exp: Experience) => {
-    const requiredFields: (keyof Experience)[] = ["company", "title", "location", "startDate", "endDate", "description"];
+    const requiredFields: (keyof Experience)[] = [
+      "company",
+      "title",
+      "location",
+      "startDate",
+      "endDate",
+      "description",
+    ];
     if (exp.current) {
       requiredFields.splice(4, 1);
     }
     return requiredFields.filter((field) => !exp[field]);
-  }
+  };
 
   return (
     <div className="space-y-4">
@@ -178,7 +185,7 @@ const ExperienceCard: React.FC<ExperienceCardProps> = ({
                     <div className="text-xs font-medium text-red-500">
                       Missing fields: {getMissingFields(exp).join(", ")}
                     </div>
-                  </CardFooter> 
+                  </CardFooter>
                 )}
               </Card>
             ))}

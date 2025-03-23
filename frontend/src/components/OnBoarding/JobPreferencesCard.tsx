@@ -79,8 +79,7 @@ const JobPreferencesCard: React.FC<JobPreferencesCardProps> = ({
       return addCountry("");
     }
     addCountry(country);
-  }
-  , [countries, country]);
+  }, [countries, country]);
 
   const addLocation = (e: React.FormEvent) => {
     e.preventDefault();
@@ -142,10 +141,7 @@ const JobPreferencesCard: React.FC<JobPreferencesCardProps> = ({
       </div>
 
       <div className="space-y-2">
-        <Label
-          htmlFor="country"
-          className="text-sm font-medium text-gray-700"
-        >
+        <Label htmlFor="country" className="text-sm font-medium text-gray-700">
           Country
         </Label>
         <Select value={country} onValueChange={setCountry}>

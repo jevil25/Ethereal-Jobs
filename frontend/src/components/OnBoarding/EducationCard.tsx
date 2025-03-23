@@ -137,12 +137,19 @@ const EducationCard: React.FC<EducationCardProps> = ({ data, updateData }) => {
   };
 
   const getMissingFields = (exp: Education) => {
-    const requiredFields: (keyof Education)[] = ["degree", "school", "startDate", "endDate", "fieldOfStudy", "grade"];
+    const requiredFields: (keyof Education)[] = [
+      "degree",
+      "school",
+      "startDate",
+      "endDate",
+      "fieldOfStudy",
+      "grade",
+    ];
     if (exp.current) {
       requiredFields.splice(4, 1);
     }
     return requiredFields.filter((field) => !exp[field]);
-  }
+  };
 
   return (
     <div className="space-y-4">
@@ -183,13 +190,13 @@ const EducationCard: React.FC<EducationCardProps> = ({ data, updateData }) => {
                     </div>
                   )}
                 </CardContent>
-                  {getMissingFields(edu).length > 0 && (
-                    <CardFooter className="flex justify-end">
-                      <div className="text-xs font-medium text-red-500">
-                        Missing fields: {getMissingFields(edu).join(", ")}
-                      </div>
-                    </CardFooter>
-                  )}
+                {getMissingFields(edu).length > 0 && (
+                  <CardFooter className="flex justify-end">
+                    <div className="text-xs font-medium text-red-500">
+                      Missing fields: {getMissingFields(edu).join(", ")}
+                    </div>
+                  </CardFooter>
+                )}
               </Card>
             ))}
         </div>

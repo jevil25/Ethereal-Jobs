@@ -61,7 +61,7 @@ const ProfilePage = () => {
     const getAppliedJobsData = async () => {
       const jobs = await getAppliedJobs();
       setAppliedJobs(jobs);
-    }
+    };
     getAppliedJobsData();
   }, []);
 
@@ -136,7 +136,9 @@ const ProfilePage = () => {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={isEditing ? handleSaveName : () => setIsEditing(true)}
+                  onClick={
+                    isEditing ? handleSaveName : () => setIsEditing(true)
+                  }
                   disabled={isLoading}
                 >
                   {isEditing ? "Save" : "Edit Name"}
@@ -209,7 +211,8 @@ const ProfilePage = () => {
                       className={`text-sm ${
                         saveStatus === "saved" && nameSaveStatus === "saved"
                           ? "text-green-600"
-                          : saveStatus === "saving" || nameSaveStatus === "saving"
+                          : saveStatus === "saving" ||
+                              nameSaveStatus === "saving"
                             ? "text-yellow-600"
                             : "text-red-600"
                       }`}
@@ -252,15 +255,13 @@ const ProfilePage = () => {
         </CardHeader>
         <CardContent>
           {appliedJobs.length === 0 ? (
-            <p className="text-gray-600">You haven't applied to any jobs yet.</p>
+            <p className="text-gray-600">
+              You haven't applied to any jobs yet.
+            </p>
           ) : (
             <div className="grid grid-cols-1 gap-4">
-              {appliedJobs && appliedJobs.map((job) => (
-                <JobCard
-                  key={job.id}
-                  job={job}
-                />
-              ))}
+              {appliedJobs &&
+                appliedJobs.map((job) => <JobCard key={job.id} job={job} />)}
             </div>
           )}
         </CardContent>

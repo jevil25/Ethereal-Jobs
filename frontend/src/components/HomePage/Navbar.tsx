@@ -13,7 +13,6 @@ const Navbar = () => {
   const [searchParams] = useSearchParams();
   const [showPleaseLogin, setShowPleaseLogin] = useState(false);
 
-
   useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY;
@@ -120,7 +119,7 @@ const Navbar = () => {
                   type="button"
                   className="px-4 py-2 rounded-full text-sm font-medium hover:cursor-pointer"
                   variant="Etheral Jobs"
-                  onClick={() => window.location.href = "/jobs"}
+                  onClick={() => (window.location.href = "/jobs")}
                 >
                   Get Started
                 </Button>
