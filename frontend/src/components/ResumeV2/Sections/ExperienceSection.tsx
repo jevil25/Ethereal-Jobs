@@ -53,18 +53,20 @@ export const ExperienceSection: React.FC<ExperienceSectionProps> = ({
               <EditableText
                 initialValue={exp.title}
                 onSave={(v: string) => onUpdate(index, "title", v)}
+                placeholder="Title"
               />
             </h3>
             <p className="text-gray-700">
               <EditableText
                 initialValue={exp.company}
                 onSave={(v: string) => onUpdate(index, "company", v)}
+                placeholder="Company Name"
               />
             </p>
           </div>
           <div className="text-gray-600 text-sm">
             <EditableText
-              initialValue={exp.startDate}
+              initialValue={exp.startDate || new Date().toDateString()}
               onSave={(v: string) => onUpdate(index, "startDate", v)}
             />{" "}
             -
@@ -78,6 +80,7 @@ export const ExperienceSection: React.FC<ExperienceSectionProps> = ({
           <EditableText
             initialValue={exp.location}
             onSave={(v: string) => onUpdate(index, "location", v)}
+            placeholder="Location"
           />
         </p>
         <ul className="mt-2 list-disc pl-5 text-sm">

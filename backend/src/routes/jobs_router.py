@@ -5,7 +5,7 @@ from datetime import date, timedelta
 from jobspy import JobType
 from src.utils.resume_job_matcher import get_job_details
 from src.decorators.auth import is_user_logged_in
-from src.db.model import JobModel, JobQuery
+from src.db.model import JobModel, JobQuery, ApplicationStatus, ApplicationStatusUpdate, Features
 from src.api.jobs import get_jobs_api_response
 from src.db.mongo import DatabaseOperations, User
 from src.utils.helpers import serialize_dates
@@ -57,6 +57,8 @@ async def get_jobs(
     # Check for cached jobs from yesterday onwards
     yesterday = str(date.today() - timedelta(days=1))
     cached_jobs = await db_ops.get_jobs_from_db(query_params, yesterday)
+
+    await db_ops.update_usage_stats(user.email, Features.JobSearch)
 
     if len(cached_jobs) > 10 and len(cached_jobs) >= results_wanted:
         json_response = [job.model_dump() for job in cached_jobs]
@@ -146,6 +148,40 @@ async def get_jobs(
         media_type="application/json"
     )
 
+@app.get("/job/applied_jobs")
+@is_user_logged_in
+async def get_applied_jobs(request: Request) -> JSONResponse:
+    user: User = request.state.user
+    logger.info(f"Getting applied jobs for user {user.email}")
+
+    jobs = await db_ops.get_applied_jobs(user.email)
+    logger.info(f"jobs: {jobs}")  
+    if not jobs:
+        return JSONResponse(
+            content={"message": "No applied jobs found"},
+            media_type="application/json",
+            status_code=200
+        )
+    job_ids = [job.jobId for job in jobs]
+    jobs = []
+    for job_id in job_ids:
+        job = await db_ops.get_job(job_id)
+        if job:
+            job = job.model_dump()
+            fields_to_remove = ["query", "createdAt", "updatedAt"]
+            for field in fields_to_remove:
+                job.pop(field)
+            jobs.append(job)
+    resume = await db_ops.get_user_resume(user.email)
+    if not resume:
+        return JSONResponse(
+            content={"message": "No resume found for user"},
+            media_type="application/json",
+            status_code=200
+        )
+    json_response = await get_job_details(db_ops, user, jobs, resume.personalInfo.headline)
+    return JSONResponse(content=json_response, media_type="application/json")
+
 @app.get("/job/{job_id}")
 @is_user_logged_in
 async def get_job(request: Request, job_id: str) -> Dict:
@@ -208,6 +244,8 @@ async def get_linkedin_profile(request: Request, job_id: str, get_new: bool) -> 
     else:
         profiles = linkedin_profiles
 
+    await db_ops.update_usage_stats(user.email, Features.LinkedInProfileGeneration, job_id)
+
     # Prepare response
     job_dict = job.model_dump()
     fields_to_remove = ["updatedAt", "createdAt"]
@@ -216,3 +254,22 @@ async def get_linkedin_profile(request: Request, job_id: str, get_new: bool) -> 
         job_dict.pop(field)
     
     return JSONResponse(content={"job": job_dict, "linkedin_profiles": profiles_dict, "is_success": True, "is_empty": False}, media_type="application/json")
+
+@app.post("/job/application_status/update")
+@is_user_logged_in
+async def update_application_status(request: Request, data: ApplicationStatusUpdate) -> JSONResponse:
+    user: User = request.state.user
+    job_id = data.job_id
+    status = data.status
+    logger.info(f"Updating application status for job {job_id}")
+
+    job: JobModel = await db_ops.get_job(job_id)
+    if not job:
+        return JSONResponse(
+            content={"message": "Job not found"},
+            media_type="application/json",
+            status_code=200
+        )
+
+    await db_ops.update_application_status(user.email, job_id, status)
+    return JSONResponse(content={"message": "Application status updated successfully"}, media_type="application/json")

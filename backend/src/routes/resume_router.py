@@ -8,7 +8,7 @@ from src.decorators.auth import is_user_logged_in
 from src.db.mongo import DatabaseOperations
 from src.logger import logger
 from fastapi import Request, status
-from src.db.model import AIResumeSave, AIResumeUpdate, ResumeUpdate, User, DownloadResume
+from src.db.model import AIResumeSave, AIResumeUpdate, Features, ResumeUpdate, User, DownloadResume
 from weasyprint import HTML
 import os
 
@@ -65,6 +65,8 @@ async def generate_resume(request: Request, data: AIResumeUpdate):
         )
     ai_optimized_resume = await get_ai_optimized_resume(resume, is_main_resume, job_id)
     await db_ops.add_ai_optimized_resume(user.email, ai_optimized_resume, is_main_resume, job_id)
+    feature = Features.OptimizedResumeGeneration if is_main_resume else Features.OptimizedJobResumeGeneration
+    await db_ops.update_usage_stats(user.email, feature, job_id)
     return JSONResponse(content={"extracted_data": ai_optimized_resume, "is_success": True, "message": "New Ai resume generated"}, media_type="application/json", status_code=200)
 
 @app.get("/ai/generate")
@@ -117,6 +119,10 @@ async def download_resume(request: Request, data: DownloadResume):
         "jobPreferences": resume.jobPreferences
     })
     pdf = HTML(string=rendered_template.body.decode()).write_pdf()
+    feature = Features.MainResumeDownload
+    if not data.is_main_resume:
+        feature = Features.OptimizedJobResumeDownload if data.job_id else Features.OptimizedResumeDownload
+    await db_ops.update_usage_stats(user.email, feature, data.job_id)
     return Response(
         content=pdf,
         media_type="application/pdf",

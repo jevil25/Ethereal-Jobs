@@ -3,7 +3,7 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Button } from "../ui/button";
 import { X, Plus } from "lucide-react";
-import { Card, CardContent } from "../ui/card";
+import { Card, CardContent, CardFooter } from "../ui/card";
 
 export interface Certification {
   id: string;
@@ -92,6 +92,11 @@ const CertificationCard: React.FC<CertificationCardProps> = ({
     updateData(data.filter((item) => item.id !== id));
   };
 
+  const getMissingFields = (exp: Certification) => {
+    const requiredFields: (keyof Certification)[] = ["name", "credentialUrl", "description"];
+    return requiredFields.filter((field) => !exp[field]);
+  };
+
   return (
     <div className="space-y-4">
       {data.length > 0 && (
@@ -136,6 +141,13 @@ const CertificationCard: React.FC<CertificationCardProps> = ({
                     </div>
                   )}
                 </CardContent>
+                {getMissingFields(cert).length > 0 && (
+                    <CardFooter className="flex justify-end">
+                      <div className="text-xs font-medium text-red-500">
+                        Missing fields: {getMissingFields(cert).join(", ")}
+                      </div>
+                    </CardFooter>
+                  )}
               </Card>
             ))}
         </div>

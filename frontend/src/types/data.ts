@@ -1,3 +1,5 @@
+import { ApplicationStatus } from "../api/types";
+
 export interface LinkedInProfile {
   name: string;
   profile_url: string;
@@ -44,6 +46,7 @@ export interface JobData {
   semantic_similarity: number;
   skill_match_score: number;
   experience_match_score: number;
+  application_status: ApplicationStatus;
 }
 
 export interface JobDataWithLinkedInProfiles extends JobData {

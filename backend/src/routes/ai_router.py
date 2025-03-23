@@ -3,8 +3,8 @@ from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 from typing import Dict, Optional
 from src.decorators.auth import is_user_logged_in
-from src.db.model import User
-from src.db.mongo import DatabaseOperations
+from src.db.model import ResumeUpdate, User
+from src.db.mongo import DatabaseOperations, Features
 from src.logger import logger
 from src.api.generate_linkedin_message import generate_message_api_response
 import requests
@@ -18,7 +18,7 @@ db_ops = DatabaseOperations()
 
 @app.get("/generate/linkedin/message/{email}")
 @is_user_logged_in
-async def generate_linkedin_message(request: Request, email: str, company: str, position: str, newMessage:bool) -> Dict:
+async def generate_linkedin_message(request: Request, email: str, company: str, position: str, newMessage:bool, job_id: str) -> Dict:
     user: User = request.state.user 
     # Get resume
     resume = await db_ops.get_user_resume(email)
@@ -48,13 +48,14 @@ async def generate_linkedin_message(request: Request, email: str, company: str, 
             linkedin_message.pop("metadata", None)
         if "metadata" in linkedin_message:
             linkedin_message.pop("metadata", None)
+        await db_ops.update_usage_stats(user.email, Features.LinkedInProfileMessageGeneration, job_id)
     return JSONResponse(content=linkedin_message, media_type="application/json")
 
 @app.post("/extract/resume")
 @is_user_logged_in
 async def extract_resume(request: Request, file: UploadFile = File(...)):
     try:
-        user = request.state.user
+        user: User = request.state.user
         file_path = file.filename
         with open(file_path, "wb") as f:
             content = await file.read()
@@ -66,9 +67,23 @@ async def extract_resume(request: Request, file: UploadFile = File(...)):
 
         result["email"] = user.email
 
+        resume_data = ResumeUpdate(
+            personalInfo=result.get("personalInfo", {}),
+            experience=result.get("experience", []),
+            education=result.get("education", []),
+            skills=result.get("skills", []),
+            projects=result.get("projects", []),
+            certifications=result.get("certifications", []),
+            jobPreferences=result.get("jobPreferences", {}),
+            is_onboarded=False,
+        )
+
         os.remove(file_path)
+        await db_ops.update_onboarding_status(user.email, resume_data, False)
+        await db_ops.update_usage_stats(user.email, Features.MainResumeUpload)
         return {"extracted_data": result, "is_success": True}
     except Exception as e:
+        print(f"Error in extract_resume: {e}")
         return {"error": str(e), "is_success": False}
 
 @app.get("/search/suggestions/job_title")

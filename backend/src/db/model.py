@@ -1,6 +1,7 @@
-from datetime import datetime, timedelta
+from datetime import datetime
+import enum
 from typing import List, Optional
-from beanie import Document, Indexed, before_event, Insert, BeanieObjectId
+from beanie import Document, Indexed, before_event, Insert
 from pydantic import BaseModel, Field
 
 class JobQuery(BaseModel):
@@ -346,3 +347,60 @@ class DownloadResume(BaseModel):
     optimized: bool
     is_main_resume: bool = False
     job_id: Optional[str] = None
+
+class ApplicationStatus(enum.Enum):
+    Pending = "Pending"
+    Applied = "Applied"
+    Interviewing = "Interviewing"
+    Offered = "Offered"
+    Rejected = "Rejected"
+    Archived = "Archived"
+
+class JobUser(Document):
+    email: Indexed(str) # type: ignore
+    jobId: Indexed(str) # type: ignore
+    application_status: ApplicationStatus = ApplicationStatus.Pending
+    
+    # Timestamp fields
+    createdAt: datetime = Field(default_factory=datetime.utcnow)
+    updatedAt: datetime = Field(default_factory=datetime.utcnow)
+
+    class Settings:
+        name = "job_user"
+        indexes = [
+            [("email", 1)],
+            [("jobId", 1)],
+        ]
+
+class ApplicationStatusUpdate(BaseModel):
+    status: ApplicationStatus
+    job_id: str
+
+class Features(enum.Enum):
+    JobSearch = "JobSearch"
+    ResumeBuilder = "ResumeUpload"
+    MainResumeUpload = "MainResumeUpload"
+    MainResumeDownload = "MainResumeDownload"
+    OptimizedResumeGeneration = "OptimizedResumeGeneration"
+    OptimizedResumeDownload = "OptimizedResumeDownload"
+    OptimizedJobResumeGeneration = "OptimizedJobResumeGeneration"
+    OptimizedJobResumeDownload = "OptimizedJobResumeDownload"
+    LinkedInProfileGeneration = "LinkedInProfileGeneration"
+    LinkedInProfileMessageGeneration = "LinkedInProfileMessageGeneration"
+
+class UsageStats(Document):
+    email: Indexed(str) # type: ignore
+    feature: Features
+    job_id: Optional[str] = None
+    count: int = 1
+    timeStamps: List[datetime] = []
+    
+    # Timestamp fields
+    createdAt: datetime = Field(default_factory=datetime.utcnow)
+    updatedAt: datetime = Field(default_factory=datetime.utcnow)
+
+    class Settings:
+        name = "usage_stats"
+        indexes = [
+            [("email", 1)],
+        ]

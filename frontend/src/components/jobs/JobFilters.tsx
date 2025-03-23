@@ -13,6 +13,7 @@ import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 
 interface FiltersProps {
+  show: boolean;
   filters: {
     is_remote: boolean;
     job_type: string;
@@ -24,10 +25,14 @@ interface FiltersProps {
 }
 
 const JobFilters: React.FC<FiltersProps> = ({
+  show,
   filters,
   onChange,
   jobTypes,
 }) => {
+  if (!show) {
+    return null;
+  }
   return (
     <Card>
       <CardHeader>

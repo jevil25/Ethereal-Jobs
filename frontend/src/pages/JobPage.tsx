@@ -84,6 +84,7 @@ const JobPage: React.FC = () => {
         company: job?.company || "",
         position: job?.title || "",
         newMessage: newMessage,
+        job_id: job?.id || "",
       });
       setGeneratedMessage(message.message);
       setNoResumeFound(message.no_resume_found ? true : false);

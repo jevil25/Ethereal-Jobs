@@ -5,7 +5,7 @@ import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
 import { X, Plus } from "lucide-react";
-import { Card, CardContent } from "../ui/card";
+import { Card, CardContent, CardFooter } from "../ui/card";
 import { CalendarForm } from "../ui/calendar";
 
 export interface Experience {
@@ -128,6 +128,14 @@ const ExperienceCard: React.FC<ExperienceCardProps> = ({
     updateData(data.filter((item) => item.id !== id));
   };
 
+  const getMissingFields = (exp: Experience) => {
+    const requiredFields: (keyof Experience)[] = ["company", "title", "location", "startDate", "endDate", "description"];
+    if (exp.current) {
+      requiredFields.splice(4, 1);
+    }
+    return requiredFields.filter((field) => !exp[field]);
+  }
+
   return (
     <div className="space-y-4">
       {data.length > 0 && (
@@ -165,6 +173,13 @@ const ExperienceCard: React.FC<ExperienceCardProps> = ({
                     <div className="mt-2 text-sm">{exp.description}</div>
                   )}
                 </CardContent>
+                {getMissingFields(exp).length > 0 && (
+                  <CardFooter className="flex justify-end">
+                    <div className="text-xs font-medium text-red-500">
+                      Missing fields: {getMissingFields(exp).join(", ")}
+                    </div>
+                  </CardFooter> 
+                )}
               </Card>
             ))}
         </div>

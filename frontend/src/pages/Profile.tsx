@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../providers/useAuth";
 import { updateName } from "../api/user";
 import { Input } from "../components/ui/input";
@@ -24,7 +24,10 @@ import {
 import toast from "../components/ui/toast";
 import ResumeTabs from "../components/ResumeV1/ResumeTabs";
 import { useWindowSize } from "../components/ResumeV2/hooks/useWindowSize";
-import { Menu } from "lucide-react";
+import { User, Briefcase } from "lucide-react";
+import { JobData } from "../types/data";
+import { getAppliedJobs } from "../api/jobs";
+import JobCard from "../components/jobs/JobCard";
 
 const ProfilePage = () => {
   const { user, logout } = useAuth();
@@ -34,6 +37,8 @@ const ProfilePage = () => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [activeTab, setActiveTab] = useState<string>("personal");
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [appliedJobs, setAppliedJobs] = useState<JobData[]>([]);
+  const [activeSection, setActiveSection] = useState<string>("profile");
   const [nameSaveStatus, setNameSaveStatus] = useState<
     "saved" | "saving" | "error"
   >("saved");
@@ -52,9 +57,13 @@ const ProfilePage = () => {
     }
   });
 
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
+  useEffect(() => {
+    const getAppliedJobsData = async () => {
+      const jobs = await getAppliedJobs();
+      setAppliedJobs(jobs);
+    }
+    getAppliedJobsData();
+  }, []);
 
   const handleNameChange = async (name: string) => {
     setNameSaveStatus("saving");
@@ -99,149 +108,168 @@ const ProfilePage = () => {
     }
   };
 
-  return (
-    <div className="w-full max-w-6xl mx-auto p-4 space-y-6">
+  const renderProfileContent = () => {
+    return (
+      <>
+        <Card className="shadow-sm mb-6">
+          <CardHeader className="pb-2">
+            <CardTitle>Profile Information</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-8">
+              <div>
+                <p className="text-sm font-medium text-gray-500 mb-1">
+                  Full Name
+                </p>
+                {isEditing ? (
+                  <Input
+                    value={name}
+                    onChange={(e) => handleNameChange(e.target.value)}
+                    placeholder="Enter your name"
+                    className="max-w-md"
+                  />
+                ) : (
+                  <p className="text-lg font-semibold">{name}</p>
+                )}
+              </div>
+              <div className="flex justify-end items-start">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={isEditing ? handleSaveName : () => setIsEditing(true)}
+                  disabled={isLoading}
+                >
+                  {isEditing ? "Save" : "Edit Name"}
+                </Button>
+              </div>
+            </div>
+            <div className="mt-6">
+              <p className="text-sm font-medium text-gray-500 mb-1">
+                Email Address
+              </p>
+              <p className="text-lg">{user?.email}</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="md:col-span-1">
+            {sidebarOpen && (
+              <Card className="shadow-sm">
+                <CardHeader className="py-3 px-4">
+                  <CardTitle className="text-xl">Resume Sections</CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <div className="flex flex-col">
+                    {[
+                      { id: "personal", label: "Personal Info" },
+                      { id: "experience", label: "Experience" },
+                      { id: "education", label: "Education" },
+                      { id: "skills", label: "Skills" },
+                      { id: "projects", label: "Projects" },
+                      { id: "certifications", label: "Certifications" },
+                      { id: "preferences", label: "Job Preferences" },
+                    ].map((section) => (
+                      <Button
+                        key={section.id}
+                        variant={
+                          activeTab === section.id ? "Etheral Jobs" : "ghost"
+                        }
+                        className={`justify-start rounded-none text-left py-3 px-4 ${
+                          activeTab === section.id
+                            ? "text-primary-foreground"
+                            : ""
+                        }`}
+                        onClick={() => {
+                          setActiveTab(section.id);
+                          if (window.innerWidth < 768) {
+                            setSidebarOpen(false);
+                          }
+                        }}
+                      >
+                        {section.label}
+                      </Button>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+
+          <div className="md:col-span-3">
+            {isLoading ? (
+              <div className="h-64 flex items-center justify-center">
+                <p>Loading job preferences...</p>
+              </div>
+            ) : resumeData ? (
+              <Card className="shadow-sm h-full">
+                <CardHeader className="pb-2">
+                  <div className="mt-4 text-right">
+                    <span
+                      className={`text-sm ${
+                        saveStatus === "saved" && nameSaveStatus === "saved"
+                          ? "text-green-600"
+                          : saveStatus === "saving" || nameSaveStatus === "saving"
+                            ? "text-yellow-600"
+                            : "text-red-600"
+                      }`}
+                    >
+                      {saveStatus === "saved" && nameSaveStatus === "saved"
+                        ? "✓ All changes saved"
+                        : saveStatus === "saving" || nameSaveStatus === "saving"
+                          ? "Saving changes..."
+                          : "Error saving changes"}
+                    </span>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <ResumeTabs
+                    handleNameChange={handleNameChange}
+                    activeTab={activeTab}
+                    handlePersonalInfoEdit={handlePersonalInfoEdit}
+                    resumeData={resumeData}
+                    updateResumeSection={handleUpdateResumeSection}
+                    setActiveTab={setActiveTab}
+                  />
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="h-64 flex items-center justify-center">
+                <p>No job preferences found. Add some to get started.</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </>
+    );
+  };
+
+  const renderJobsContent = () => {
+    return (
       <Card className="shadow-sm">
         <CardHeader className="pb-2">
-          <CardTitle>Profile Information</CardTitle>
+          <CardTitle>Applied Jobs</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 gap-8">
-            <div>
-              <p className="text-sm font-medium text-gray-500 mb-1">
-                Full Name
-              </p>
-              {isEditing ? (
-                <Input
-                  value={name}
-                  onChange={(e) => handleNameChange(e.target.value)}
-                  placeholder="Enter your name"
-                  className="max-w-md"
+          {appliedJobs.length === 0 ? (
+            <p className="text-gray-600">You haven't applied to any jobs yet.</p>
+          ) : (
+            <div className="grid grid-cols-1 gap-4">
+              {appliedJobs.map((job) => (
+                <JobCard
+                  key={job.id}
+                  job={job}
                 />
-              ) : (
-                <p className="text-lg font-semibold">{name}</p>
-              )}
+              ))}
             </div>
-            <div className="flex justify-end items-start">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={isEditing ? handleSaveName : () => setIsEditing(true)}
-                disabled={isLoading}
-              >
-                {isEditing ? "Save" : "Edit Name"}
-              </Button>
-            </div>
-          </div>
-          <div className="mt-6">
-            <p className="text-sm font-medium text-gray-500 mb-1">
-              Email Address
-            </p>
-            <p className="text-lg">{user?.email}</p>
-          </div>
+          )}
         </CardContent>
       </Card>
+    );
+  };
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="md:col-span-1">
-          <div className="md:hidden mb-4">
-            <Button
-              variant="outline"
-              className="w-full flex items-center justify-center gap-2"
-              onClick={toggleSidebar}
-            >
-              <Menu size={16} />
-              {sidebarOpen ? "Hide Sections" : "Show Sections"}
-            </Button>
-          </div>
-
-          {sidebarOpen && (
-            <Card className="shadow-sm">
-              <CardHeader className="py-3 px-4">
-                <CardTitle className="text-xl">Resume Sections</CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="flex flex-col">
-                  {[
-                    { id: "personal", label: "Personal Info" },
-                    { id: "experience", label: "Experience" },
-                    { id: "education", label: "Education" },
-                    { id: "skills", label: "Skills" },
-                    { id: "projects", label: "Projects" },
-                    { id: "certifications", label: "Certifications" },
-                    { id: "preferences", label: "Job Preferences" },
-                  ].map((section) => (
-                    <Button
-                      key={section.id}
-                      variant={
-                        activeTab === section.id ? "Etheral Jobs" : "ghost"
-                      }
-                      className={`justify-start rounded-none text-left py-3 px-4 ${
-                        activeTab === section.id
-                          ? "text-primary-foreground"
-                          : ""
-                      }`}
-                      onClick={() => {
-                        setActiveTab(section.id);
-                        if (window.innerWidth < 768) {
-                          setSidebarOpen(false);
-                        }
-                      }}
-                    >
-                      {section.label}
-                    </Button>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-        </div>
-
-        <div className="md:col-span-3">
-          {isLoading ? (
-            <div className="h-64 flex items-center justify-center">
-              <p>Loading job preferences...</p>
-            </div>
-          ) : resumeData ? (
-            <Card className="shadow-sm h-full">
-              <CardHeader className="pb-2">
-                <div className="mt-4 text-right">
-                  <span
-                    className={`text-sm ${
-                      saveStatus === "saved" && nameSaveStatus === "saved"
-                        ? "text-green-600"
-                        : saveStatus === "saving" || nameSaveStatus === "saving"
-                          ? "text-yellow-600"
-                          : "text-red-600"
-                    }`}
-                  >
-                    {saveStatus === "saved" && nameSaveStatus === "saved"
-                      ? "✓ All changes saved"
-                      : saveStatus === "saving" || nameSaveStatus === "saving"
-                        ? "Saving changes..."
-                        : "Error saving changes"}
-                  </span>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <ResumeTabs
-                  handleNameChange={handleNameChange}
-                  activeTab={activeTab}
-                  handlePersonalInfoEdit={handlePersonalInfoEdit}
-                  resumeData={resumeData}
-                  updateResumeSection={handleUpdateResumeSection}
-                  setActiveTab={setActiveTab}
-                />
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="h-64 flex items-center justify-center">
-              <p>No job preferences found. Add some to get started.</p>
-            </div>
-          )}
-        </div>
-      </div>
-
+  const renderDangerZoneContent = () => {
+    return (
       <Card className="border-red-200 shadow-sm">
         <CardHeader className="pb-2">
           <CardTitle className="text-red-600">Danger Zone</CardTitle>
@@ -260,7 +288,55 @@ const ProfilePage = () => {
           </Button>
         </CardContent>
       </Card>
+    );
+  };
 
+  return (
+    <div className="flex flex-col md:flex-row w-full max-w-6xl mx-auto p-4 gap-6 min-h-screen">
+      <div className="w-full md:w-64 flex-shrink-0">
+        <Card className="shadow-sm sticky top-4">
+          <CardHeader className="py-3 px-4">
+            <CardTitle className="text-xl">Profile Settings</CardTitle>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="flex flex-col">
+              <Button
+                variant={activeSection === "profile" ? "Etheral Jobs" : "ghost"}
+                className="justify-start rounded-none text-left py-3 px-4 flex items-center gap-2"
+                onClick={() => setActiveSection("profile")}
+              >
+                <User size={16} />
+                Profile & Resume
+              </Button>
+              <Button
+                variant={activeSection === "jobs" ? "Etheral Jobs" : "ghost"}
+                className="justify-start rounded-none text-left py-3 px-4 flex items-center gap-2"
+                onClick={() => setActiveSection("jobs")}
+              >
+                <Briefcase size={16} />
+                Applied Jobs
+              </Button>
+              {/* <Button
+                variant={activeSection === "danger" ? "Etheral Jobs" : "ghost"}
+                className="justify-start rounded-none text-left py-3 px-4 flex items-center gap-2"
+                onClick={() => setActiveSection("danger")}
+              >
+                <AlertTriangle size={16} />
+                Danger Zone
+              </Button> */}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-grow">
+        {activeSection === "profile" && renderProfileContent()}
+        {activeSection === "jobs" && renderJobsContent()}
+        {activeSection === "danger" && renderDangerZoneContent()}
+      </div>
+
+      {/* Delete Account Dialog */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>

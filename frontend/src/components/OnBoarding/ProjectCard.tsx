@@ -4,7 +4,7 @@ import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
 import { X, Plus } from "lucide-react";
-import { Card, CardContent } from "../ui/card";
+import { Card, CardContent, CardFooter } from "../ui/card";
 import { Badge } from "../ui/badge";
 
 export interface Project {
@@ -148,6 +148,11 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ data, updateData }) => {
     }
   };
 
+  const getMissingFields = (exp: Project) => {
+    const requiredFields: (keyof Project)[] = ["title", "technologies", "description", "url"];
+    return requiredFields.filter((field) => !exp[field]);
+  }
+
   return (
     <div className="space-y-4">
       {data.length > 0 && (
@@ -202,6 +207,13 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ data, updateData }) => {
                     <div className="mt-2 text-sm">{project.description}</div>
                   )}
                 </CardContent>
+                {getMissingFields(project).length > 0 && (
+                  <CardFooter className="flex justify-end">
+                    <div className="text-xs font-medium text-red-500">
+                      Missing fields: {getMissingFields(project).join(", ")}
+                    </div>
+                  </CardFooter>
+                )}
               </Card>
             ))}
         </div>

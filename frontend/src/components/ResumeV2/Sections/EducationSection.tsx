@@ -28,18 +28,20 @@ export const EducationSection: React.FC<EducationSectionProps> = ({
             <EditableText
               initialValue={edu.degree}
               onSave={(v: string) => onSave(index, "degree", v)}
+              placeholder="Degree"
             />
           </h3>
           <p className="text-gray-700">
             <EditableText
               initialValue={edu.school}
               onSave={(v: string) => onSave(index, "school", v)}
+              placeholder="School Name"
             />
           </p>
         </div>
         <div className="text-gray-600 text-sm">
           <EditableText
-            initialValue={edu.startDate}
+            initialValue={edu.startDate || new Date().toDateString()}
             onSave={(v: string) => onSave(index, "startDate", v)}
           />{" "}
           -
@@ -53,6 +55,7 @@ export const EducationSection: React.FC<EducationSectionProps> = ({
         <EditableText
           initialValue={edu.fieldOfStudy}
           onSave={(v: string) => onSave(index, "fieldOfStudy", v)}
+          placeholder="Field of Study"
         />
       </p>
       {edu.grade && (
@@ -60,6 +63,7 @@ export const EducationSection: React.FC<EducationSectionProps> = ({
           <EditableText
             initialValue={edu.grade}
             onSave={(v: string) => onSave(index, "grade", v)}
+            placeholder="Grade"
           />
         </p>
       )}

@@ -24,6 +24,7 @@ export const AboutMeSection: React.FC<AboutMeProps> = ({
         initialValue={content}
         onSave={onSave}
         multiline={true}
+        placeholder="Tell us about yourself"
       />
     </div>
   );

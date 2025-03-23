@@ -77,6 +77,18 @@ const OnboardingFlow: React.FC = () => {
 
   const updateResumeDetail = useCallback(
     async (isOnBoarded: boolean) => {
+      if (formData.personalInfo.headline === "" &&
+        formData.experience.length === 0 &&
+        formData.education.length === 0 &&
+        formData.projects.length === 0 &&
+        formData.certifications.length === 0 &&
+        formData.skills.length === 0 &&
+        formData.jobPreferences.jobTypes.length === 0 &&
+        formData.jobPreferences.locations.length === 0 &&
+        formData.jobPreferences.country === "") {
+          console.log("No data to update");
+          return
+      }
       await updateResumeDetails({ data: formData }, isOnBoarded);
     },
     [formData],

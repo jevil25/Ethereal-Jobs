@@ -32,6 +32,7 @@ interface LinkedInGenerateMessageRequest {
   company: string;
   email: string;
   newMessage: boolean;
+  job_id: string;
 }
 
 interface LinkedInGenerateMessageResponse {
@@ -223,6 +224,15 @@ interface DownloadResumeRequest {
   job_id?: string;
 }
 
+enum ApplicationStatus {
+  Pending = "Pending",
+  Applied = "Applied",
+  Interviewing = "Interviewing",
+  Offered = "Offered",
+  Rejected = "Rejected",
+  Archived = "Archived",
+}
+
 export type {
   ResumeSaveRequest,
   ResumeSaveResponse,
@@ -258,5 +268,7 @@ export type {
   DownloadResumeRequest,
   GenerateAiResumeUpdateRequest,
 };
+
+export { ApplicationStatus };
 
 export { Provider };

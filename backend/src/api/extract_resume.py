@@ -101,7 +101,7 @@ async def get_ai_optimized_resume(resume_data: ResumeModel, is_main_resume: bool
     dont add any thing from {mode} that person resume does not have example if job has html and resume does not have html then do not add html anywhere in the resume
     do not add any skill in points or descriptions that is not present in the resume (must follow rule)
 
-    keep it professional and concise, change project and experience descriptions as per the {mode}, divide the points by new line character
+    keep it professional and concise, change project and experience descriptions as per the {mode}, divide the points by new line character keep min 3 points max 5 points
     remove or add skills as per the {mode}, user can later edit the skills soo don't worry about it
     keep skills that are relevant to the {mode}, remove irrelevant skills
 

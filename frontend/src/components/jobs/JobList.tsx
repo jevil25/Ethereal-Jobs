@@ -19,6 +19,7 @@ const JobList: React.FC<JobListProps> = ({
   const [resultsPerPage] = useState<number>(10);
   const observer = useRef<IntersectionObserver | null>(null);
   const lastJobElementRef = useRef<HTMLDivElement | null>(null);
+  const [loadingMessage, setLoadingMessage] = useState<string>("Please wait while we load the jobs... this may take a few seconds");
 
   useEffect(() => {
     // Disconnect previous observer if it exists
@@ -56,13 +57,30 @@ const JobList: React.FC<JobListProps> = ({
     };
   }, [jobs, hasMore, loading, onLoadMore, resultsPerPage]);
 
+  useEffect(() => {
+    const loadingMessages = [
+      "This is taking longer than expected... Please wait",
+      "We have found some jobs for you... Comparing with your resume/skills",
+      "We are almost there... Just a few more seconds",
+    ];
+    let index = 0;
+    const interval = setInterval(() => {
+      if (index === loadingMessages.length) return;
+      setLoadingMessage(loadingMessages[index]);
+      index = (index + 1) % loadingMessages.length;
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }
+  , [loading]);
+
   if (loading && jobs.length === 0) {
     return (
       <div className="flex justify-center items-center py-4 flex-row gap-2">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-        <div>
-          Please wait while we load the jobs... this may take a few seconds
-        </div>
+          <div className="transition-all duration-300 ease-in-out">
+            {loadingMessage}
+          </div>
       </div>
     );
   }

@@ -6,8 +6,10 @@ import { JobData } from "../types/data";
 import { getJobs } from "../api/jobs";
 import { toaster } from "../utils/helper";
 import { useSearchParams } from "react-router-dom";
+import { ApplicationStatus } from "../api/types";
 
 const JobSearch: React.FC = () => {
+  const show = false;
   const [, setSearchParams] = useSearchParams();
   const [results_wanted, setResultsWanted] = useState<number>(30);
   const [increaseCounter, setIncreaseCounter] = useState<number>(0);
@@ -105,7 +107,9 @@ const JobSearch: React.FC = () => {
               (t) =>
                 t.title === job.title &&
                 t.company === job.company &&
-                t.date_posted === job.date_posted,
+                t.date_posted === job.date_posted && (
+                  job.application_status === ApplicationStatus.Pending
+                )
             ),
         );
         setFilteredJobs(uniqueJobs);
@@ -138,7 +142,9 @@ const JobSearch: React.FC = () => {
       const jobsFiltered = data.filter(
         (job) =>
           (!filters.salary_min || job.min_amount >= filters.salary_min) &&
-          (!filters.salary_max || job.max_amount <= filters.salary_max),
+          (!filters.salary_max || job.max_amount <= filters.salary_max) && (
+            job.application_status === ApplicationStatus.Pending
+          )
       );
       setFilteredJobs(jobsFiltered);
     } catch (error) {
@@ -176,7 +182,9 @@ const JobSearch: React.FC = () => {
         (!overAllFilters.salary_min ||
           job.min_amount >= overAllFilters.salary_min) &&
         (!overAllFilters.salary_max ||
-          job.max_amount <= overAllFilters.salary_max);
+          job.max_amount <= overAllFilters.salary_max) && (
+            job.application_status === ApplicationStatus.Pending
+          )
       return res;
     });
     setFilteredJobs(jobsFiltered);
@@ -194,18 +202,19 @@ const JobSearch: React.FC = () => {
   }, []);
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 min-h-screen">
       <h1 className="text-3xl font-bold mb-6">Job Search</h1>
       <SearchBar onSearch={handleSearch} filters={filters} jobs={filteredJobs} />
       <div className="flex flex-col md:flex-row gap-6 mt-6">
-        <div className="w-full md:w-1/4">
+        <div className={`w-full ${show ? "md:w-1/4": "hidden"}`}>
           <JobFilters
+            show={show}
             onChange={handleFilterChange}
             filters={filters}
             jobTypes={jobTypes}
           />
         </div>
-        <div className="w-full md:w-3/4">
+        <div className={`w-full ${show ? "md:w-3/4": ""}`}>
           <JobList
             jobs={filteredJobs}
             loading={loading}

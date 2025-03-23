@@ -15,7 +15,11 @@ from src.db.model import (
     LinkedMessages,
     ResumeModel,
     AiOptimzedResumeModel,
-    UserLinkedInProfiles
+    UserLinkedInProfiles,
+    JobUser,
+    ApplicationStatus,
+    UsageStats,
+    Features
 )
 
 from beanie import init_beanie
@@ -59,7 +63,9 @@ class DatabaseOperations:
                 LinkedMessages,
                 ResumeModel,
                 AiOptimzedResumeModel,
-                UserLinkedInProfiles
+                UserLinkedInProfiles,
+                JobUser,
+                UsageStats
             ]
         )
 
@@ -623,3 +629,86 @@ class DatabaseOperations:
             return user, True
         return None, False
     
+    async def get_user_to_job(self, email: str, job_id: str):
+        job_user = await JobUser.find_one({
+            "email": email,
+            "jobId": job_id
+        })
+        return job_user
+    
+    async def add_user_to_job(self, email: str, job_id: str, match_score: int, missing_skills: List[str], matched_skills: List[str], job_required_years: int, salary_with_currency: str, tfidf_similarity: int, semantic_similarity: int, skill_match_score: int, experience_match_score: int):
+        job_user = await JobUser.find_one({
+            "email": email,
+            "jobId": job_id
+        })
+        if not job_user:
+            job_user = JobUser(
+                email=email,
+                jobId=job_id,
+                match_score=match_score,
+                missing_skills=missing_skills,
+                matched_skills=matched_skills,
+                job_required_years=job_required_years,
+                salary_with_currency=salary_with_currency,
+                tfidf_similarity=tfidf_similarity,
+                semantic_similarity=semantic_similarity,
+                skill_match_score=skill_match_score,
+                experience_match_score=experience_match_score
+            )
+            return await job_user.save()
+        job_user.match_score = match_score
+        job_user.missing_skills = missing_skills
+        job_user.matched_skills = matched_skills
+        job_user.job_required_years = job_required_years
+        job_user.salary_with_currency = salary_with_currency
+        job_user.tfidf_similarity = tfidf_similarity
+        job_user.semantic_similarity = semantic_similarity
+        job_user.skill_match_score = skill_match_score
+        job_user.experience_match_score = experience_match_score
+        return await job_user.save()
+    
+    async def update_application_status(self, email: str, job_id: str, status: ApplicationStatus):
+        job_user = await JobUser.find_one({
+            "email": email,
+            "jobId": job_id
+        })
+        if job_user:
+            job_user.application_status = status
+            await job_user.save()
+            return job_user
+        else:
+            return await JobUser.insert(
+                JobUser(
+                    email=email,
+                    jobId=job_id,
+                    application_status=status.value
+                )
+            )
+        return None
+    
+    async def get_applied_jobs(self, email: str):
+        return await JobUser.find(
+            JobUser.email == email,
+            JobUser.application_status != ApplicationStatus.Pending
+        ).to_list()
+    
+    async def update_usage_stats(self, email: str, feature: Features, job_id: str = None):
+        usage_stats_doc = await UsageStats.find_one({
+            "email": email,
+            "feature": feature.value,
+            "job_id": job_id
+        })
+        if not usage_stats_doc:
+            return await UsageStats.insert(
+                UsageStats(
+                    email=email,
+                    feature=feature.value,
+                    count=1,
+                    job_id=job_id,
+                    timeStamps=[datetime.utcnow()]
+                )
+            )
+        usage_stats_doc.count += 1
+        usage_stats_doc.timeStamps.append(datetime.utcnow())
+        return await usage_stats_doc.save()
+        

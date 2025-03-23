@@ -8,6 +8,7 @@ import {
   AutoSuggestionsResponse,
   AutoSuggestionsRequestLocation,
   AutoSuggestionsLocationResponse,
+  ApplicationStatus,
 } from "./types";
 import { constructServerUrlFromPath } from "../utils/helper";
 import axios, { CancelTokenSource } from "axios";
@@ -207,6 +208,58 @@ export const getLocationSuggestions = async (
     showToast(
       "Error fetching location suggestions: " +
         (error.message || "Unknown error"),
+      "error",
+    );
+    throw error;
+  }
+};
+
+// post /job/application_status/update
+export const applicationStatusUpdate = async (jobId: string, ApplicationStatus: ApplicationStatus ): Promise<void> => {
+  try {
+    const response = await axios.post(
+      constructServerUrlFromPath(`/job/application_status/update`),
+      { status: ApplicationStatus, job_id: jobId },
+    );
+    if (
+      response.data &&
+      response.data.detail &&
+      response.data.detail === "Token expired"
+    ) {
+      await userRefresh();
+      return await axios
+        .post(constructServerUrlFromPath(`/job/${jobId}`))
+        .then(() => {});
+    }
+  } catch (error: any) {
+    showToast(
+      "Error applying to job: " + (error.message || "Unknown error"),
+      "error",
+    );
+    throw error;
+  }
+};
+
+// post /job/applied_jobs
+export const getAppliedJobs = async (): Promise<JobData[]> => {
+  try {
+    const response = await axios.get(
+      constructServerUrlFromPath(`/job/applied_jobs`),
+    );
+    if (
+      response.data &&
+      response.data.detail &&
+      response.data.detail === "Token expired"
+    ) {
+      await userRefresh();
+      return await axios
+        .post(constructServerUrlFromPath(`/job/applied_jobs`))
+        .then((res) => res.data as JobData[]);
+    }
+    return response.data as JobData[];
+  } catch (error: any) {
+    showToast(
+      "Error applying to job: " + (error.message || "Unknown error"),
       "error",
     );
     throw error;

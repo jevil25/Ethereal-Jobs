@@ -31,6 +31,7 @@ export const CertificationsSection: React.FC<CertificationsSectionProps> = ({
               <EditableText
                 initialValue={certification.name}
                 onSave={(v: string) => onUpdate(index, "name", v)}
+                placeholder="Certification Name"
               />
             </h3>
           </div>
@@ -42,6 +43,7 @@ export const CertificationsSection: React.FC<CertificationsSectionProps> = ({
             <EditableText
               initialValue={certification.credentialUrl}
               onSave={(v: string) => onUpdate(index, "credentialUrl", v)}
+              placeholder="Credential URL"
             />
           </p>
         )}
@@ -52,6 +54,7 @@ export const CertificationsSection: React.FC<CertificationsSectionProps> = ({
               initialValue={certification.description}
               onSave={(v: string) => onUpdate(index, "description", v)}
               multiline={true}
+              placeholder="Description"
             />
           </div>
         )}

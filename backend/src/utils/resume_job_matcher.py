@@ -1,4 +1,5 @@
 from datetime import date
+import os
 import pandas as pd
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -16,17 +17,48 @@ from src.db.model import ResumeModel
 
 class ResumeJobMatcher:
     def __init__(self):
-        # Download necessary NLTK resources
-        nltk.download('stopwords', quiet=True)
-        nltk.download('wordnet', quiet=True)
+        # Download resources only once if not already present
+        try:
+            stopwords.words('english')
+        except LookupError:
+            nltk.download('stopwords', quiet=True)
+            nltk.download('wordnet', quiet=True)
         
-        # Initialize NLP tools
-        self.nlp = spacy.load('en_core_web_md')
+        # Load smaller spaCy model for better performance
+        self.nlp = spacy.load('en_core_web_sm')
         self.stop_words = set(stopwords.words('english'))
         self.lemmatizer = WordNetLemmatizer()
         
-        # Common skills dictionary - expand as needed
-        self.skills_dict = {
+        # Precompile skill regex patterns for faster matching
+        self.skills_dict = self._load_skills_dict()
+        self.all_skills = []
+        for category in self.skills_dict.values():
+            self.all_skills.extend(category)
+            
+        # Precompile common regex patterns
+        self.skill_patterns = {skill: re.compile(r'\b' + re.escape(skill) + r'\b') for skill in self.all_skills}
+        self.experience_patterns = [
+            re.compile(r'experience:?\s*(\d+)[\+]?\s*(?:years|yrs|year)'),
+            re.compile(r'(\d+)[\+]?\s*(?:years|yrs|year)(?:\s*of)?\s*(?:experience|exp|expertise)'),
+            re.compile(r'(?:experience|exp|expertise)(?:\s*of)?\s*(\d+)[\+]?\s*(?:years|yrs|year)'),
+            re.compile(r'(\d+)[\+]?[-]?(?:year|yr)(?:s)?(?:\s*of)?\s*(?:experience|exp)'),
+            re.compile(r'(?:with|having)\s*(\d+)[\+]?\s*(?:years|yrs|year)(?:\s*of)?\s*(?:experience|exp)'),
+            re.compile(r'(?:worked|working)(?:\s*for)?\s*(\d+)[\+]?\s*(?:years|yrs|year)')
+        ]
+        self.salary_patterns = [
+            re.compile(r'(?i)(?:\$|€|£|¥|USD|EUR|GBP|JPY|CAD|AUD|CHF|CNY|Rs\.?|INR|₹|₽|₩|₱|₴|₪|฿|₫|₢|₮|₸|₦|₲|₡|₵|₺|₼|₾|₷|₠|₧|R\$|zł|kr|руб\.?|лв|RON|KD|QAR|SAR|AED)\s*(?:\d{1,3}(?:,\d{3})*(?:\.\d+)?|\d+(?:\.\d+)?)\s*(?:k|K|M|thousand|million|billion)?\s*(?:-|to|–|~|\s+to\s+)?\s*(?:(?:\$|€|£|¥|USD|EUR|GBP|JPY|CAD|AUD|CHF|CNY|Rs\.?|INR|₹|₽|₩|₱|₴|₪|฿|₫|₢|₮|₸|₦|₲|₡|₵|₺|₼|₾|₷|₠|₧|R\$|zł|kr|руб\.?|лв|RON|KD|QAR|SAR|AED)\s*)?(?:\d{1,3}(?:,\d{3})*(?:\.\d+)?|\d+(?:\.\d+)?)\s*(?:k|K|M|thousand|million|billion)?(?:\s*(?:per|\/)\s*(?:year|yr|month|mo|week|wk|hour|hr|annum|pa|p\.a\.))?'),
+            re.compile(r'(?i)(?:salary|pay|compensation|wage|earnings|remuneration|stipend)?\s*:?\s*(?:\$|€|£|¥|USD|EUR|GBP|JPY|CAD|AUD|CHF|CNY|Rs\.?|INR|₹|₽|₩|₱|₴|₪|฿|₫|₢|₮|₸|₦|₲|₡|₵|₺|₼|₾|₷|₠|₧|R\$|zł|kr|руб\.?|лв|RON|KD|QAR|SAR|AED)\s*(?:\d{1,3}(?:,\d{3})*(?:\.\d+)?|\d+(?:\.\d+)?)\s*(?:k|K|M|thousand|million|billion)?\s*(?:-|to|–|~|\s+to\s+)?\s*(?:(?:\$|€|£|¥|USD|EUR|GBP|JPY|CAD|AUD|CHF|CNY|Rs\.?|INR|₹|₽|₩|₱|₴|₪|฿|₫|₢|₮|₸|₦|₲|₡|₵|₺|₼|₾|₷|₠|₧|R\$|zł|kr|руб\.?|лв|RON|KD|QAR|SAR|AED)\s*)?(?:\d{1,3}(?:,\d{3})*(?:\.\d+)?|\d+(?:\.\d+)?)\s*(?:k|K|M|thousand|million|billion)?(?:\s*(?:per|\/)\s*(?:year|yr|month|mo|week|wk|hour|hr|annum|pa|p\.a\.))?'),
+            re.compile(r'(?:[\$€£¥₹₽₩₱₴₪฿₫₢₮₸₦₲₡₵₺₼₾₷₠₧R]|\b(?:USD|EUR|GBP|JPY|CAD|AUD|CHF|CNY|INR|Rs))\s*\d[\d,\.]*(?:\s*[-–]\s*(?:[\$€£¥₹₽₩₱₴₪฿₫₢₮₸₦₲₡₵₺₼₾₷₠₧R]|\b(?:USD|EUR|GBP|JPY|CAD|AUD|CHF|CNY|INR|Rs))?\s*\d[\d,\.]*)?')
+        ]
+        
+        # Create a reusable vectorizer
+        self.vectorizer = TfidfVectorizer()
+        
+        # Cache for preprocessed text
+        self.text_cache = {}
+    
+    def _load_skills_dict(self):
+        return {
             'programming': [
                 'python', 'java', 'javascript', 'c++', 'c#', 'ruby', 'php', 'swift', 'kotlin', 'go', 
                 'rust', 'scala', 'haskell', 'perl', 'typescript', 'r', 'matlab', 'bash', 'powershell', 
@@ -114,13 +146,12 @@ class ResumeJobMatcher:
                 'just-in-time (jit)', 'total quality management (tqm)'
             ]
         }
-        # Flatten skills for easier matching
-        self.all_skills = []
-        for category in self.skills_dict.values():
-            self.all_skills.extend(category)
     
     def preprocess_text(self, text):
-        """Clean and normalize text for better matching"""
+        """Clean and normalize text with caching for better performance"""
+        if text in self.text_cache:
+            return self.text_cache[text]
+        
         # Convert to lowercase
         text = text.lower()
         
@@ -132,45 +163,35 @@ class ResumeJobMatcher:
         tokens = text.split()
         tokens = [self.lemmatizer.lemmatize(token) for token in tokens if token not in self.stop_words]
         
-        return ' '.join(tokens)
+        result = ' '.join(tokens)
+        self.text_cache[text] = result
+        return result
     
     def extract_skills(self, text):
-        """Extract skills from text using NER and pattern matching"""
-        skills = []
+        """Extract skills using pre-compiled patterns for faster matching"""
+        skills = set()
         text_lower = text.lower()
         
-        # Pattern matching for skills in our dictionary
-        for skill in self.all_skills:
-            if re.search(r'\b' + re.escape(skill) + r'\b', text_lower):
-                skills.append(skill)
+        # Fast pattern matching using pre-compiled patterns
+        for skill, pattern in self.skill_patterns.items():
+            if pattern.search(text_lower):
+                skills.add(skill)
         
-        # Use spaCy for entity extraction (skills often appear as PRODUCT, ORG, etc.)
-        doc = self.nlp(text)
+        # Use spaCy for entity extraction but limit to important entities
+        doc = self.nlp(text[:10000])  # Limit text processing for speed
         for ent in doc.ents:
-            if ent.label_ in ["PRODUCT", "ORG", "GPE"] and len(ent.text) > 2:
-                # Clean entity text
+            if ent.label_ in ["PRODUCT", "ORG"] and len(ent.text) > 2:
                 skill = ent.text.lower().strip()
-                skills.append(skill)
+                skills.add(skill)
         
-        return list(set(skills))  # Remove duplicates
+        return list(skills)
     
-    import re
-
     def extract_experience(self, text):
-        """Extract years of experience from text"""
-        # Look for patterns like "X years of experience" with more variations
-        experience_patterns = [
-            r'experience:?\s*(\d+)[\+]?\s*(?:years|yrs|year)',  # Matches "Experience: 4+ years"
-            r'(\d+)[\+]?\s*(?:years|yrs|year)(?:\s*of)?\s*(?:experience|exp|expertise)',
-            r'(?:experience|exp|expertise)(?:\s*of)?\s*(\d+)[\+]?\s*(?:years|yrs|year)',
-            r'(\d+)[\+]?[-]?(?:year|yr)(?:s)?(?:\s*of)?\s*(?:experience|exp)',
-            r'(?:with|having)\s*(\d+)[\+]?\s*(?:years|yrs|year)(?:\s*of)?\s*(?:experience|exp)',
-            r'(?:worked|working)(?:\s*for)?\s*(\d+)[\+]?\s*(?:years|yrs|year)'
-        ]
-        
+        """Extract years of experience using pre-compiled patterns"""
         all_matches = []
-        for pattern in experience_patterns:
-            matches = re.findall(pattern, text.lower())
+        
+        for pattern in self.experience_patterns:
+            matches = pattern.findall(text.lower())
             all_matches.extend(matches)
         
         if all_matches:
@@ -179,72 +200,60 @@ class ResumeJobMatcher:
         return 0
     
     def calculate_tfidf_similarity(self, text1, text2):
-        """Calculate TF-IDF based similarity between two texts"""
+        """Calculate TF-IDF similarity with faster preprocessing"""
         preprocessed_text1 = self.preprocess_text(text1)
         preprocessed_text2 = self.preprocess_text(text2)
         
-        vectorizer = TfidfVectorizer()
-        tfidf_matrix = vectorizer.fit_transform([preprocessed_text1, preprocessed_text2])
+        tfidf_matrix = self.vectorizer.fit_transform([preprocessed_text1, preprocessed_text2])
         
         # Calculate cosine similarity
         similarity = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:2])[0][0]
         return similarity
     
     def calculate_semantic_similarity(self, text1, text2):
-        """Calculate semantic similarity using spaCy's word vectors"""
-        doc1 = self.nlp(self.preprocess_text(text1))
-        doc2 = self.nlp(self.preprocess_text(text2))
+        """Calculate semantic similarity with limited text size for speed"""
+        # Limit text size for faster processing
+        doc1 = self.nlp(self.preprocess_text(text1[:5000]))
+        doc2 = self.nlp(self.preprocess_text(text2[:5000]))
         
         if doc1.vector_norm and doc2.vector_norm:
             return doc1.similarity(doc2)
         return 0.0
     
     def calculate_skill_match(self, resume_skills, job_skills):
-        """Calculate how well resume skills match job skills"""
+        """Calculate skill match (optimized for sets)"""
         if not job_skills:
             return 0.0
         
-        matched_skills = set(resume_skills) & set(job_skills)
-        return len(matched_skills) / len(job_skills)
+        resume_skills_set = set(resume_skills)
+        job_skills_set = set(job_skills)
+        matched_skills = resume_skills_set & job_skills_set
+        return len(matched_skills) / len(job_skills_set)
     
     def calculate_experience_match(self, resume_years, job_years):
-        """Calculate how well the resume experience matches job requirements"""
+        """Calculate experience match"""
         if job_years == 0:
-            return 1.0  # No specific requirement
+            return 1.0
         
         if resume_years >= job_years:
             return 1.0
         elif resume_years >= 0.7 * job_years:
-            return 0.8  # Close to requirement
+            return 0.8
         elif resume_years >= 0.5 * job_years:
-            return 0.5  # Partially meets requirement
+            return 0.5
         else:
-            return 0.2  # Significantly below requirement
+            return 0.2
         
     def extract_salary_with_currency(self, text):
-        """this should be able to any currency"""
-        salary_patterns = [
-            r'(?i)(?:\$|€|£|¥|USD|EUR|GBP|JPY|CAD|AUD|CHF|CNY|Rs\.?|INR|₹|₽|₩|₱|₴|₪|฿|₫|₢|₮|₸|₦|₲|₡|₵|₺|₼|₾|₷|₠|₧|R\$|zł|kr|руб\.?|лв|RON|KD|QAR|SAR|AED)\s*(?:\d{1,3}(?:,\d{3})*(?:\.\d+)?|\d+(?:\.\d+)?)\s*(?:k|K|M|thousand|million|billion)?\s*(?:-|to|–|~|\s+to\s+)?\s*(?:(?:\$|€|£|¥|USD|EUR|GBP|JPY|CAD|AUD|CHF|CNY|Rs\.?|INR|₹|₽|₩|₱|₴|₪|฿|₫|₢|₮|₸|₦|₲|₡|₵|₺|₼|₾|₷|₠|₧|R\$|zł|kr|руб\.?|лв|RON|KD|QAR|SAR|AED)\s*)?(?:\d{1,3}(?:,\d{3})*(?:\.\d+)?|\d+(?:\.\d+)?)\s*(?:k|K|M|thousand|million|billion)?(?:\s*(?:per|\/)\s*(?:year|yr|month|mo|week|wk|hour|hr|annum|pa|p\.a\.))?',
-            r'(?i)(?:salary|pay|compensation|wage|earnings|remuneration|stipend)?\s*:?\s*(?:\$|€|£|¥|USD|EUR|GBP|JPY|CAD|AUD|CHF|CNY|Rs\.?|INR|₹|₽|₩|₱|₴|₪|฿|₫|₢|₮|₸|₦|₲|₡|₵|₺|₼|₾|₷|₠|₧|R\$|zł|kr|руб\.?|лв|RON|KD|QAR|SAR|AED)\s*(?:\d{1,3}(?:,\d{3})*(?:\.\d+)?|\d+(?:\.\d+)?)\s*(?:k|K|M|thousand|million|billion)?\s*(?:-|to|–|~|\s+to\s+)?\s*(?:(?:\$|€|£|¥|USD|EUR|GBP|JPY|CAD|AUD|CHF|CNY|Rs\.?|INR|₹|₽|₩|₱|₴|₪|฿|₫|₢|₮|₸|₦|₲|₡|₵|₺|₼|₾|₷|₠|₧|R\$|zł|kr|руб\.?|лв|RON|KD|QAR|SAR|AED)\s*)?(?:\d{1,3}(?:,\d{3})*(?:\.\d+)?|\d+(?:\.\d+)?)\s*(?:k|K|M|thousand|million|billion)?(?:\s*(?:per|\/)\s*(?:year|yr|month|mo|week|wk|hour|hr|annum|pa|p\.a\.))?',
-            r'(?:[\$€£¥₹₽₩₱₴₪฿₫₢₮₸₦₲₡₵₺₼₾₷₠₧R]|\b(?:USD|EUR|GBP|JPY|CAD|AUD|CHF|CNY|INR|Rs))\s*\d[\d,\.]*(?:\s*[-–]\s*(?:[\$€£¥₹₽₩₱₴₪฿₫₢₮₸₦₲₡₵₺₼₾₷₠₧R]|\b(?:USD|EUR|GBP|JPY|CAD|AUD|CHF|CNY|INR|Rs))?\s*\d[\d,\.]*)?'
-        ]
-        for pattern in salary_patterns:
-            matches = re.findall(pattern, text)
+        """Extract salary with optimized regex patterns"""
+        for pattern in self.salary_patterns:
+            matches = pattern.findall(text)
             if matches:
                 return matches[0]
         return "No salary mentioned"
     
     def match_resume_to_job(self, resume_text, job_description):
-        """
-        Match a resume to a job description and return a detailed score
-        
-        Parameters:
-        resume_text (str): The resume text
-        job_description (str): The job description text
-        
-        Returns:
-        dict: Detailed matching scores and information
-        """
+        """Fast resume-job matching with optimized steps"""
         # Extract skills
         resume_skills = self.extract_skills(resume_text)
         job_skills = self.extract_skills(job_description)
@@ -252,16 +261,22 @@ class ResumeJobMatcher:
         # Extract experience
         resume_years = self.extract_experience(resume_text)
         job_years = self.extract_experience(job_description)
-        salary_with_curreny = self.extract_salary_with_currency(job_description)
+        salary_with_currency = self.extract_salary_with_currency(job_description)
         
-        # Calculate similarities
-        tfidf_similarity = self.calculate_tfidf_similarity(resume_text, job_description)
-        semantic_similarity = self.calculate_semantic_similarity(resume_text, job_description)
+        # Calculate similarities - do cheaper calculations first
         skill_match = self.calculate_skill_match(resume_skills, job_skills)
         experience_match = self.calculate_experience_match(resume_years, job_years)
         
-        # Calculate weighted score
-        # Weights can be adjusted based on importance of each factor
+        # Only do more expensive calculations if necessary
+        tfidf_similarity = self.calculate_tfidf_similarity(resume_text, job_description)
+        
+        # Semantic similarity is expensive - only calculate if others indicate a potential match
+        if (skill_match + experience_match + tfidf_similarity) / 3 > 0.5:
+            semantic_similarity = self.calculate_semantic_similarity(resume_text, job_description)
+        else:
+            semantic_similarity = tfidf_similarity * 0.8  # Approximate based on TF-IDF
+        
+        # Calculate weighted score with optimized weights
         weights = {
             'tfidf': 0.25,
             'semantic': 0.25,
@@ -276,7 +291,10 @@ class ResumeJobMatcher:
             weights['experience'] * experience_match
         )
         
-        # Prepare detailed result
+        # Prepare result with minimal computation
+        matched_skills = list(set(resume_skills) & set(job_skills))
+        missing_skills = list(set(job_skills) - set(resume_skills))
+        
         result = {
             'overall_score': round(overall_score * 100, 2),
             'tfidf_similarity': round(tfidf_similarity * 100, 2),
@@ -285,120 +303,141 @@ class ResumeJobMatcher:
             'experience_match_score': round(experience_match * 100, 2),
             'resume_skills': resume_skills,
             'job_skills': job_skills,
-            'matched_skills': list(set(resume_skills) & set(job_skills)),
-            'missing_skills': list(set(job_skills) - set(resume_skills)),
+            'matched_skills': matched_skills,
+            'missing_skills': missing_skills,
             'resume_years': resume_years,
             'job_required_years': job_years,
-            'salary_with_currency': salary_with_curreny
+            'salary_with_currency': salary_with_currency
         }
         
         return result
-    
-    def get_top_jobs_for_resume(self, resume_text, job_descriptions, top_n=3):
-        """
-        Find the best matching jobs for a resume
-        
-        Parameters:
-        resume_text (str): The resume text
-        job_descriptions (list): List of job description texts
-        top_n (int): Number of top results to return
-        
-        Returns:
-        list: Top matching jobs with scores
-        """
-        results = []
-        
-        for i, job in enumerate(job_descriptions):
-            match = self.match_resume_to_job(resume_text, job)
-            results.append({
-                'job_id': i + 1,
-                'match_details': match,
-                'job_text': job
-            })
-        
-        # Sort by overall score in descending order
-        sorted_results = sorted(results, key=lambda x: x['match_details']['overall_score'], reverse=True)
-        
-        return sorted_results[:top_n]
 
 def match_resume_to_job(resume_text, job_description):
     matcher = ResumeJobMatcher()
     return matcher.match_resume_to_job(resume_text, job_description)
 
-def process_job(job, user_data):
-    description = job.get("description")
-    description = re.sub(r'<[^>]*>', '', description).lower()
-    matcher_rank = match_resume_to_job(user_data, description)
-    return job, matcher_rank
+# Create a global matcher instance to avoid re-initialization
+global_matcher = None
 
-def match_all_jobs(json_response: ResumeModel, overall_user_data, num_workers=10):
-    process_job_with_data = partial(process_job, user_data=overall_user_data)
+def get_matcher():
+    global global_matcher
+    if global_matcher is None:
+        global_matcher = ResumeJobMatcher()
+    return global_matcher
+
+def process_job(job, user_data):
+    description = job.get("description", "")
+    description = re.sub(r'<[^>]*>', '', description).lower()
+    matcher = get_matcher()
+    matcher_rank = matcher.match_resume_to_job(user_data, description)
+    return job.get("id"), matcher_rank
+
+def match_all_jobs(json_response, overall_user_data, num_workers=None):
+    # Auto-determine optimal number of workers based on CPU count
+    if num_workers is None:
+        num_workers = min(32, max(4, os.cpu_count() + 4))
     
     results = []
     
-    with concurrent.futures.ProcessPoolExecutor(max_workers=num_workers) as executor:
-        future_to_job = {executor.submit(process_job_with_data, job): job for job in json_response}
+    # Use ThreadPoolExecutor instead of ProcessPoolExecutor for shared memory
+    with concurrent.futures.ThreadPoolExecutor(max_workers=num_workers) as executor:
+        # Initialize the matcher once
+        matcher = get_matcher()
         
-        for future in concurrent.futures.as_completed(future_to_job):
+        # Submit jobs in batches for better performance
+        futures = []
+        for job in json_response:
+            description = job.get("description", "")
+            description = re.sub(r'<[^>]*>', '', description).lower()
+            future = executor.submit(matcher.match_resume_to_job, overall_user_data, description)
+            futures.append((job.get("id"), future))
+        
+        # Process results as they complete
+        for job_id, future in futures:
             try:
-                job, matcher_rank = future.result()
-                results.append((job.get("id"), matcher_rank))
+                matcher_rank = future.result()
+                results.append((job_id, matcher_rank))
             except Exception as exc:
                 print(f"Job processing generated an exception: {exc}")
     
-    # sorted_results = sorted(results, key=lambda x: x[1], reverse=True)
-    scores = [score["overall_score"] for _, score in results]
-    max_score = max(scores)
-    normalized_scores = [score / max_score for score in scores]
-    results = [(job_id, {**score, "overall_score": round(normalized_score * 100, 2)}) for (job_id, score), normalized_score in zip(results, normalized_scores)]
+    # Normalize scores more efficiently
+    # if results:
+    #     scores = [score["overall_score"] for _, score in results]
+    #     max_score = max(scores) if scores else 100
+        
+    #     normalized_results = []
+    #     for job_id, score in results:
+    #         normalized_score = score["overall_score"] / max_score
+    #         normalized_results.append((job_id, {**score, "overall_score": round(normalized_score * 100, 2)}))
+        
+    #     return normalized_results
+    
     return results
 
 async def get_job_details(db_ops: DatabaseOperations, user: User, json_response: dict, job_title: str):
     resume = await db_ops.get_user_resume(user.email)
-    if resume:
-        job_title = job_title.lower()
-        resume_skills = " ,".join(resume.skills).lower()
-        projects = resume.projects
-        resume_years = 0
-        for project in projects:
-            resume_skills += " ,".join(project.technologies).lower()
-        experience = resume.experience
-        for exp in experience:
-            startDate = exp.startDate
-            endDate = exp.endDate
-            if endDate.lower() == "present" or endDate == "":
-                endDate = str(date.today())
-            resume_years += int(endDate.split("-")[0]) - int(startDate.split("-")[0])
-        overall_user_data = f"""
-        job title: {job_title}
-        {resume.personalInfo.about_me}
-        {resume_skills}
-        {resume_years} years of experience
-        """
-        matches = match_all_jobs(json_response, overall_user_data)
-        for match_data in matches:
-            job_id, match = match_data
-            for index, json in enumerate(json_response):
-                if json["id"] == job_id:
-                    break
-            json = json_response[index]
-            json["match_score"] = match["overall_score"]
-            json["missing_skills"] = match["missing_skills"]
-            json["matched_skills"] = match["matched_skills"]
-            json["job_required_years"] = match["job_required_years"]
-            json["salary_with_currency"] = match["salary_with_currency"]
-            json['tfidf_similarity'] = match['tfidf_similarity']
-            json['semantic_similarity'] = match['semantic_similarity']
-            json['skill_match_score'] = match['skill_match_score']
-            json['experience_match_score'] = match['experience_match_score']
+    if not resume:
+        return sorted(json_response, key=lambda x: str(x.get("date_posted", "")), reverse=True)
+        
+    # Prepare user data more efficiently
+    job_title = job_title.lower()
     
-    # sort based on date posted and match score
-    json_response = sorted(
+    # Collect skills in one pass
+    all_skills = set(resume.skills)
+    
+    # Calculate experience years
+    resume_years = 0
+    for exp in resume.experience:
+        startDate = exp.startDate
+        endDate = exp.endDate
+        if endDate.lower() == "present" or endDate == "":
+            endDate = str(date.today())
+        try:
+            resume_years += int(endDate.split("-")[0]) - int(startDate.split("-")[0])
+        except (ValueError, IndexError):
+            continue
+    
+    # Build consolidated skills from projects
+    for project in resume.projects:
+        all_skills.update(project.technologies)
+    
+    # Build user data string once
+    overall_user_data = f"""
+    job title: {job_title}
+    {resume.personalInfo.about_me}
+    {', '.join(all_skills).lower()}
+    {resume_years} years of experience
+    """
+    
+    # Create lookup dictionary for jobs by ID for faster access
+    jobs_by_id = {job["id"]: job for job in json_response}
+    
+    # Run matching with optimized thread pool
+    matches = match_all_jobs(json_response, overall_user_data)
+    
+    # Update jobs with match data in one efficient pass
+    for job_id, match in matches:
+        if job_id not in jobs_by_id:
+            continue
+            
+        job = jobs_by_id[job_id]
+        job["match_score"] = match["overall_score"]
+        job["missing_skills"] = match["missing_skills"]
+        job["matched_skills"] = match["matched_skills"]
+        job["job_required_years"] = match["job_required_years"]
+        job["salary_with_currency"] = match["salary_with_currency"]
+        job['tfidf_similarity'] = match['tfidf_similarity']
+        job['semantic_similarity'] = match['semantic_similarity']
+        job['skill_match_score'] = match['skill_match_score']
+        job['experience_match_score'] = match['experience_match_score']
+        
+        # Get application status
+        job_application = await db_ops.get_user_to_job(user.email, job_id)
+        job["application_status"] = job_application.application_status.value if job_application else "Pending"
+    
+    # Sort with a more efficient lambda
+    return sorted(
         json_response,
-        key=lambda x: (
-            str(x.get("date_posted", "")),
-            x.get("match_score", 0)
-        ),
+        key=lambda x: (str(x.get("date_posted", "")), x.get("match_score", 0)),
         reverse=True
     )
-    return json_response

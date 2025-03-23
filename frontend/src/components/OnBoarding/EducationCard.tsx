@@ -4,7 +4,7 @@ import { Label } from "../ui/label";
 import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
 import { X, Plus } from "lucide-react";
-import { Card, CardContent } from "../ui/card";
+import { Card, CardContent, CardFooter } from "../ui/card";
 import {
   Select,
   SelectContent,
@@ -136,6 +136,14 @@ const EducationCard: React.FC<EducationCardProps> = ({ data, updateData }) => {
     updateData(data.filter((item) => item.id !== id));
   };
 
+  const getMissingFields = (exp: Education) => {
+    const requiredFields: (keyof Education)[] = ["degree", "school", "startDate", "endDate", "fieldOfStudy", "grade"];
+    if (exp.current) {
+      requiredFields.splice(4, 1);
+    }
+    return requiredFields.filter((field) => !exp[field]);
+  }
+
   return (
     <div className="space-y-4">
       {data.length > 0 && (
@@ -175,6 +183,13 @@ const EducationCard: React.FC<EducationCardProps> = ({ data, updateData }) => {
                     </div>
                   )}
                 </CardContent>
+                  {getMissingFields(edu).length > 0 && (
+                    <CardFooter className="flex justify-end">
+                      <div className="text-xs font-medium text-red-500">
+                        Missing fields: {getMissingFields(edu).join(", ")}
+                      </div>
+                    </CardFooter>
+                  )}
               </Card>
             ))}
         </div>
