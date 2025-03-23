@@ -140,8 +140,6 @@ class EmailSender:
 
         try:
             resend.api_key = os.getenv("RESEND_API_KEY")
-            print(F"send from {self.config.display_name} <{encoded_sender_email}>")
-            print(f"send email to {email_service.recipient}")
             resend.Emails.send({
                 "from": f"{self.config.display_name} <{encoded_sender_email}>",
                 "to": email_service.recipient,
