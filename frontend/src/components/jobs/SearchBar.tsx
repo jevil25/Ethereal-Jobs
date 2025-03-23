@@ -33,9 +33,10 @@ interface SearchBarProps {
     salary_max: number;
   };
   jobs: JobData[];
+  loading: boolean;
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ onSearch, filters, jobs }) => {
+const SearchBar: React.FC<SearchBarProps> = ({ onSearch, filters, jobs, loading }) => {
   const countries = getNames();
 
   const [searchParams] = useSearchParams();
@@ -289,6 +290,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, filters, jobs }) => {
               type="submit"
               variant="Etheral Jobs"
               className="w-full py-2 px-4 rounded-md transition duration-200"
+              disabled={loading}
             >
               Search Jobs
             </Button>

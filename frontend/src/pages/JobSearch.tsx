@@ -205,6 +205,7 @@ const JobSearch: React.FC = () => {
         onSearch={handleSearch}
         filters={filters}
         jobs={filteredJobs}
+        loading={loading}
       />
       <div className="flex flex-col md:flex-row gap-6 mt-6">
         <div className={`w-full ${show ? "md:w-1/4" : "hidden"}`}>
