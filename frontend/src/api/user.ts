@@ -206,3 +206,26 @@ export const updateName = async (name: string): Promise<User | undefined> => {
     return undefined;
   }
 };
+
+// post user/feedback
+export const sendFeedback = async (
+  page: string,
+  message: string,
+): Promise<boolean> => {
+  try {
+    const response = await axios.post(
+      constructServerUrlFromPath("/user/feedback"),
+      { page, message },
+    );
+    if (response.data.detail === "Token expired") {
+      await userRefresh();
+      return await axios
+        .post(constructServerUrlFromPath("/user/feedback"), { page, message })
+        .then((res) => res.data.is_success);
+    }
+    return response.data.is_success;
+  } catch (error) {
+    showToast("Error sending feedback. Please try again.", "error");
+    return false;
+  }
+};

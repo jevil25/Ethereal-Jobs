@@ -404,3 +404,15 @@ class UsageStats(Document):
         indexes = [
             [("email", 1)],
         ]
+
+class Feedback(Document):
+    email: str
+    feedback: str
+    feature: str
+    
+    # Timestamp fields
+    createdAt: datetime = Field(default_factory=datetime.utcnow)
+    updatedAt: datetime = Field(default_factory=datetime.utcnow)
+
+    class Settings:
+        name = "feedback"

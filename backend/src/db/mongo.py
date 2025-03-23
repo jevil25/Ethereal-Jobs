@@ -19,7 +19,8 @@ from src.db.model import (
     JobUser,
     ApplicationStatus,
     UsageStats,
-    Features
+    Features,
+    Feedback
 )
 
 from beanie import init_beanie
@@ -65,7 +66,8 @@ class DatabaseOperations:
                 AiOptimzedResumeModel,
                 UserLinkedInProfiles,
                 JobUser,
-                UsageStats
+                UsageStats,
+                Feedback
             ]
         )
 
@@ -709,4 +711,14 @@ class DatabaseOperations:
         usage_stats_doc.count += 1
         usage_stats_doc.timeStamps.append(datetime.utcnow())
         return await usage_stats_doc.save()
+    
+    async def add_feedback(self, email: str, feedback: dict):
+        feedback = await Feedback.insert(
+            Feedback(
+                email=email,
+                feedback=feedback.get("message"),
+                feature=feedback.get("page"),
+            )
+        )
+        return feedback
         

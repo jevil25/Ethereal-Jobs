@@ -24,6 +24,7 @@ import OnboardingFlow from "./pages/OnBoarding";
 import { Toaster } from "react-hot-toast";
 import ProfilePage from "./pages/Profile";
 import Footer from "./components/HomePage/Footer";
+import FeedbackButton from "./components/FeedbackButton";
 
 // needed for axios to send cookies
 axios.defaults.withCredentials = true;
@@ -91,6 +92,7 @@ function AppContent() {
           element={
             <RequireAuth location={location} searchParams={searchParams}>
               <JobSearch />
+              <FeedbackButton />
             </RequireAuth>
           }
         />
@@ -99,6 +101,7 @@ function AppContent() {
           element={
             <RequireAuth location={location} searchParams={searchParams}>
               <JobPage />
+              <FeedbackButton />
             </RequireAuth>
           }
         />
@@ -107,6 +110,7 @@ function AppContent() {
           element={
             <RequireAuth location={location} searchParams={searchParams}>
               <ResumeBuilder />
+              <FeedbackButton />
             </RequireAuth>
           }
         />
@@ -115,6 +119,7 @@ function AppContent() {
           element={
             <RequireAuth location={location} searchParams={searchParams}>
               <OnboardingFlow />
+              <FeedbackButton />
             </RequireAuth>
           }
         />
@@ -123,6 +128,7 @@ function AppContent() {
           element={
             <RequireAuth location={location} searchParams={searchParams}>
               <ProfilePage />
+              <FeedbackButton />
             </RequireAuth>
           }
         />

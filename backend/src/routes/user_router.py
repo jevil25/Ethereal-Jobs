@@ -161,3 +161,10 @@ async def update_name(request:Request, data:UserUpdateName):
     for field in fields_to_exclude:
         user_dict.pop(field)
     return JSONResponse(content={"message": "Name updated successfully", "is_updated": True, "user": user_dict})
+
+@app.post('/feedback')
+@is_user_logged_in
+async def feedback(request:Request, data:dict):
+    user: User = request.state.user
+    await db_ops.add_feedback(user.email, data)
+    return JSONResponse(content={"message": "Feedback added successfully", "is_success": True})
