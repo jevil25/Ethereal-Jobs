@@ -8,15 +8,11 @@ import { Button } from "../ui/button";
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSignIn, setIsSignIn] = useState(true);
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [searchParams] = useSearchParams();
   const [showPleaseLogin, setShowPleaseLogin] = useState(false);
 
-  const handleLogout = () => {
-    setShowPleaseLogin(false);
-    logout();
-  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -63,7 +59,7 @@ const Navbar = () => {
   return (
     <>
       <nav
-        className={`flex items-center justify-between px-4 md:px-6 py-4 fixed top-0 left-0 right-0 z-10 transition-all duration-300
+        className={`flex items-center justify-between px-4 md:px-6 py-4 fixed top-0 left-0 right-0 z-100 transition-all duration-300
                     ${isScrolled ? "bg-white shadow-md" : "bg-transparent"}`}
       >
         <div
@@ -104,13 +100,13 @@ const Navbar = () => {
           >
             Insider Connections
           </a>
-          <a
+          {/* <a
             onClick={(e) => scrollToSection(e, "about")}
             className={`hover:text-gray-600 hover:cursor-pointer transition-colors
                             ${isScrolled ? "text-gray-700" : "text-gray-800"}`}
           >
             About Us
-          </a>
+          </a> */}
         </div>
 
         <div className="flex items-center space-x-2 md:space-x-4">
@@ -119,14 +115,14 @@ const Navbar = () => {
               <span className="text-sm text-gray-700">
                 Hello, {user?.name.split(" ")[0]}
               </span>
-              <div className="relative">
+              <div className="relative gap-3 flex">
                 <Button
                   type="button"
                   className="px-4 py-2 rounded-full text-sm font-medium hover:cursor-pointer"
-                  onClick={handleLogout}
                   variant="Etheral Jobs"
+                  onClick={() => window.location.href = "/jobs"}
                 >
-                  Logout
+                  Get Started
                 </Button>
               </div>
             </div>

@@ -15,11 +15,29 @@ const JobList: React.FC<JobListProps> = ({
   onLoadMore,
   hasMore,
 }) => {
-  const [, setPage] = useState<number>(1);
+  const [page, setPage] = useState<number>(1);
   const [resultsPerPage] = useState<number>(10);
   const observer = useRef<IntersectionObserver | null>(null);
   const lastJobElementRef = useRef<HTMLDivElement | null>(null);
+  const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const [loadingMessage, setLoadingMessage] = useState<string>("Please wait while we load the jobs... this may take a few seconds");
+
+  // Function to load more jobs
+  const loadMoreJobs = () => {
+    if (isLoadingMore || !hasMore || loading) return;
+    
+    setIsLoadingMore(true);
+    const newPage = page + 1;
+    setPage(newPage);
+    
+    // Call the onLoadMore prop
+    onLoadMore(newPage * resultsPerPage);
+  };
+
+  // Reset loading state when jobs array changes (indicating load completed)
+  useEffect(() => {
+    setIsLoadingMore(false);
+  }, [jobs]);
 
   useEffect(() => {
     // Disconnect previous observer if it exists
@@ -28,18 +46,13 @@ const JobList: React.FC<JobListProps> = ({
     }
 
     // Only observe if there are more jobs to load
-    if (!hasMore || loading) return;
+    if (!hasMore || loading || isLoadingMore) return;
 
     observer.current = new IntersectionObserver(
       (entries) => {
         const [entry] = entries;
         if (entry.isIntersecting) {
-          // Load more jobs when the last element is visible
-          setPage((prevPage) => {
-            const newPage = prevPage + 1;
-            onLoadMore(newPage * resultsPerPage);
-            return newPage;
-          });
+          loadMoreJobs();
         }
       },
       { threshold: 0.5 },
@@ -55,7 +68,7 @@ const JobList: React.FC<JobListProps> = ({
         observer.current.disconnect();
       }
     };
-  }, [jobs, hasMore, loading, onLoadMore, resultsPerPage]);
+  }, [jobs, hasMore, loading, isLoadingMore, page]);
 
   useEffect(() => {
     const loadingMessages = [
@@ -71,16 +84,15 @@ const JobList: React.FC<JobListProps> = ({
     }, 4000);
 
     return () => clearInterval(interval);
-  }
-  , [loading]);
+  }, [loading]);
 
   if (loading && jobs.length === 0) {
     return (
       <div className="flex justify-center items-center py-4 flex-row gap-2">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-          <div className="transition-all duration-300 ease-in-out">
-            {loadingMessage}
-          </div>
+        <div className="transition-all duration-300 ease-in-out">
+          {loadingMessage}
+        </div>
       </div>
     );
   }
@@ -117,7 +129,7 @@ const JobList: React.FC<JobListProps> = ({
           </p>
         </div>
       )}
-      {loading && (
+      {(loading || isLoadingMore) && (
         <div className="flex justify-center items-center py-4">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
         </div>

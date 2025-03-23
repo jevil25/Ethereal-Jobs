@@ -25,9 +25,10 @@ import { ApplicationStatus } from "../../api/types";
 
 interface JobCardProps {
   job: JobData;
+  redirect?: boolean;
 }
 
-const JobCard: React.FC<JobCardProps> = ({ job }) => {
+const JobCard: React.FC<JobCardProps> = ({ job, redirect = true} ) => {
   const isJobPage = useLocation().pathname.includes("/job/");
   const [openIsAppliedModal, setOpenIsAppliedModal] = React.useState(false);
   const formatSalary = () => {
@@ -57,6 +58,7 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
 
   const redirectToJobPage = (e: React.MouseEvent) => {
     e.preventDefault();
+    if (!redirect) return;
     isJobPage ? window.open(job.job_url_direct || job.url) : window.open(`/job/${job.id}`, "_blank");
     if (isJobPage) {
       setOpenIsAppliedModal(true);

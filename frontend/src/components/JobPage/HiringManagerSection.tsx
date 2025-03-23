@@ -5,7 +5,7 @@ import { JobData, LinkedInProfile } from "../../types/data";
 import { Linkedin, Loader2 } from "lucide-react";
 import ResumeDrawer from "./ResumeDrawer";
 
-const LinkedInProfileCard: React.FC<{
+export const LinkedInProfileCard: React.FC<{
   profile: LinkedInProfile;
   index: number;
 }> = ({ profile, index }) => (

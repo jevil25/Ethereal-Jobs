@@ -255,7 +255,7 @@ const ProfilePage = () => {
             <p className="text-gray-600">You haven't applied to any jobs yet.</p>
           ) : (
             <div className="grid grid-cols-1 gap-4">
-              {appliedJobs.map((job) => (
+              {appliedJobs && appliedJobs.map((job) => (
                 <JobCard
                   key={job.id}
                   job={job}

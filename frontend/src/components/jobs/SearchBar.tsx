@@ -83,6 +83,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, filters, jobs}) => {
       resumeData.jobPreferences.locations[0] &&
       resumeData.jobPreferences.jobTypes &&
       resumeData.jobPreferences.jobTypes[0]) {
+        console.log(resumeData);
       const countryCode = getCode(
         resumeData.jobPreferences.country
           .split(" ")
