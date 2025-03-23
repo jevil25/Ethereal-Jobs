@@ -616,7 +616,7 @@ const HeroSection = ({ navigate }: HeroSectionProps) => {
         </div>
         <div id="insider-connections">
           <FeatureSection
-            title="Connect With Industry Insiders For Direct Referrals"
+            title="Connect With Job Specific Industry Insiders For Direct Referrals"
             animationProps={animationProps}
             variant="alternate"
           >
