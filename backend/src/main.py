@@ -10,6 +10,7 @@ import os
 
 load_dotenv()
 frontend_url = os.getenv("FRONTEND_URL")
+print(f"Frontend URL: {frontend_url}")
 
 # Initialize FastAPI app
 app = FastAPI()
