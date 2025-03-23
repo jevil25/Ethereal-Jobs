@@ -4,14 +4,13 @@ from fastapi import FastAPI
 from google import genai
 import textract
 from dotenv import load_dotenv
+from src.api.store_get_index import read_or_make_json
 from src.db.model import JobModel, ResumeUpdate, ResumeModel
 
 load_dotenv()
 
-client = genai.Client(api_key=os.getenv("GOOGLE_GEMINI_KEY"))
-
 app = FastAPI()
-
+api_keys=os.getenv("GOOGLE_GEMINI_KEY").split(",")
 
 def convert_to_plain_text(file_path):
     try:
@@ -32,6 +31,8 @@ def replace_nulls(data):
 
 
 def ats_extractor(resume_data, text, is_pdf=False):
+    api_key = api_keys[read_or_make_json(len(api_keys))]
+    client = genai.Client(api_key=api_key)
     json_model = ResumeUpdate.model_json_schema()
     json_model_string = json.dumps(json_model, indent=4)
     prompt = f'''
@@ -70,6 +71,8 @@ def ats_extractor(resume_data, text, is_pdf=False):
     return data_json
 
 async def get_ai_optimized_resume(resume_data: ResumeModel, is_main_resume: bool, job_id: str = None):
+    api_key = api_keys[read_or_make_json(len(api_keys))]
+    client = genai.Client(api_key=api_key)
     json_model = ResumeUpdate.model_json_schema()
     json_model_string = json.dumps(json_model, indent=4)
     headline = resume_data.personalInfo.headline
