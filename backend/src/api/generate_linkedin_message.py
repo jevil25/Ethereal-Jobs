@@ -1,7 +1,6 @@
 from datetime import datetime
 import os
 from typing import Dict, List
-from src.api.store_get_index import read_or_make_json
 from src.db.model import Experience, Project, ResumeModel
 from src.logger import logger
 # from transformers import pipeline, set_seed, AutoModelForCausalLM, AutoTokenizer
@@ -10,7 +9,7 @@ import dotenv
 
 dotenv.load_dotenv()
 
-api_keys=os.getenv("GOOGLE_GEMINI_KEY").split(",")
+client = genai.Client(api_key=os.getenv("GOOGLE_GEMINI_KEY"))
 
 class EnhancedLinkedInMessageGenerator:
     def __init__(self):
@@ -161,8 +160,6 @@ class EnhancedLinkedInMessageGenerator:
         return f"{end_date - start_date} years"
         
     def generate_message_using_gemini(self, params: ResumeModel, company: str, position: str, name: str) -> str:
-        api_key = api_keys[read_or_make_json(len(api_keys))]
-        client = genai.Client(api_key=api_key)
         try:
             # Prepare context variables
             current_experience = self.format_experience(params.experience)

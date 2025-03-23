@@ -3,10 +3,12 @@ import requests
 from typing import List, Dict
 import os
 from dotenv import load_dotenv
+
+from src.api.store_get_index import read_or_make_json
 load_dotenv()
 
-GOOGLE_CSE_KEY=os.getenv("GOOGLE_CSE_KEY")
-SEARCH_ENGINE_ID = os.getenv("SEARCH_ENGINE_ID")
+GOOGLE_CSE_KEYS=os.getenv("GOOGLE_CSE_KEY").split(",")
+SEARCH_ENGINE_IDS = os.getenv("SEARCH_ENGINE_ID").split(",")
 SEARCH_URL="https://customsearch.googleapis.com/customsearch/v1"
 
 class GoogleSearchError(Exception):
@@ -41,10 +43,11 @@ def google_search(company_name: str, location: str, title:str, results_wanted: i
     ]
     
     query = " ".join(search_terms)
+    index = read_or_make_json(len(GOOGLE_CSE_KEYS))   
     
     params = {
-        "key": GOOGLE_CSE_KEY,
-        "cx": SEARCH_ENGINE_ID,
+        "key": GOOGLE_CSE_KEYS[index],
+        "cx": SEARCH_ENGINE_IDS[index],
         "q": query,
         "num": min(results_wanted, 10),  # API limits free tier to 10 results
     }
@@ -66,12 +69,15 @@ def google_search(company_name: str, location: str, title:str, results_wanted: i
         ]
     
     except requests.exceptions.HTTPError as e:
+        print(f"Error: {e}")
         status_code = e.response.status_code
         if status_code == 429:
             return []
     except requests.exceptions.RequestException as e:
+        print(f"Error: {e}")
         raise GoogleSearchError(f"Search request failed: {str(e)}") from e
     except (KeyError, ValueError) as e:
+        print(f"Error: {e}")
         raise GoogleSearchError(f"Failed to parse search results: {str(e)}") from e
     
 def get_linkedin_profiles(company, location, title) -> List[Dict]:
