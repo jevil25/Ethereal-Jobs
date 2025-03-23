@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import JobCard from "./JobCard";
 import { JobData } from "../../types/data";
+import JobSearchNotification from "./JobNotification";
 
 interface JobListProps {
   jobs: JobData[];
@@ -20,9 +21,9 @@ const JobList: React.FC<JobListProps> = ({
   const observer = useRef<IntersectionObserver | null>(null);
   const lastJobElementRef = useRef<HTMLDivElement | null>(null);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
-  const [loadingMessage, setLoadingMessage] = useState<string>(
-    "Please wait while we load the jobs... this may take a few seconds",
-  );
+  // const [loadingMessage, setLoadingMessage] = useState<string>(
+  //   "Please wait while we load the jobs... this may take a few seconds",
+  // );
 
   // Function to load more jobs
   const loadMoreJobs = () => {
@@ -81,7 +82,7 @@ const JobList: React.FC<JobListProps> = ({
     let index = 0;
     const interval = setInterval(() => {
       if (index === loadingMessages.length) return;
-      setLoadingMessage(loadingMessages[index]);
+      // setLoadingMessage(loadingMessages[index]);
       index = (index + 1) % loadingMessages.length;
     }, 4000);
 
@@ -90,11 +91,8 @@ const JobList: React.FC<JobListProps> = ({
 
   if (loading && jobs.length === 0) {
     return (
-      <div className="flex justify-center items-center py-4 flex-row gap-2">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-        <div className="transition-all duration-300 ease-in-out">
-          {loadingMessage}
-        </div>
+      <div className="flex justify-center items-center py-4 flex-col gap-2">
+        <JobSearchNotification />
       </div>
     );
   }
