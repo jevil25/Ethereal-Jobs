@@ -22,7 +22,7 @@ import { useAuth } from "./providers/useAuth";
 import VerifyEmailPage from "./pages/verify-email";
 import OnboardingFlow from "./pages/OnBoarding";
 import { Toaster } from "react-hot-toast";
-import ProfilePage from "./pages/profile";
+import ProfilePage from "./pages/Profile";
 import Footer from "./components/HomePage/Footer";
 
 // needed for axios to send cookies
