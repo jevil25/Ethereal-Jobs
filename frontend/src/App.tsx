@@ -39,7 +39,6 @@ function App() {
               <AppContent />
             </AuthProvider>
           </Router>
-          <Footer />
         </main>
       </div>
     </>
@@ -129,6 +128,7 @@ function AppContent() {
         />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
+      <Footer />
     </>
   );
 }
