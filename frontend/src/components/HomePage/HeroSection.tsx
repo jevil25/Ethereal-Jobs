@@ -322,6 +322,8 @@ const HeroSection = ({ navigate }: HeroSectionProps) => {
   const selectedJobs = useMemo(() => jobArray.slice(0, 3), []);
   const selectedProfiles = useMemo(() => linkedInProfiles, []);
 
+  const isMobile = window.innerWidth < 768;
+
   return (
     <div
       ref={containerRef}
@@ -517,7 +519,7 @@ const HeroSection = ({ navigate }: HeroSectionProps) => {
       <main className="container mx-auto relative z-10" id="features">
         <FeatureSection
           title="Discover Perfect-Match Opportunities with AI"
-          animationProps={fastAnimationProps}
+          animationProps={isMobile ? {} : fastAnimationProps}
           variant="alternate"
         >
           <motion.div
@@ -627,7 +629,7 @@ const HeroSection = ({ navigate }: HeroSectionProps) => {
                     viewport={{ once: true }}
                   >
                     <span className="text-blue-600 font-medium mr-2 w-36 flex-shrink-0">
-                      • Match Score (85.7%):
+                      • Match Score:
                     </span>
                     <span className="flex-1">
                       Overall compatibility between your resume and job
@@ -642,7 +644,7 @@ const HeroSection = ({ navigate }: HeroSectionProps) => {
                     viewport={{ once: true }}
                   >
                     <span className="text-blue-600 font-medium mr-2 w-36 flex-shrink-0">
-                      • Keywords (12%):
+                      • Keywords:
                     </span>
                     <span className="flex-1">
                       Important terms from your resume that match job
@@ -657,7 +659,7 @@ const HeroSection = ({ navigate }: HeroSectionProps) => {
                     viewport={{ once: true }}
                   >
                     <span className="text-blue-600 font-medium mr-2 w-36 flex-shrink-0">
-                      • Content (82%):
+                      • Content:
                     </span>
                     <span className="flex-1">
                       How well your experience aligns with job responsibilities
@@ -671,7 +673,7 @@ const HeroSection = ({ navigate }: HeroSectionProps) => {
                     viewport={{ once: true }}
                   >
                     <span className="text-blue-600 font-medium mr-2 w-36 flex-shrink-0">
-                      • Skills (76%):
+                      • Skills:
                     </span>
                     <span className="flex-1">
                       Technical abilities that match job requirements
@@ -685,7 +687,7 @@ const HeroSection = ({ navigate }: HeroSectionProps) => {
                     viewport={{ once: true }}
                   >
                     <span className="text-blue-600 font-medium mr-2 w-36 flex-shrink-0">
-                      • Experience (91%):
+                      • Experience:
                     </span>
                     <span className="flex-1">
                       How your work history aligns with job expectations
