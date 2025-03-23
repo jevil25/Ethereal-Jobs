@@ -150,7 +150,7 @@ const FeatureSection = ({
     opacity: MotionValue<number>;
     y: MotionValue<number>;
     scale: MotionValue<number>;
-  };
+  } | {};
   variant?: "default" | "alternate";
 }) => {
   const sectionRef = useRef(null);
@@ -161,15 +161,14 @@ const FeatureSection = ({
       ? "bg-gradient-to-br from-blue-50/60 to-indigo-50/60 backdrop-blur-sm border border-blue-100/40 rounded-2xl shadow-lg"
       : "";
 
-  // Staggered animation for section entrance
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.1,
-        duration: 0.5,
+        staggerChildren: 0.01,
+        delayChildren: 0.01,
+        duration: 0.05,
       },
     },
   };
@@ -216,28 +215,35 @@ const useAnimatedCounter = (end: number, duration: number = 1500) => {
 
   useEffect(() => {
     if (!isInView) return;
-
+  
     let startTime: number;
     let animationFrame: number;
-
+    let lastUpdate = 0;
+    const throttleDelay = 50; // Only update the UI every 50ms on mobile
+  
     const easeOutQuart = (x: number): number => 1 - Math.pow(1 - x, 4);
-
+  
     const updateCount = (timestamp: number) => {
       if (!startTime) startTime = timestamp;
       const progress = timestamp - startTime;
       const percentage = Math.min(progress / duration, 1);
-
-      // Apply easing function for more natural animation
-      const easedProgress = easeOutQuart(percentage);
-      setCount(Math.floor(easedProgress * end));
-
+      
+      // Only update the state if enough time has passed since last update
+      // This reduces the number of re-renders
+      if (timestamp - lastUpdate >= throttleDelay || percentage === 1) {
+        // Apply easing function for more natural animation
+        const easedProgress = easeOutQuart(percentage);
+        setCount(Math.floor(easedProgress * end));
+        lastUpdate = timestamp;
+      }
+  
       if (progress < duration) {
         animationFrame = requestAnimationFrame(updateCount);
       }
     };
-
+  
     animationFrame = requestAnimationFrame(updateCount);
-
+  
     return () => cancelAnimationFrame(animationFrame);
   }, [end, duration, isInView]);
 
@@ -280,6 +286,31 @@ const HeroSection = ({ navigate }: HeroSectionProps) => {
     opacity: imageOpacity,
     y: imageY,
     scale: imageScale,
+  };
+
+  const fastImageOpacity = useTransform(
+    scrollYProgress, 
+    [0, 0.15], // Earlier trigger point
+    [0.4, 1]   // Start at 40% opacity for faster initial visibility
+  );
+  
+  const fastImageScale = useTransform(
+    scrollYProgress, 
+    [0, 0.15], 
+    [0.98, 1]  // Less dramatic scale effect
+  );
+  
+  const fastImageY = useTransform(
+    scrollYProgress, 
+    [0, 0.15], 
+    [25, 0]    // Smaller y-offset
+  );
+  
+  // Combined animation props for simpler usage
+  const fastAnimationProps = {
+    opacity: fastImageOpacity,
+    y: fastImageY,
+    scale: fastImageScale,
   };
 
   // Animated user count
@@ -334,7 +365,7 @@ const HeroSection = ({ navigate }: HeroSectionProps) => {
                 <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-violet-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-violet-500"></span>
               </span>
-              <p className="text-violet-800 text-sm font-medium group-hover:text-yellow-900">
+              <p className="text-violet-800 text-xs md:text-sm font-medium group-hover:text-yellow-900">
                 Just Launched • Beta (v1.0)
               </p>
               <ShimmerEffect className="rounded-full" />
@@ -360,7 +391,7 @@ const HeroSection = ({ navigate }: HeroSectionProps) => {
                 <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-violet-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-violet-500"></span>
               </span>
-              <p className="text-violet-800 text-sm font-medium group-hover:text-yellow-900">
+              <p className="text-violet-800 text-xs md:text-sm font-medium group-hover:text-yellow-900">
                 Free to use (Launch offer only)
               </p>
               <ShimmerEffect className="rounded-full" />
@@ -484,7 +515,7 @@ const HeroSection = ({ navigate }: HeroSectionProps) => {
       <main className="container mx-auto relative z-10" id="features">
         <FeatureSection
           title="Discover Perfect-Match Opportunities with AI"
-          animationProps={animationProps}
+          animationProps={fastAnimationProps}
           variant="alternate"
         >
           <div className="w-full max-w-5xl">
