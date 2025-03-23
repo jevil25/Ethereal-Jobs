@@ -126,7 +126,7 @@ const HiringManagersSection: React.FC<{
             </div>
           </div>
 
-          <div className="flex items-center gap-4 mb-4">
+          <div className="flex md:items-center gap-4 mb-4 flex-col md:flex-row items-start">
             <Button
               variant="outline"
               className="border-blue-500 text-blue-500 hover:bg-blue-50 hover:text-blue-600"

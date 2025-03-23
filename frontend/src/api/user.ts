@@ -95,7 +95,7 @@ export const userMe = async () => {
       needsLogin: true,
     };
   } catch (error) {
-    showToast("Error fetching user details. Please try again.", "error");
+    // showToast("Error fetching user details. Please try again.", "error");
     return {
       message: "Error fetching user details.",
       needsLogin: true,
