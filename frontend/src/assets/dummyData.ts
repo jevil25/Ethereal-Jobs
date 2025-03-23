@@ -19,7 +19,7 @@ export const jobArray: JobData[] = [
     currency: "USD",
     is_remote: true,
     job_level: "Senior",
-    job_function: "Engineering",
+    job_function: "",
     listing_type: "Direct",
     emails: "careers@techsolutions.com",
     description:
@@ -62,7 +62,7 @@ export const jobArray: JobData[] = [
     currency: "USD",
     is_remote: true,
     job_level: "Mid",
-    job_function: "Engineering",
+    job_function: "",
     listing_type: "Direct",
     emails: "",
     description:
@@ -77,7 +77,7 @@ export const jobArray: JobData[] = [
     company_description:
       "Tech Solutions Inc. is a leading software development company specializing in web applications and cloud solutions.",
     has_linkedIn_profiles: true,
-    match_score: 85.7,
+    match_score: 75.4,
     missing_skills: ["GraphQL", "AWS"],
     matched_skills: ["JavaScript", "React", "TypeScript", "Node.js"],
     job_required_years: 3,

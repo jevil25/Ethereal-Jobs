@@ -146,11 +146,13 @@ const FeatureSection = ({
 }: {
   title: string;
   children: React.ReactNode;
-  animationProps: {
-    opacity: MotionValue<number>;
-    y: MotionValue<number>;
-    scale: MotionValue<number>;
-  } | {};
+  animationProps:
+    | {
+        opacity: MotionValue<number>;
+        y: MotionValue<number>;
+        scale: MotionValue<number>;
+      }
+    | {};
   variant?: "default" | "alternate";
 }) => {
   const sectionRef = useRef(null);
@@ -215,19 +217,19 @@ const useAnimatedCounter = (end: number, duration: number = 1500) => {
 
   useEffect(() => {
     if (!isInView) return;
-  
+
     let startTime: number;
     let animationFrame: number;
     let lastUpdate = 0;
     const throttleDelay = 50; // Only update the UI every 50ms on mobile
-  
+
     const easeOutQuart = (x: number): number => 1 - Math.pow(1 - x, 4);
-  
+
     const updateCount = (timestamp: number) => {
       if (!startTime) startTime = timestamp;
       const progress = timestamp - startTime;
       const percentage = Math.min(progress / duration, 1);
-      
+
       // Only update the state if enough time has passed since last update
       // This reduces the number of re-renders
       if (timestamp - lastUpdate >= throttleDelay || percentage === 1) {
@@ -236,14 +238,14 @@ const useAnimatedCounter = (end: number, duration: number = 1500) => {
         setCount(Math.floor(easedProgress * end));
         lastUpdate = timestamp;
       }
-  
+
       if (progress < duration) {
         animationFrame = requestAnimationFrame(updateCount);
       }
     };
-  
+
     animationFrame = requestAnimationFrame(updateCount);
-  
+
     return () => cancelAnimationFrame(animationFrame);
   }, [end, duration, isInView]);
 
@@ -289,23 +291,23 @@ const HeroSection = ({ navigate }: HeroSectionProps) => {
   };
 
   const fastImageOpacity = useTransform(
-    scrollYProgress, 
+    scrollYProgress,
     [0, 0.15], // Earlier trigger point
-    [0.4, 1]   // Start at 40% opacity for faster initial visibility
+    [0.4, 1], // Start at 40% opacity for faster initial visibility
   );
-  
+
   const fastImageScale = useTransform(
-    scrollYProgress, 
-    [0, 0.15], 
-    [0.98, 1]  // Less dramatic scale effect
+    scrollYProgress,
+    [0, 0.15],
+    [0.98, 1], // Less dramatic scale effect
   );
-  
+
   const fastImageY = useTransform(
-    scrollYProgress, 
-    [0, 0.15], 
-    [25, 0]    // Smaller y-offset
+    scrollYProgress,
+    [0, 0.15],
+    [25, 0], // Smaller y-offset
   );
-  
+
   // Combined animation props for simpler usage
   const fastAnimationProps = {
     opacity: fastImageOpacity,
@@ -518,48 +520,260 @@ const HeroSection = ({ navigate }: HeroSectionProps) => {
           animationProps={fastAnimationProps}
           variant="alternate"
         >
-          <div className="w-full max-w-5xl">
+          <motion.div
+            className="w-full max-w-6xl flex flex-col md:flex-row gap-5"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
             <motion.div
-              className="w-full rounded-xl overflow-hidden flex flex-col gap-8"
+              className="w-full rounded-xl overflow-hidden flex flex-col md:flex-row gap-8"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
               viewport={{ once: true, margin: "-50px" }}
             >
-              {selectedJobs.map((job, index) => (
-                <motion.div
-                  key={`job-${index}`}
-                  className="relative"
-                  initial={{ opacity: 0, x: -20, scale: 0.98 }}
-                  whileInView={{
-                    opacity: 1,
-                    x: 0,
-                    scale: 1,
-                    transition: { delay: index * 0.1, duration: 0.4 },
-                  }}
-                  whileHover={{
-                    y: -5,
-                    boxShadow:
-                      "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-                    transition: { duration: 0.2 },
-                  }}
-                  viewport={{ once: true, margin: "-50px" }}
-                >
-                  <JobCard job={job} redirect={false} />
-                  {/* Add subtle highlight effect on hover */}
+              <motion.div
+                className="w-full rounded-xl overflow-hidden flex flex-col gap-8"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                viewport={{ once: true, margin: "-50px" }}
+              >
+                {selectedJobs.map((job, index) => (
                   <motion.div
-                    className="absolute inset-0 border-2 border-blue-400/0 rounded-xl pointer-events-none"
-                    initial={{ opacity: 0 }}
-                    whileHover={{
+                    key={`job-${index}`}
+                    className="relative"
+                    initial={{ opacity: 0, x: -20, scale: 0.98 }}
+                    whileInView={{
                       opacity: 1,
-                      borderColor: "rgba(96, 165, 250, 0.5)",
+                      x: 0,
+                      scale: 1,
+                      transition: { delay: index * 0.1, duration: 0.4 },
                     }}
-                    transition={{ duration: 0.2 }}
-                  />
-                </motion.div>
-              ))}
+                    whileHover={{
+                      y: -5,
+                      boxShadow:
+                        "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+                      transition: { duration: 0.2 },
+                    }}
+                    viewport={{ once: true, margin: "-50px" }}
+                  >
+                    <JobCard job={job} redirect={false} />
+                    {/* Add subtle highlight effect on hover */}
+                    <motion.div
+                      className="absolute inset-0 border-2 border-blue-400/0 rounded-xl pointer-events-none"
+                      initial={{ opacity: 0 }}
+                      whileHover={{
+                        opacity: 1,
+                        borderColor: "rgba(96, 165, 250, 0.5)",
+                      }}
+                      transition={{ duration: 0.2 }}
+                    />
+                  </motion.div>
+                ))}
+              </motion.div>
             </motion.div>
-          </div>
+
+            <motion.div
+              className="w-full md:w-2/5 lg:w-1/3 flex-shrink-0 bg-gradient-to-br from-blue-50 to-indigo-50 p-4 md:p-6 rounded-xl shadow-lg"
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              viewport={{ once: true, margin: "-50px" }}
+            >
+              <motion.h4
+                className="text-lg font-semibold text-gray-800 mb-3"
+                initial={{ opacity: 0, y: -10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.3 }}
+                viewport={{ once: true }}
+              >
+                How it works
+              </motion.h4>
+              <motion.ul
+                className="space-y-3"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.4 }}
+                viewport={{ once: true }}
+              >
+                <li>
+                  <span className="font-semibold text-blue-600">Step 1:</span>{" "}
+                  Enter your job preferences and upload your resume
+                </li>
+                <li>
+                  <span className="font-semibold text-blue-600">Step 2:</span>{" "}
+                  Get matched with personalized job listings
+                </li>
+              </motion.ul>
+
+              <motion.div
+                className="mt-4 pt-4 border-t border-blue-100"
+                initial={{ opacity: 0, y: 15 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.5 }}
+                viewport={{ once: true }}
+              >
+                <h5 className="font-semibold text-gray-800 mb-2">
+                  Understanding your match:
+                </h5>
+                <ul className="space-y-2 text-sm">
+                  <motion.li
+                    className="flex flex-col sm:flex-row items-start"
+                    initial={{ opacity: 0, x: -10 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.3, delay: 0.6 }}
+                    viewport={{ once: true }}
+                  >
+                    <span className="text-blue-600 font-medium mr-2 w-36 flex-shrink-0">
+                      • Match Score (85.7%):
+                    </span>
+                    <span className="flex-1">
+                      Overall compatibility between your resume and job
+                      requirements
+                    </span>
+                  </motion.li>
+                  <motion.li
+                    className="flex flex-col sm:flex-row items-start"
+                    initial={{ opacity: 0, x: -10 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.3, delay: 0.7 }}
+                    viewport={{ once: true }}
+                  >
+                    <span className="text-blue-600 font-medium mr-2 w-36 flex-shrink-0">
+                      • Keywords (12%):
+                    </span>
+                    <span className="flex-1">
+                      Important terms from your resume that match job
+                      description
+                    </span>
+                  </motion.li>
+                  <motion.li
+                    className="flex flex-col sm:flex-row items-start"
+                    initial={{ opacity: 0, x: -10 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.3, delay: 0.8 }}
+                    viewport={{ once: true }}
+                  >
+                    <span className="text-blue-600 font-medium mr-2 w-36 flex-shrink-0">
+                      • Content (82%):
+                    </span>
+                    <span className="flex-1">
+                      How well your experience aligns with job responsibilities
+                    </span>
+                  </motion.li>
+                  <motion.li
+                    className="flex flex-col sm:flex-row items-start"
+                    initial={{ opacity: 0, x: -10 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.3, delay: 0.9 }}
+                    viewport={{ once: true }}
+                  >
+                    <span className="text-blue-600 font-medium mr-2 w-36 flex-shrink-0">
+                      • Skills (76%):
+                    </span>
+                    <span className="flex-1">
+                      Technical abilities that match job requirements
+                    </span>
+                  </motion.li>
+                  <motion.li
+                    className="flex flex-col sm:flex-row items-start"
+                    initial={{ opacity: 0, x: -10 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.3, delay: 1.0 }}
+                    viewport={{ once: true }}
+                  >
+                    <span className="text-blue-600 font-medium mr-2 w-36 flex-shrink-0">
+                      • Experience (91%):
+                    </span>
+                    <span className="flex-1">
+                      How your work history aligns with job expectations
+                    </span>
+                  </motion.li>
+                </ul>
+              </motion.div>
+
+              <motion.div
+                className="mt-4 pt-4 border-t border-blue-100"
+                initial={{ opacity: 0, y: 15 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 1.1 }}
+                viewport={{ once: true }}
+              >
+                <h5 className="font-semibold text-gray-800 mb-2">
+                  Technology tags:
+                </h5>
+                <p className="text-sm mb-2">
+                  Green tags highlight skills from your resume that match job
+                  requirements.
+                </p>
+                <motion.div
+                  className="flex flex-wrap gap-2"
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 1.2 }}
+                  viewport={{ once: true }}
+                >
+                  <motion.span
+                    className="px-2 py-1 bg-green-100 text-green-800 rounded text-xs font-medium"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.3, delay: 1.3 }}
+                    viewport={{ once: true }}
+                  >
+                    JavaScript
+                  </motion.span>
+                  <motion.span
+                    className="px-2 py-1 bg-green-100 text-green-800 rounded text-xs font-medium"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.3, delay: 1.4 }}
+                    viewport={{ once: true }}
+                  >
+                    React
+                  </motion.span>
+                  <motion.span
+                    className="px-2 py-1 bg-green-100 text-green-800 rounded text-xs font-medium"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.3, delay: 1.5 }}
+                    viewport={{ once: true }}
+                  >
+                    TypeScript
+                  </motion.span>
+                  <motion.span
+                    className="px-2 py-1 bg-gray-100 text-gray-800 rounded text-xs font-medium"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.3, delay: 1.6 }}
+                    viewport={{ once: true }}
+                  >
+                    GraphQL
+                  </motion.span>
+                  <motion.span
+                    className="px-2 py-1 bg-gray-100 text-gray-800 rounded text-xs font-medium"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.3, delay: 1.7 }}
+                    viewport={{ once: true }}
+                  >
+                    AWS
+                  </motion.span>
+                </motion.div>
+                <motion.p
+                  className="text-xs mt-2 text-gray-600"
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 1.8 }}
+                  viewport={{ once: true }}
+                >
+                  Gray tags indicate skills required by the job that weren't
+                  found in your resume.
+                </motion.p>
+              </motion.div>
+            </motion.div>
+          </motion.div>
         </FeatureSection>
 
         <div id="resume">
