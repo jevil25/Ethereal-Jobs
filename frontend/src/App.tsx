@@ -25,6 +25,7 @@ import { Toaster } from "react-hot-toast";
 import ProfilePage from "./pages/Profile";
 import Footer from "./components/HomePage/Footer";
 import FeedbackButton from "./components/FeedbackButton";
+import { Analytics } from "@vercel/analytics/react"
 
 // needed for axios to send cookies
 axios.defaults.withCredentials = true;
@@ -40,6 +41,7 @@ function App() {
               <AppContent />
             </AuthProvider>
           </Router>
+          <Analytics/>
         </main>
       </div>
     </>
