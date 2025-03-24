@@ -175,7 +175,7 @@ const ProfilePage = () => {
                       <Button
                         key={section.id}
                         variant={
-                          activeTab === section.id ? "Etheral Jobs" : "ghost"
+                          activeTab === section.id ? "Ethereal Jobs" : "ghost"
                         }
                         className={`justify-start rounded-none text-left py-3 px-4 ${
                           activeTab === section.id
@@ -302,7 +302,7 @@ const ProfilePage = () => {
           <CardContent className="p-0">
             <div className="flex flex-col">
               <Button
-                variant={activeSection === "profile" ? "Etheral Jobs" : "ghost"}
+                variant={activeSection === "profile" ? "Ethereal Jobs" : "ghost"}
                 className="justify-start rounded-none text-left py-3 px-4 flex items-center gap-2"
                 onClick={() => setActiveSection("profile")}
               >
@@ -310,7 +310,7 @@ const ProfilePage = () => {
                 Profile & Resume
               </Button>
               <Button
-                variant={activeSection === "jobs" ? "Etheral Jobs" : "ghost"}
+                variant={activeSection === "jobs" ? "Ethereal Jobs" : "ghost"}
                 className="justify-start rounded-none text-left py-3 px-4 flex items-center gap-2"
                 onClick={() => setActiveSection("jobs")}
               >
@@ -318,7 +318,7 @@ const ProfilePage = () => {
                 Applied Jobs
               </Button>
               {/* <Button
-                variant={activeSection === "danger" ? "Etheral Jobs" : "ghost"}
+                variant={activeSection === "danger" ? "Ethereal Jobs" : "ghost"}
                 className="justify-start rounded-none text-left py-3 px-4 flex items-center gap-2"
                 onClick={() => setActiveSection("danger")}
               >
