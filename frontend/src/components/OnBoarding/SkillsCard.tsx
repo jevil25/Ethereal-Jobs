@@ -59,7 +59,7 @@ const SkillsCard: React.FC<SkillsCardProps> = ({ data, updateData }) => {
           onChange={(e) => setNewSkill(e.target.value)}
           className="flex-1"
         />
-        <Button type="submit" variant="Etheral Jobs">
+        <Button type="submit" variant="Ethereal Jobs">
           Add
         </Button>
       </form>

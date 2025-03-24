@@ -65,7 +65,7 @@ const NavBar = () => {
         <Link to="/" className="flex items-center space-x-2">
           <img
             src={logo}
-            alt="Etheral Jobs Logo"
+            alt="Ethereal Jobs Logo"
             className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12"
           />
           <span
@@ -159,7 +159,7 @@ const NavBar = () => {
               <Button variant="outline" size="sm" className="hidden sm:flex">
                 <Link to="/login">Sign In</Link>
               </Button>
-              <Button variant="Etheral Jobs" size="sm">
+              <Button variant="Ethereal Jobs" size="sm">
                 <Link to="/signup">Sign Up</Link>
               </Button>
             </div>
@@ -216,7 +216,7 @@ const NavBar = () => {
                   </Link>
                 </Button>
                 <Button
-                  variant="Etheral Jobs"
+                  variant="Ethereal Jobs"
                   className="w-full justify-center"
                 >
                   <Link to="/signup" className="w-full text-center">

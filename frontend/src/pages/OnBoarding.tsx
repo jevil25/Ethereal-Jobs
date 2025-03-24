@@ -409,7 +409,7 @@ const OnboardingFlow: React.FC = () => {
 
               <Button
                 onClick={handleNext}
-                variant="Etheral Jobs"
+                variant="Ethereal Jobs"
                 disabled={!transitionComplete || isParsingResume}
               >
                 {currentStep === steps.length - 1 ? "Complete" : "Next"}

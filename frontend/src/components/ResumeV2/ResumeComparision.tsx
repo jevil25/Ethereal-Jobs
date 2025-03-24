@@ -105,7 +105,7 @@ const ResumeComparison = ({
                     </div>
                     <Button
                       className="mt-4"
-                      variant="Etheral Jobs"
+                      variant="Ethereal Jobs"
                       onClick={() => startResumeGeneration(false)}
                     >
                       Generate Resume

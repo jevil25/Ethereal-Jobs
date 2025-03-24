@@ -67,7 +67,7 @@ const Navbar = () => {
         >
           <img
             src={logo}
-            alt="Etheral Jobs Logo"
+            alt="Ethereal Jobs Logo"
             className="w-10 h-10 md:w-14 md:h-14"
           />
           <span
@@ -118,7 +118,7 @@ const Navbar = () => {
                 <Button
                   type="button"
                   className="px-4 py-2 rounded-full text-sm font-medium hover:cursor-pointer"
-                  variant="Etheral Jobs"
+                  variant="Ethereal Jobs"
                   onClick={() => (window.location.href = "/jobs")}
                 >
                   Get Started
@@ -132,7 +132,7 @@ const Navbar = () => {
               </Button>
               <Button
                 onClick={() => handleAuthClick(false)}
-                variant={"Etheral Jobs"}
+                variant={"Ethereal Jobs"}
               >
                 Sign Up
               </Button>

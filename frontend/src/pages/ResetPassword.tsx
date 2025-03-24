@@ -211,7 +211,7 @@ const ResetPasswordPage: React.FC = () => {
               type="submit"
               className={`w-full py-3 rounded-full hover:bg-gray-800 hover:cursor-pointer transition-colors ${isLoading ? "opacity-70 cursor-not-allowed" : ""}`}
               disabled={isLoading}
-              variant={"Etheral Jobs"}
+              variant={"Ethereal Jobs"}
             >
               {isLoading ? "Resetting..." : "Reset Password"}
             </Button>

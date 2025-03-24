@@ -311,7 +311,7 @@ const EducationCard: React.FC<EducationCardProps> = ({ data, updateData }) => {
             <Button variant="outline" onClick={resetForm}>
               Cancel
             </Button>
-            <Button variant="Etheral Jobs" onClick={saveEducation}>
+            <Button variant="Ethereal Jobs" onClick={saveEducation}>
               {isEditing ? "Update Education" : "Add Education"}
             </Button>
           </div>

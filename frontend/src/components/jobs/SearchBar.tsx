@@ -288,7 +288,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, filters, jobs, loading 
           <div className="mt-4">
             <Button
               type="submit"
-              variant="Etheral Jobs"
+              variant="Ethereal Jobs"
               className="w-full py-2 px-4 rounded-md transition duration-200"
               disabled={loading}
             >

@@ -263,7 +263,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ data, updateData }) => {
                 onChange={(e) => setNewTech(e.target.value)}
                 className="flex-1"
               />
-              <Button type="submit" variant="Etheral Jobs" size="sm">
+              <Button type="submit" variant="Ethereal Jobs" size="sm">
                 Add
               </Button>
             </form>
@@ -330,7 +330,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ data, updateData }) => {
             <Button variant="outline" onClick={resetForm}>
               Cancel
             </Button>
-            <Button variant="Etheral Jobs" onClick={saveProject}>
+            <Button variant="Ethereal Jobs" onClick={saveProject}>
               {isEditing ? "Update Project" : "Add Project"}
             </Button>
           </div>

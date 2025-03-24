@@ -478,7 +478,7 @@ const HeroSection = ({ navigate }: HeroSectionProps) => {
             >
               <Button
                 onClick={() => navigate("/jobs")}
-                variant="Etheral Jobs"
+                variant="Ethereal Jobs"
                 size="lg"
                 className="relative overflow-hidden rounded-full px-8 py-6 text-lg font-semibold bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 transition-all shadow-lg hover:shadow-xl border border-blue-400/20"
               >

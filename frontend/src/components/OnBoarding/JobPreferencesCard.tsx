@@ -170,7 +170,7 @@ const JobPreferencesCard: React.FC<JobPreferencesCardProps> = ({
             onChange={(e) => setNewLocation(e.target.value)}
             className="flex-1"
           />
-          <Button type="submit" variant="Etheral Jobs">
+          <Button type="submit" variant="Ethereal Jobs">
             Add
           </Button>
         </form>
