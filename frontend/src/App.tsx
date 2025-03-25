@@ -25,6 +25,8 @@ import { Toaster } from "react-hot-toast";
 import ProfilePage from "./pages/Profile";
 import Footer from "./components/HomePage/Footer";
 import FeedbackButton from "./components/FeedbackButton";
+import { Role } from "./types/data";
+import AdminDashboard from "./pages/Admin";
 
 // needed for axios to send cookies
 axios.defaults.withCredentials = true;
@@ -51,10 +53,12 @@ function RequireAuth({
   children,
   location,
   searchParams,
+  adminRoute = false,
 }: {
   children: ReactNode;
   location: Location;
   searchParams: URLSearchParams;
+  adminRoute?: boolean;
 }) {
   const { user } = useAuth();
   if (!user || user === null) {
@@ -67,6 +71,10 @@ function RequireAuth({
   }
   if (!user.is_onboarded && location.pathname !== "/onboarding") {
     return <Navigate to="/onboarding" replace />;
+  }
+
+  if (adminRoute && user.role !== Role.Admin) {
+    return <Navigate to="/" replace />;
   }
 
   return <>{children}</>;
@@ -129,6 +137,18 @@ function AppContent() {
             <RequireAuth location={location} searchParams={searchParams}>
               <ProfilePage />
               <FeedbackButton />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <RequireAuth
+              location={location}
+              searchParams={searchParams}
+              adminRoute
+            >
+              <AdminDashboard />
             </RequireAuth>
           }
         />

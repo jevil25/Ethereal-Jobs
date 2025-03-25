@@ -20,12 +20,12 @@ class EmailTemplates(enum.Enum):
 class ResetPasswordEmail(BaseModel):
     reset_link: str
     name: str
-    subject: str = "Etheral Jobs - Reset Password"
+    subject: str = "Ethereal Jobs - Reset Password"
 
 class EmailVerificationEmail(BaseModel):
     verification_link: str
     name: str
-    subject: str = "Etheral Jobs - Email Verification"
+    subject: str = "Ethereal Jobs - Email Verification"
     
 
 class EmailService(BaseModel):
@@ -39,7 +39,7 @@ class EmailConfig:
     smtp_username: str
     smtp_password: str
     from_email: str
-    display_name: str = "Etheral Jobs"
+    display_name: str = "Ethereal Jobs"
 
 
     def __init__(self) -> None:

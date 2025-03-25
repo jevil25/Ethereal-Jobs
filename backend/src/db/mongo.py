@@ -722,3 +722,11 @@ class DatabaseOperations:
         )
         return feedback
         
+    async def get_users(self):
+        return await User.find().to_list()
+
+    async def get_usage_stats(self):
+        return await UsageStats.find().to_list()
+
+    async def get_feedback(self):
+        return await Feedback.find().to_list()

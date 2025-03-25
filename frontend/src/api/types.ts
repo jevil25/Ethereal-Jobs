@@ -233,6 +233,34 @@ enum ApplicationStatus {
   Archived = "Archived",
 }
 
+enum Features {
+    JobSearch = "JobSearch",
+    ResumeBuilder = "ResumeUpload",
+    MainResumeUpload = "MainResumeUpload",
+    MainResumeDownload = "MainResumeDownload",
+    OptimizedResumeGeneration = "OptimizedResumeGeneration",
+    OptimizedResumeDownload = "OptimizedResumeDownload",
+    OptimizedJobResumeGeneration = "OptimizedJobResumeGeneration",
+    OptimizedJobResumeDownload = "OptimizedJobResumeDownload",
+    LinkedInProfileGeneration = "LinkedInProfileGeneration",
+    LinkedInProfileMessageGeneration = "LinkedInProfileMessageGeneration",
+}
+
+interface Feedback {
+  email: string;
+  feedback: string;
+  feature: string;
+  createdAt: string;
+}
+
+interface UsageStats {
+  email: string;
+  feature: Features;
+  job_id: string;
+  count: number;
+  timestamps: string[];
+}
+
 export type {
   ResumeSaveRequest,
   ResumeSaveResponse,
@@ -267,6 +295,8 @@ export type {
   GenerateAiResumeResponse,
   DownloadResumeRequest,
   GenerateAiResumeUpdateRequest,
+  Feedback,
+  UsageStats,
 };
 
 export { ApplicationStatus };

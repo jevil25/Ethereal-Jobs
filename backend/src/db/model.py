@@ -88,6 +88,10 @@ class UserLinkedInProfiles(Document):
             [("email", 1)],
         ]
 
+class Roles(enum.Enum):
+    Admin = "Admin"
+    User = "User"
+
 class User(Document):
     name: str
     email: Indexed(str, unique=True) # type: ignore
@@ -95,6 +99,7 @@ class User(Document):
     provider: str
     is_verified: bool = False
     is_onboarded: bool = False
+    role: str
     
     # Timestamp fields
     createdAt: datetime = Field(default_factory=datetime.utcnow)
@@ -103,6 +108,11 @@ class User(Document):
     @before_event(Insert)
     def capitalize_name(self):
         self.name = self.name.capitalize()
+    
+    @before_event(Insert)
+    def check_role(self):
+        if self.role not in [role.value for role in Roles]:
+            self.role = Roles.User.value
 
     class Settings:
         name = "users"
@@ -359,11 +369,16 @@ class ApplicationStatus(enum.Enum):
 class JobUser(Document):
     email: Indexed(str) # type: ignore
     jobId: Indexed(str) # type: ignore
-    application_status: ApplicationStatus = ApplicationStatus.Pending
+    application_status: str = ApplicationStatus.Pending.value
     
     # Timestamp fields
     createdAt: datetime = Field(default_factory=datetime.utcnow)
     updatedAt: datetime = Field(default_factory=datetime.utcnow)
+
+    @before_event(Insert)
+    def check_application_status(self):
+        if self.application_status not in [status.value for status in ApplicationStatus]:
+            self.application_status = ApplicationStatus.Applied.value
 
     class Settings:
         name = "job_user"
@@ -390,7 +405,7 @@ class Features(enum.Enum):
 
 class UsageStats(Document):
     email: Indexed(str) # type: ignore
-    feature: Features
+    feature: str
     job_id: Optional[str] = None
     count: int = 1
     timeStamps: List[datetime] = []
@@ -398,6 +413,11 @@ class UsageStats(Document):
     # Timestamp fields
     createdAt: datetime = Field(default_factory=datetime.utcnow)
     updatedAt: datetime = Field(default_factory=datetime.utcnow)
+
+    @before_event(Insert)
+    def check_feature(self):
+        if self.feature not in [feature.value for feature in Features]:
+            raise ValueError("Invalid feature")
 
     class Settings:
         name = "usage_stats"

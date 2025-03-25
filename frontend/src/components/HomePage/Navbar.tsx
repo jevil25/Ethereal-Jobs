@@ -4,6 +4,7 @@ import AuthForms from "../Auth/AuthForms";
 import { useAuth } from "../../providers/useAuth";
 import { useSearchParams } from "react-router-dom";
 import { Button } from "../ui/button";
+import { Role } from "../../types/data";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -107,6 +108,19 @@ const Navbar = () => {
             About Us
           </a> */}
         </div>
+        {
+          user?.role === Role.Admin && (
+            <div className="hidden md:flex items-center space-x-4 md:space-x-6">
+              <a
+                href="/admin"
+                className={`hover:text-gray-600 hover:cursor-pointer transition-colors
+                            ${isScrolled ? "text-gray-700" : "text-gray-800"}`}
+              >
+                Admin
+              </a>
+            </div>
+          )
+        }
 
         <div className="flex items-center space-x-2 md:space-x-4">
           {isAuthenticated ? (

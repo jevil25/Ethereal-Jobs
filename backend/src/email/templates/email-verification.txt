@@ -1,16 +1,16 @@
-Etheral Jobs - AI-Powered Job Search
+Ethereal Jobs - AI-Powered Job Search
 
 VERIFY YOUR ACCOUNT
 
 Hello ${name},
 
-Welcome to Etheral Jobs! To complete your account setup and start your AI-powered job search, please verify your email address by visiting the link below:
+Welcome to Ethereal Jobs! To complete your account setup and start your AI-powered job search, please verify your email address by visiting the link below:
 
 ${verification_link}
 
-If you didn't create an account with Etheral Jobs, please ignore this email or contact our support team.
+If you didn't create an account with Ethereal Jobs, please ignore this email or contact our support team.
 
 This verification link will expire in 24 hours.
 
-© 2025 Etheral Jobs • AI-Powered Job Search & Networking
+© 2025 Ethereal Jobs • AI-Powered Job Search & Networking
 Your Dream Job Is One Connection Away

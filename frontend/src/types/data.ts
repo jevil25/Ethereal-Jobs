@@ -55,8 +55,17 @@ export interface JobDataWithLinkedInProfiles extends JobData {
   is_empty: boolean;
 }
 
+export enum Role {
+  Admin = "Admin",
+  User = "User",
+}
+
 export interface User {
   email: string;
   name: string;
   is_onboarded: boolean;
+  role: Role;
+  createdAt: string;
+  provider: string;
+  is_verified: boolean;
 }

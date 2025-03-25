@@ -156,7 +156,7 @@ async def update_name(request:Request, data:UserUpdateName):
     user, success = await db_ops.update_user_name(user.email, name)
     if not success:
         return JSONResponse(content={"message": "Name not updated", "is_updated": False})
-    user_dict = user.__dict__
+    user_dict = user.model_dump()
     fields_to_exclude = ["id", "password", "updatedAt", "createdAt"]
     for field in fields_to_exclude:
         user_dict.pop(field)
