@@ -433,7 +433,7 @@ async def get_job_details(db_ops: DatabaseOperations, user: User, json_response:
         
         # Get application status
         job_application = await db_ops.get_user_to_job(user.email, job_id)
-        job["application_status"] = job_application.application_status.value if job_application else "Pending"
+        job["application_status"] = job_application.application_status if job_application else "Pending"
     
     # Sort with a more efficient lambda
     return sorted(
