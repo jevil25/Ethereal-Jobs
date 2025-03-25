@@ -100,58 +100,50 @@ const Navbar = () => {
           >
             Insider Connections
           </a>
-          {/* <a
-            onClick={(e) => scrollToSection(e, "about")}
-            className={`hover:text-gray-600 hover:cursor-pointer transition-colors
-                            ${isScrolled ? "text-gray-700" : "text-gray-800"}`}
-          >
-            About Us
-          </a> */}
         </div>
-        {
-          user?.role === Role.Admin && (
-            <div className="hidden md:flex items-center space-x-4 md:space-x-6">
-              <a
-                href="/admin"
-                className={`hover:text-gray-600 hover:cursor-pointer transition-colors
-                            ${isScrolled ? "text-gray-700" : "text-gray-800"}`}
-              >
-                Admin
-              </a>
-            </div>
-          )
-        }
 
-        <div className="flex items-center space-x-2 md:space-x-4">
-          {isAuthenticated ? (
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-700">
-                Hello, {user?.name.split(" ")[0]}
-              </span>
-              <div className="relative gap-3 flex">
+        <div className="flex items-center space-x-4 md:space-x-6">
+          {user?.role === Role.Admin && (
+            <Button 
+              variant="outline" 
+              className="hidden md:flex items-center space-x-2 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-100"
+              onClick={() => window.location.href = "/admin"}
+            >
+              <span>Admin Dashboard</span>
+            </Button>
+          )}
+
+          <div className="flex items-center space-x-2 md:space-x-4">
+            {isAuthenticated ? (
+              <div className="flex items-center space-x-4">
+                <span className="text-sm text-gray-700">
+                  Hello, {user?.name.split(" ")[0]}
+                </span>
+                <div className="relative gap-3 flex">
+                  <Button
+                    type="button"
+                    className="px-4 py-2 rounded-full text-sm font-medium hover:cursor-pointer"
+                    variant="Ethereal Jobs"
+                    onClick={() => (window.location.href = "/jobs")}
+                  >
+                    Get Started
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex space-x-4">
+                <Button onClick={() => handleAuthClick(true)} variant={"outline"}>
+                  Sign In
+                </Button>
                 <Button
-                  type="button"
-                  className="px-4 py-2 rounded-full text-sm font-medium hover:cursor-pointer"
-                  variant="Ethereal Jobs"
-                  onClick={() => (window.location.href = "/jobs")}
+                  onClick={() => handleAuthClick(false)}
+                  variant={"Ethereal Jobs"}
                 >
-                  Get Started
+                  Sign Up
                 </Button>
               </div>
-            </div>
-          ) : (
-            <div className="flex space-x-4">
-              <Button onClick={() => handleAuthClick(true)} variant={"outline"}>
-                Sign In
-              </Button>
-              <Button
-                onClick={() => handleAuthClick(false)}
-                variant={"Ethereal Jobs"}
-              >
-                Sign Up
-              </Button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </nav>
 
