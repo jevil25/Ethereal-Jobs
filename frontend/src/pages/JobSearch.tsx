@@ -7,6 +7,7 @@ import { getJobs } from "../api/jobs";
 import { toaster } from "../utils/helper";
 import { useSearchParams } from "react-router-dom";
 import { ApplicationStatus } from "../api/types";
+import { Helmet } from "react-helmet";
 
 const JobSearch: React.FC = () => {
   const show = false;
@@ -41,7 +42,47 @@ const JobSearch: React.FC = () => {
   });
   const jobTypes = ["Full-time", "Part-time", "Internship"];
 
-  const searchTimeout = useRef<number>(null);
+  const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Create structured data for JobList
+  const generateJobSearchStructuredData = () => {
+    return {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "speakable": {
+        "@type": "SpeakableSpecification",
+        "cssSelector": ["h1", ".job-search-description"]
+      },
+      "name": "Find Your Dream Job | Ethereal Jobs Search",
+      "description": "Search through thousands of job listings optimized for your skills and experience. Filter by job type, salary, and location to find your perfect match.",
+      "mainEntity": {
+        "@type": "ItemList",
+        "itemListElement": filteredJobs.slice(0, 10).map((job, index) => ({
+          "@type": "ListItem",
+          "position": index + 1,
+          "item": {
+            "@type": "JobPosting",
+            "title": job.title,
+            "description": job.description?.substring(0, 100) + "...",
+            "datePosted": job.date_posted,
+            "hiringOrganization": {
+              "@type": "Organization",
+              "name": job.company,
+              "sameAs": job.company_url || ""
+            },
+            "jobLocation": {
+              "@type": "Place",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": job.location
+              }
+            },
+            "employmentType": job.job_type
+          }
+        }))
+      }
+    };
+  };
 
   const handleSearch = async (params: {
     city: string;
@@ -189,7 +230,15 @@ const JobSearch: React.FC = () => {
 
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
+    const job_title = searchParams.get("job_title") || "";
+    const city = searchParams.get("city") || "";
     const job_type = searchParams.get("job_type") || "";
+    
+    // Set page title based on search params
+    document.title = job_title 
+      ? `${job_title} Jobs ${city ? `in ${city}` : ''} | Ethereal Jobs`
+      : "Find Your Dream Job | Ethereal Jobs";
+    
     setFilters({
       is_remote: searchParams.get("is_remote") === "true",
       job_type,
@@ -198,34 +247,63 @@ const JobSearch: React.FC = () => {
     });
   }, []);
 
+  // Create meta description based on search params
+  const getMetaDescription = () => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const job_title = searchParams.get("job_title") || "";
+    const city = searchParams.get("city") || "";
+    const job_type = searchParams.get("job_type") || "";
+    
+    if (job_title) {
+      return `Find the best ${job_title} jobs ${city ? `in ${city}` : ''}${job_type ? ` (${job_type})` : ''} with AI-powered job matching. Discover positions that match your skills and experience.`;
+    }
+    
+    return "Search thousands of jobs with AI-powered matching. Filter by job type, location, and salary to find your perfect opportunity.";
+  };
+
   return (
-    <div className="container mx-auto px-4 py-8 min-h-screen">
-      <h1 className="text-3xl font-bold mb-6">Job Search</h1>
-      <SearchBar
-        onSearch={handleSearch}
-        filters={filters}
-        jobs={filteredJobs}
-        loading={loading}
-      />
-      <div className="flex flex-col md:flex-row gap-6 mt-6">
-        <div className={`w-full ${show ? "md:w-1/4" : "hidden"}`}>
-          <JobFilters
-            show={show}
-            onChange={handleFilterChange}
-            filters={filters}
-            jobTypes={jobTypes}
-          />
-        </div>
-        <div className={`w-full ${show ? "md:w-3/4" : ""}`}>
-          <JobList
-            jobs={filteredJobs}
-            loading={loading}
-            onLoadMore={handleLoadMore}
-            hasMore={hasMore}
-          />
+    <>
+      <Helmet>
+        <title>{document.title}</title>
+        <meta name="description" content={getMetaDescription()} />
+        <meta name="keywords" content="job search, career opportunities, job listings, employment, job board, AI job matching" />
+        <link rel="canonical" href={`https://www.etherealjobs.com${window.location.pathname}${window.location.search}`} />
+        <script type="application/ld+json">
+          {JSON.stringify(generateJobSearchStructuredData())}
+        </script>
+      </Helmet>
+      
+      <div className="container mx-auto px-4 py-8 min-h-screen">
+        <h1 className="text-3xl font-bold mb-6">Job Search</h1>
+        <p className="job-search-description text-gray-600 mb-6">
+          Find your perfect career opportunity with our AI-powered job matching system. Upload your resume for more relevant results.
+        </p>
+        <SearchBar
+          onSearch={handleSearch}
+          filters={filters}
+          jobs={filteredJobs}
+          loading={loading}
+        />
+        <div className="flex flex-col md:flex-row gap-6 mt-6">
+          <div className={`w-full ${show ? "md:w-1/4" : "hidden"}`}>
+            <JobFilters
+              show={show}
+              onChange={handleFilterChange}
+              filters={filters}
+              jobTypes={jobTypes}
+            />
+          </div>
+          <div className={`w-full ${show ? "md:w-3/4" : ""}`}>
+            <JobList
+              jobs={filteredJobs}
+              loading={loading}
+              onLoadMore={handleLoadMore}
+              hasMore={hasMore}
+            />
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

@@ -2,6 +2,7 @@ import { Badge } from "../ui/badge";
 import { JobData } from "../../types/data";
 import { Button } from "../ui/button";
 import { MapPin, Calendar, ExternalLink, DollarSign } from "lucide-react";
+import { useEffect } from "react";
 
 const JobHeader: React.FC<{ job: JobData }> = ({ job }) => {
   const formatSalary = (min: number, max: number, currency: string) => {
@@ -20,6 +21,71 @@ const JobHeader: React.FC<{ job: JobData }> = ({ job }) => {
       year: "numeric",
     });
   };
+
+  // Add structured data for job posting
+  useEffect(() => {
+    if (!job) return;
+    
+    // Create job posting schema
+    const jobPostingSchema = {
+      "@context": "https://schema.org/",
+      "@type": "JobPosting",
+      "title": job.title,
+      "description": job.description,
+      "datePosted": job.date_posted,
+      "validThrough": new Date(new Date(job.date_posted).getTime() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+      "employmentType": job.job_type,
+      "hiringOrganization": {
+        "@type": "Organization",
+        "name": job.company,
+        "sameAs": job.company_url || "",
+        "logo": job.company_logo || ""
+      },
+      "jobLocation": {
+        "@type": "Place",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": job.location
+        }
+      },
+      "applicantLocationRequirements": job.is_remote ? {
+        "@type": "Country",
+        "name": "Remote"
+      } : undefined,
+      "baseSalary": (job.min_amount && job.max_amount) ? {
+        "@type": "MonetaryAmount",
+        "currency": job.currency || "USD",
+        "value": {
+          "@type": "QuantitativeValue",
+          "minValue": job.min_amount,
+          "maxValue": job.max_amount,
+          "unitText": job.interval || "YEAR"
+        }
+      } : undefined
+    };
+
+    // Add schema to head
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.text = JSON.stringify(jobPostingSchema);
+    script.id = 'job-posting-schema';
+    
+    // Remove any existing schema
+    const existingScript = document.getElementById('job-posting-schema');
+    if (existingScript) {
+      existingScript.remove();
+    }
+    
+    document.head.appendChild(script);
+    
+    // Clean up on unmount
+    return () => {
+      const scriptToRemove = document.getElementById('job-posting-schema');
+      if (scriptToRemove) {
+        scriptToRemove.remove();
+      }
+    };
+  }, [job]);
 
   return (
     <div className="bg-white rounded-lg border shadow-md p-6 mb-6">

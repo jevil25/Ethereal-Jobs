@@ -13,7 +13,12 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "prepare": "husky && husky install",
-    "prettier": "prettier --write . --ignore-path .gitignore"
+    "prettier": "prettier --write . --ignore-path .gitignore",
+    "generate-sitemap": "npx tsx src/utils/generateSitemap.ts",
+    "submit-sitemap": "npx tsx src/utils/submitSitemap.ts",
+    "validate-schemas": "npx tsx src/utils/validateSchemas.ts",
+    "build:seo": "npm run generate-sitemap && npm run build && npm run submit-sitemap",
+    "seo:check": "npm run validate-schemas"
   },
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown",
@@ -61,6 +66,8 @@
     "react-day-picker": "8.10.1",
     "react-dom": "^18.3.1",
     "react-frame-component": "^5.2.7",
+    "react-helmet": "^6.1.0",
+    "react-helmet-async": "^2.0.5",
     "react-hot-toast": "^2.5.2",
     "react-markdown": "^9.0.3",
     "react-redux": "^8.1.3",
@@ -75,8 +82,10 @@
     "@react-pdf/types": "^2.8.0",
     "@types/country-list": "^2.1.4",
     "@types/lodash": "^4.17.15",
+    "@types/node": "^22.14.1",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
+    "@types/react-helmet": "^6.1.11",
     "@vitejs/plugin-react-swc": "^3.8.0",
     "eslint": "^9.20.1",
     "eslint-plugin-react-hooks": "^5.1.0",

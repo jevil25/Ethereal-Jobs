@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Button } from "../components/ui/button";
 import {
   Card,
@@ -20,6 +20,7 @@ import ResumeComparison from "../components/ResumeV2/ResumeComparision";
 import { useResumeData } from "../components/ResumeV2/hooks/useResumeData";
 import { useResumeUpload } from "../components/ResumeV2/hooks/useResumeUpload";
 import { useWindowSize } from "../components/ResumeV2/hooks/useWindowSize";
+import { Helmet } from "react-helmet";
 
 const ResumeEditor: React.FC = () => {
   // Local UI state
@@ -53,6 +54,52 @@ const ResumeEditor: React.FC = () => {
     useResumeUpload(controllerRef.current, (data) =>
       setResumeData((prev) => ({ ...prev, ...data })),
     );
+
+  // Add structured data for resume builder tool
+  useEffect(() => {
+    // Create JSON-LD for WebApplication (Resume Builder Tool)
+    const resumeBuilderSchema = {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Ethereal Jobs AI Resume Builder",
+      "applicationCategory": "BusinessApplication, ProductivityApplication",
+      "operatingSystem": "Web browser",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "description": "AI-powered resume builder that optimizes your resume for specific job applications, highlighting relevant skills and experience.",
+      "featureList": [
+        "AI resume optimization",
+        "Resume comparison view",
+        "Tailored resume generation",
+        "Resume parsing",
+        "One-click downloading"
+      ]
+    };
+
+    // Add schema to head
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.text = JSON.stringify(resumeBuilderSchema);
+    script.id = 'resume-builder-schema';
+    
+    // Remove any existing schema
+    const existingScript = document.getElementById('resume-builder-schema');
+    if (existingScript) {
+      existingScript.remove();
+    }
+    
+    document.head.appendChild(script);
+    
+    return () => {
+      const scriptToRemove = document.getElementById('resume-builder-schema');
+      if (scriptToRemove) {
+        scriptToRemove.remove();
+      }
+    };
+  }, []);
 
   const uploadResume = async (file: File | null) => {
     await handleResumeUpload(file);
@@ -96,204 +143,213 @@ const ResumeEditor: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-6 max-w-5xl">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
-            My Resume
-          </h1>
-          <p className="text-sm md:text-base text-gray-600">
-            Update and customize your professional profile
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2 w-full md:w-auto">
-          {!editMode && (
-            <Button
-              variant="default"
-              className="flex items-center gap-2 text-xs md:text-sm flex-1 md:flex-none"
-              onClick={downloadRegularResume}
-            >
-              <Download size={16} />
-              Download Resume
-            </Button>
-          )}
-          {!editMode && showGeneratedResume && (
-            <Button
-              variant="default"
-              className="flex items-center gap-2 text-xs md:text-sm flex-1 md:flex-none"
-              onClick={downloadOptimizedResume}
-            >
-              <Download size={16} />
-              Download Ai Optimized Resume
-            </Button>
-          )}
-          {!editMode && (
-            <label htmlFor="resume-upload" className="flex-1 md:flex-none">
+    <>
+      <Helmet>
+        <title>AI Resume Builder & Optimizer | Ethereal Jobs</title>
+        <meta name="description" content="Build and optimize your resume with AI. Our smart resume builder analyzes job descriptions to create tailored, ATS-friendly resumes that highlight your relevant skills and experience." />
+        <meta name="keywords" content="resume builder, AI resume, resume optimization, ATS resume, professional resume, job application, career tools" />
+        <link rel="canonical" href="https://www.etherealjobs.com/resume" />
+      </Helmet>
+      
+      <div className="container mx-auto px-4 py-6 max-w-5xl">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+              My Resume
+            </h1>
+            <p className="text-sm md:text-base text-gray-600">
+              Update and customize your professional profile
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2 w-full md:w-auto">
+            {!editMode && (
+              <Button
+                variant="default"
+                className="flex items-center gap-2 text-xs md:text-sm flex-1 md:flex-none"
+                onClick={downloadRegularResume}
+              >
+                <Download size={16} />
+                Download Resume
+              </Button>
+            )}
+            {!editMode && showGeneratedResume && (
+              <Button
+                variant="default"
+                className="flex items-center gap-2 text-xs md:text-sm flex-1 md:flex-none"
+                onClick={downloadOptimizedResume}
+              >
+                <Download size={16} />
+                Download Ai Optimized Resume
+              </Button>
+            )}
+            {!editMode && (
+              <label htmlFor="resume-upload" className="flex-1 md:flex-none">
+                <Button
+                  variant="Ethereal Jobs"
+                  className="flex items-center gap-2 text-xs md:text-sm w-full"
+                  onClick={() => {
+                    setResumeFile(null);
+                    setOpenUploadResumeModal(true);
+                  }}
+                >
+                  <Upload size={16} />
+                  Import Resume
+                </Button>
+              </label>
+            )}
+            {!editMode && !showGeneratedResume && (
               <Button
                 variant="Ethereal Jobs"
-                className="flex items-center gap-2 text-xs md:text-sm w-full"
-                onClick={() => {
-                  setResumeFile(null);
-                  setOpenUploadResumeModal(true);
-                }}
+                className="flex items-center gap-2 text-xs md:text-sm flex-1 md:flex-none"
+                onClick={() => startResumeGeneration(false)}
               >
-                <Upload size={16} />
-                Import Resume
+                <BrainCircuit size={16} />
+                Improve Resume
               </Button>
-            </label>
-          )}
-          {!editMode && !showGeneratedResume && (
-            <Button
-              variant="Ethereal Jobs"
-              className="flex items-center gap-2 text-xs md:text-sm flex-1 md:flex-none"
-              onClick={() => startResumeGeneration(false)}
-            >
-              <BrainCircuit size={16} />
-              Improve Resume
-            </Button>
-          )}
-          {!editMode && showGeneratedResume && (
-            <Button
-              variant="Ethereal Jobs"
-              className="flex items-center gap-2 text-xs md:text-sm flex-1 md:flex-none"
-              onClick={() => startResumeGeneration(true)}
-            >
-              <BrainCircuit size={16} />
-              Regenerate Resume
-            </Button>
-          )}
-          {gettingAiResume && (
-            <Dialog open={gettingAiResume} onOpenChange={setGettingAiResume}>
-              <DialogContent className="sm:max-w-md p-6 bg-white">
-                <DialogTitle className="text-lg font-semibold mb-2">
-                  Generating Resume
-                </DialogTitle>
-                <Loader2 className="h-12 w-12 animate-spin text-blue-500" />
-                Please wait while we generate your resume...
-              </DialogContent>
-            </Dialog>
-          )}
-          {openUploadResumeModal && (
-            <Dialog
-              open={openUploadResumeModal}
-              onOpenChange={setOpenUploadResumeModal}
-            >
-              <DialogContent className="sm:max-w-md p-6 bg-white">
-                <DialogTitle className="text-lg font-semibold mb-2">
-                  Upload Resume
-                </DialogTitle>
-                <DialogClose onClick={() => setOpenUploadResumeModal(false)} />
-                <ResumeUploadCard
-                  file={resumeFile}
-                  isParsing={isParsing}
-                  updateFile={uploadResume}
-                  controller={controllerRef.current}
-                />
-              </DialogContent>
-            </Dialog>
-          )}
-        </div>
-      </div>
-
-      <div className="flex flex-col gap-4 md:gap-6 relative">
-        {/* Mobile sidebar toggle */}
-        {editMode && (
-          <div className="md:hidden mb-4">
-            <Button
-              variant="outline"
-              className="w-full flex items-center justify-center gap-2"
-              onClick={toggleSidebar}
-            >
-              <Menu size={16} />
-              {sidebarOpen ? "Hide Sections" : "Show Sections"}
-            </Button>
+            )}
+            {!editMode && showGeneratedResume && (
+              <Button
+                variant="Ethereal Jobs"
+                className="flex items-center gap-2 text-xs md:text-sm flex-1 md:flex-none"
+                onClick={() => startResumeGeneration(true)}
+              >
+                <BrainCircuit size={16} />
+                Regenerate Resume
+              </Button>
+            )}
+            {gettingAiResume && (
+              <Dialog open={gettingAiResume} onOpenChange={setGettingAiResume}>
+                <DialogContent className="sm:max-w-md p-6 bg-white">
+                  <DialogTitle className="text-lg font-semibold mb-2">
+                    Generating Resume
+                  </DialogTitle>
+                  <Loader2 className="h-12 w-12 animate-spin text-blue-500" />
+                  Please wait while we generate your resume...
+                </DialogContent>
+              </Dialog>
+            )}
+            {openUploadResumeModal && (
+              <Dialog
+                open={openUploadResumeModal}
+                onOpenChange={setOpenUploadResumeModal}
+              >
+                <DialogContent className="sm:max-w-md p-6 bg-white">
+                  <DialogTitle className="text-lg font-semibold mb-2">
+                    Upload Resume
+                  </DialogTitle>
+                  <DialogClose onClick={() => setOpenUploadResumeModal(false)} />
+                  <ResumeUploadCard
+                    file={resumeFile}
+                    isParsing={isParsing}
+                    updateFile={uploadResume}
+                    controller={controllerRef.current}
+                  />
+                </DialogContent>
+              </Dialog>
+            )}
           </div>
-        )}
+        </div>
 
-        {/* Sidebar for resume sections */}
-        {editMode && sidebarOpen && (
-          <div className="w-full md:w-64 md:shrink-0">
-            <Card className="sticky top-4">
-              <CardHeader className="p-4">
-                <CardTitle className="text-xl">Resume Sections</CardTitle>
-              </CardHeader>
-              <CardContent className="p-3">
-                <div className="flex flex-col gap-2">
-                  {[
-                    { id: "personal", label: "Personal Info" },
-                    { id: "experience", label: "Experience" },
-                    { id: "education", label: "Education" },
-                    { id: "skills", label: "Skills" },
-                    { id: "projects", label: "Projects" },
-                    { id: "certifications", label: "Certifications" },
-                    { id: "preferences", label: "Job Preferences" },
-                  ].map((section) => (
-                    <Button
-                      key={section.id}
-                      variant={activeTab === section.id ? "default" : "ghost"}
-                      className="justify-start"
-                      onClick={() => {
-                        setActiveTab(section.id);
-                        // Auto-close sidebar on mobile after selection
-                        if (window.innerWidth < 768) {
-                          setSidebarOpen(false);
-                        }
-                      }}
-                    >
-                      {section.label}
-                    </Button>
-                  ))}
-                </div>
-              </CardContent>
+        <div className="flex flex-col gap-4 md:gap-6 relative">
+          {/* Mobile sidebar toggle */}
+          {editMode && (
+            <div className="md:hidden mb-4">
+              <Button
+                variant="outline"
+                className="w-full flex items-center justify-center gap-2"
+                onClick={toggleSidebar}
+              >
+                <Menu size={16} />
+                {sidebarOpen ? "Hide Sections" : "Show Sections"}
+              </Button>
+            </div>
+          )}
+
+          {/* Sidebar for resume sections */}
+          {editMode && sidebarOpen && (
+            <div className="w-full md:w-64 md:shrink-0">
+              <Card className="sticky top-4">
+                <CardHeader className="p-4">
+                  <CardTitle className="text-xl">Resume Sections</CardTitle>
+                </CardHeader>
+                <CardContent className="p-3">
+                  <div className="flex flex-col gap-2">
+                    {[
+                      { id: "personal", label: "Personal Info" },
+                      { id: "experience", label: "Experience" },
+                      { id: "education", label: "Education" },
+                      { id: "skills", label: "Skills" },
+                      { id: "projects", label: "Projects" },
+                      { id: "certifications", label: "Certifications" },
+                      { id: "preferences", label: "Job Preferences" },
+                    ].map((section) => (
+                      <Button
+                        key={section.id}
+                        variant={activeTab === section.id ? "default" : "ghost"}
+                        className="justify-start"
+                        onClick={() => {
+                          setActiveTab(section.id);
+                          // Auto-close sidebar on mobile after selection
+                          if (window.innerWidth < 768) {
+                            setSidebarOpen(false);
+                          }
+                        }}
+                      >
+                        {section.label}
+                      </Button>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {!editMode && (
+            <div className="mt-4 text-right">
+              <span
+                className={`text-sm ${
+                  saveStatus === "saved"
+                    ? "text-green-600"
+                    : saveStatus === "saving"
+                      ? "text-yellow-600"
+                      : "text-red-600"
+                }`}
+              >
+                {saveStatus === "saved"
+                  ? "✓ All changes saved"
+                  : saveStatus === "saving"
+                    ? "Saving changes..."
+                    : "Error saving changes"}
+              </span>
+            </div>
+          )}
+
+          <div className="flex-1">
+            <Card className="shadow-lg border-0">
+              {!editMode ? (
+                <ResumeComparison
+                  name={user?.name}
+                  originalResume={resumeData}
+                  optimizedResume={generatedResume}
+                  updateResumeSection={updateResumeSection}
+                  showGeneratedResume={showGeneratedResume}
+                  startResumeGeneration={startResumeGeneration}
+                />
+              ) : (
+                <ResumeTabs
+                  handleNameChange={handleNameChange}
+                  activeTab={activeTab}
+                  setActiveTab={setActiveTab}
+                  resumeData={resumeData}
+                  updateResumeSection={updateResumeSection}
+                  handlePersonalInfoEdit={handlePersonalInfoEdit}
+                />
+              )}
             </Card>
           </div>
-        )}
-
-        {!editMode && (
-          <div className="mt-4 text-right">
-            <span
-              className={`text-sm ${
-                saveStatus === "saved"
-                  ? "text-green-600"
-                  : saveStatus === "saving"
-                    ? "text-yellow-600"
-                    : "text-red-600"
-              }`}
-            >
-              {saveStatus === "saved"
-                ? "✓ All changes saved"
-                : saveStatus === "saving"
-                  ? "Saving changes..."
-                  : "Error saving changes"}
-            </span>
-          </div>
-        )}
-
-        <div className="flex-1">
-          <Card className="shadow-lg border-0">
-            {!editMode ? (
-              <ResumeComparison
-                name={user?.name}
-                originalResume={resumeData}
-                optimizedResume={generatedResume}
-                updateResumeSection={updateResumeSection}
-                showGeneratedResume={showGeneratedResume}
-                startResumeGeneration={startResumeGeneration}
-              />
-            ) : (
-              <ResumeTabs
-                handleNameChange={handleNameChange}
-                activeTab={activeTab}
-                setActiveTab={setActiveTab}
-                resumeData={resumeData}
-                updateResumeSection={updateResumeSection}
-                handlePersonalInfoEdit={handlePersonalInfoEdit}
-              />
-            )}
-          </Card>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

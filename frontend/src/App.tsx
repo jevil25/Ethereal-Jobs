@@ -27,6 +27,7 @@ import Footer from "./components/HomePage/Footer";
 import FeedbackButton from "./components/FeedbackButton";
 import { Role } from "./types/data";
 import AdminDashboard from "./pages/Admin";
+import { HelmetProvider } from "react-helmet-async";
 
 // needed for axios to send cookies
 axios.defaults.withCredentials = true;
@@ -37,11 +38,13 @@ function App() {
       <div className="App">
         <main className="pt-18 md:pt-24 from-white via-white to-blue-50/30">
           <Toaster />
-          <Router>
-            <AuthProvider>
-              <AppContent />
-            </AuthProvider>
-          </Router>
+          <HelmetProvider>
+            <Router>
+              <AuthProvider>
+                <AppContent />
+              </AuthProvider>
+            </Router>
+          </HelmetProvider>
         </main>
       </div>
     </>

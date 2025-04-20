@@ -1,2 +1,17 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /profile
+Disallow: /resume/*/edit
+Disallow: /*?auth=*
+
+# External bots that may put load on the server
+User-agent: AhrefsBot
+Crawl-delay: 10
+
+User-agent: SemrushBot
+Crawl-delay: 10
+
+# Sitemaps
 Sitemap: https://etherealjobs.com/sitemap.xml
 Sitemap: https://www.etherealjobs.com/sitemap.xml
