@@ -121,7 +121,6 @@ const AuthForms: React.FC<AuthFormsProps> = ({
           email: formData.email,
           password: formData.password,
           provider: Provider.Custom,
-          role: "User",
         });
         if (!response) {
           return setError(
@@ -170,6 +169,7 @@ const AuthForms: React.FC<AuthFormsProps> = ({
           password: formData.password,
           name: formData.name,
           provider: Provider.Custom,
+          role: "User",
         });
         if (!response) {
           return setError(
@@ -229,7 +229,6 @@ const AuthForms: React.FC<AuthFormsProps> = ({
             email: user.email as string,
             password: "",
             provider: Provider.Google,
-            role: "User",
           });
           if (!response) {
             return setError(
@@ -264,6 +263,7 @@ const AuthForms: React.FC<AuthFormsProps> = ({
             password: "",
             name: user.displayName as string,
             provider: Provider.Google,
+            role: "User",
           });
           if (!response) {
             return setError(

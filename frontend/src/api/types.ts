@@ -82,6 +82,7 @@ interface UserSignupRequest {
   password: string;
   name: string;
   provider: Provider;
+  role: string;
 }
 
 interface UserSignupResponse {
@@ -95,7 +96,6 @@ interface UserSigninRequest {
   email: string;
   password: string;
   provider: Provider;
-  role: string;
 }
 
 interface UserSigninResponse {
