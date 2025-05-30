@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Menu, X, ChevronDown, ChevronUp } from "lucide-react";
+import { Menu, X, ChevronDown, ChevronUp, Bookmark } from "lucide-react";
 import { Button } from "./ui/button";
 import { useAuth } from "../providers/useAuth";
 import logo from "../assets/logo.png";
@@ -112,6 +112,27 @@ const NavBar = () => {
           >
             Search Jobs
           </Link>
+          {isAuthenticated && (
+            <>
+              <Link
+                to="/applications"
+                className={`hover:text-gray-600 transition-colors ${
+                  location.pathname === "/applications" ? getTextColor(true) : getTextColor()
+                }`}
+              >
+                Applications
+              </Link>
+              <Link
+                to="/saved-searches"
+                className={`flex items-center hover:text-gray-600 transition-colors ${
+                  location.pathname === "/saved-searches" ? getTextColor(true) : getTextColor()
+                }`}
+              >
+                <Bookmark size={16} className="mr-1.5" />
+                Saved Searches
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Auth Controls - Desktop */}
@@ -144,6 +165,20 @@ const NavBar = () => {
                     onClick={() => setUserMenuOpen(false)}
                   >
                     Profile
+                  </Link>
+                  <Link
+                    to="/applications"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    onClick={() => setUserMenuOpen(false)}
+                  >
+                    Applications
+                  </Link>
+                  <Link
+                    to="/saved-searches"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    onClick={() => setUserMenuOpen(false)}
+                  >
+                    Saved Searches
                   </Link>
                   <button
                     className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -189,6 +224,23 @@ const NavBar = () => {
             >
               Search Jobs
             </Link>
+            {isAuthenticated && (
+              <>
+                <Link
+                  to="/applications"
+                  className={`block py-2 px-3 rounded-md ${location.pathname === "/applications" ? "bg-gray-100 font-medium" : ""}`}
+                >
+                  Applications
+                </Link>
+                <Link
+                  to="/saved-searches"
+                  className={`flex items-center py-2 px-3 rounded-md ${location.pathname === "/saved-searches" ? "bg-gray-100 font-medium" : ""}`}
+                >
+                  <Bookmark size={16} className="mr-1.5" />
+                  Saved Searches
+                </Link>
+              </>
+            )}
 
             {/* Auth Controls - Mobile */}
             {isAuthenticated ? (

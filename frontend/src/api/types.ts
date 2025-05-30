@@ -95,6 +95,7 @@ interface UserSigninRequest {
   email: string;
   password: string;
   provider: Provider;
+  role: string;
 }
 
 interface UserSigninResponse {
