@@ -167,7 +167,7 @@ const NavBar = () => {
                     Profile
                   </Link>
                   <Link
-                    to="/applications"
+                    to="/profile?tab=application"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     onClick={() => setUserMenuOpen(false)}
                   >
@@ -227,7 +227,7 @@ const NavBar = () => {
             {isAuthenticated && (
               <>
                 <Link
-                  to="/applications"
+                  to="/profile?tab=application"
                   className={`block py-2 px-3 rounded-md ${location.pathname === "/applications" ? "bg-gray-100 font-medium" : ""}`}
                 >
                   Applications
