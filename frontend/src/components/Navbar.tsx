@@ -115,7 +115,7 @@ const NavBar = () => {
           {isAuthenticated && (
             <>
               <Link
-                to="/applications"
+                to="profile?tab=application"
                 className={`hover:text-gray-600 transition-colors ${
                   location.pathname === "/profile?tab=application" ? getTextColor(true) : getTextColor()
                 }`}
