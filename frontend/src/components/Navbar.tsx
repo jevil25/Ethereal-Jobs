@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Menu, X, ChevronDown, ChevronUp, Bookmark } from "lucide-react";
+import { Menu, X, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "./ui/button";
 import { useAuth } from "../providers/useAuth";
 import logo from "../assets/logo.png";
@@ -122,7 +122,7 @@ const NavBar = () => {
               >
                 Applications
               </Link>
-              <Link
+              {/* <Link
                 to="/saved-searches"
                 className={`flex items-center hover:text-gray-600 transition-colors ${
                   location.pathname === "/saved-searches" ? getTextColor(true) : getTextColor()
@@ -130,7 +130,7 @@ const NavBar = () => {
               >
                 <Bookmark size={16} className="mr-1.5" />
                 Saved Searches
-              </Link>
+              </Link> */}
             </>
           )}
         </div>
@@ -173,13 +173,13 @@ const NavBar = () => {
                   >
                     Applications
                   </Link>
-                  <Link
+                  {/* <Link
                     to="/saved-searches"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     onClick={() => setUserMenuOpen(false)}
                   >
                     Saved Searches
-                  </Link>
+                  </Link> */}
                   <button
                     className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     onClick={handleLogout}
@@ -232,13 +232,13 @@ const NavBar = () => {
                 >
                   Applications
                 </Link>
-                <Link
+                {/* <Link
                   to="/saved-searches"
                   className={`flex items-center py-2 px-3 rounded-md ${location.pathname === "/saved-searches" ? "bg-gray-100 font-medium" : ""}`}
                 >
                   <Bookmark size={16} className="mr-1.5" />
                   Saved Searches
-                </Link>
+                </Link> */}
               </>
             )}
 
