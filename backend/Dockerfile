@@ -1,5 +1,5 @@
 # Use an official Python runtime as the base image
-FROM python:3.11-slim
+FROM python:3.12.11
 
 # Set working directory in the container
 WORKDIR /app
@@ -17,4 +17,4 @@ COPY . .
 EXPOSE 8000
 
 # Command to run the application
-CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["uvicorn", "src.main:app", "--host", "${UVICORN_HOST:-0.0.0.0}", "--port", "${UVICORN_PORT:-8000}", "--reload", "--workers", "${UVICORN_WORKERS:-4}"]
