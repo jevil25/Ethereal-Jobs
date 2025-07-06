@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
 import { useAuth } from "../providers/useAuth";
 import { updateName } from "../api/user";
 import { Input } from "../components/ui/input";
@@ -32,7 +31,6 @@ import JobCard from "../components/jobs/JobCard";
 
 const ProfilePage = () => {
   const { user, logout } = useAuth();
-  const [searchParams] = useSearchParams();
   const [name, setName] = useState(user?.name || "");
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -58,13 +56,6 @@ const ProfilePage = () => {
       setSidebarOpen(true);
     }
   });
-
-  useEffect(() => {
-    const tabParam = searchParams.get("tab");
-    if (tabParam === "application") {
-      setActiveSection("jobs");
-    }
-  }, [searchParams]);
 
   useEffect(() => {
     const getAppliedJobsData = async () => {

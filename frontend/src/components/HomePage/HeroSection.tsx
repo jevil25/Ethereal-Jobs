@@ -17,6 +17,7 @@ import {
 import JobCard from "../jobs/JobCard";
 import ResumeComparison from "../ResumeV2/ResumeComparision";
 import { LinkedInProfileCard } from "../JobPage/HiringManagerSection";
+import { getUserCount } from "../../api/admin";
 
 interface HeroSectionProps {
   navigate: NavigateFunction;
@@ -270,10 +271,30 @@ const ShimmerEffect = ({ className = "" }: { className?: string }) => (
 
 const HeroSection = ({ navigate }: HeroSectionProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [liveUserCount, setLiveUserCount] = useState(15000); // Default fallback value
+  const [isLoadingUserCount, setIsLoadingUserCount] = useState(true);
+  
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end start"],
   });
+
+  // Fetch live user count on component mount
+  useEffect(() => {
+    const fetchUserCount = async () => {
+      try {
+        const count = await getUserCount();
+        setLiveUserCount(count);
+      } catch (error) {
+        console.error("Failed to fetch user count:", error);
+        // Keep the default fallback value
+      } finally {
+        setIsLoadingUserCount(false);
+      }
+    };
+
+    fetchUserCount();
+  }, []);
 
   // Enhanced transform values for richer animations
   const imageOpacity = useTransform(scrollYProgress, [0, 0.2], [0, 1]);
@@ -315,8 +336,8 @@ const HeroSection = ({ navigate }: HeroSectionProps) => {
     scale: fastImageScale,
   };
 
-  // Animated user count
-  const { count: userCount, ref: counterRef } = useAnimatedCounter(15000);
+  // Animated user count with live data
+  const { count: userCount, ref: counterRef } = useAnimatedCounter(liveUserCount);
 
   // Selected jobs for display with memoization to avoid unnecessary re-renders
   const selectedJobs = useMemo(() => jobArray.slice(0, 3), []);
@@ -508,7 +529,11 @@ const HeroSection = ({ navigate }: HeroSectionProps) => {
             <p className="text-sm text-gray-600 flex items-center gap-2">
               Join{" "}
               <span ref={counterRef} className="font-semibold text-blue-600">
-                {userCount.toLocaleString()}+
+                {isLoadingUserCount ? (
+                  <span className="animate-pulse">Loading...</span>
+                ) : (
+                  `${userCount.toLocaleString()}+`
+                )}
               </span>{" "}
               successful job seekers
             </p>

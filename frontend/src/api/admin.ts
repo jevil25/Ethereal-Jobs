@@ -80,3 +80,13 @@ export const getUsageStats = async (): Promise<UsageStats[]> => {
         throw error;
     }
 }
+
+export const getUserCount = async (): Promise<number> => {
+    try {
+        const response = await axios.get(constructServerUrlFromPath("/admin/user-count"));
+        return response.data.count;
+    } catch (error: any) {
+        console.error("Error fetching user count: " + (error.message || "Unknown error"));
+        return 15000;
+    }
+};
