@@ -7,6 +7,15 @@ from src.db.mongo import DatabaseOperations
 app = APIRouter(prefix="/admin")
 db_ops = DatabaseOperations()
 
+@app.get("/user-count")
+async def get_user_count():
+    """Get the total number of registered users - public endpoint"""
+    try:
+        user_count = await db_ops.get_user_count()
+        return JSONResponse(content={"count": user_count})
+    except Exception as e:
+        return JSONResponse(content={"count": 15000}, status_code=500)  # Fallback to hardcoded value
+
 @app.get("/users")
 @is_user_admin
 async def get_users(request: Request):

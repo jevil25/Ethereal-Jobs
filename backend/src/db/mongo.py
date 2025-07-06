@@ -725,6 +725,10 @@ class DatabaseOperations:
     async def get_users(self):
         return await User.find().to_list()
 
+    async def get_user_count(self):
+        """Get the total count of registered users efficiently"""
+        return await User.count()
+
     async def get_usage_stats(self):
         return await UsageStats.find().to_list()
 
