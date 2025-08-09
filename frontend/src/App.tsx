@@ -23,6 +23,7 @@ import VerifyEmailPage from "./pages/verify-email";
 import OnboardingFlow from "./pages/OnBoarding";
 import { Toaster } from "react-hot-toast";
 import ProfilePage from "./pages/Profile";
+import UnsubscribePage from "./pages/unsubscribe";
 import Footer from "./components/HomePage/Footer";
 import FeedbackButton from "./components/FeedbackButton";
 import { Role } from "./types/data";
@@ -89,7 +90,8 @@ function AppContent() {
   const isHomePage =
     location.pathname === "/" ||
     location.pathname === "/reset-password" ||
-    location.pathname === "/verify-email";
+    location.pathname === "/verify-email" ||
+    location.pathname === "/unsubscribe";
 
   return (
     <>
@@ -98,6 +100,7 @@ function AppContent() {
         <Route path="/" element={<HomePage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/verify-email" element={<VerifyEmailPage />} />
+        <Route path="/unsubscribe" element={<UnsubscribePage />} />
         <Route
           path="/jobs"
           element={

@@ -1,0 +1,22 @@
+Hello ${name},
+
+We noticed you haven't completed your profile setup. Here's what you're missing out on:
+
+Exclusive Features Awaiting You:
+• AI Resume Optimization - Get tailored suggestions to make your resume stand out
+• Smart Job Matching - Our AI matches you with jobs that fit your skills perfectly
+• ATS-Friendly Formatting - Ensure your resume passes Applicant Tracking Systems
+• AI-Generated LinkedIn Messages - Create personalized outreach messages
+• Advanced Job Search - Filter by location, experience level, and more
+
+Complete your profile now to unlock these powerful features and increase your chances of landing your dream job.
+
+Complete your profile here: ${complete_profile_link}
+
+If you need any assistance, our support team is here to help you get started.
+
+--
+© 2025 Ethereal Jobs • AI-Powered Job Search & Networking
+Your Dream Job Is One Connection Away
+
+To unsubscribe from reminders: ${unsubscribe_link}

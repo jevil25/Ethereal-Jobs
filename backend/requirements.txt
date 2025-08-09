@@ -98,6 +98,8 @@ PySocks==1.7.1
 python-dateutil==2.9.0.post0
 python-docx==1.1.2
 python-dotenv==1.0.1
+fastapi-mail==1.4.1
+APScheduler==3.10.4
 python-jobspy @ git+https://github.com/jevil25/JobSpy.git
 python-jose==3.4.0
 python-multipart==0.0.20
@@ -167,3 +169,4 @@ xlrd==1.2.0
 XlsxWriter==3.2.2
 zopfli==0.2.3.post1
 geoip2==4.8.0
+pycountry==24.6.1

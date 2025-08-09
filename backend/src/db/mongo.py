@@ -1,5 +1,5 @@
 from typing import List, Optional
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from src.db.model import (
     JobQuery, 
@@ -22,6 +22,7 @@ from src.db.model import (
     Features,
     Feedback
 )
+from src.db.email_model import EmailTracking, EmailPreferences
 
 from beanie import init_beanie
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -50,6 +51,7 @@ class DatabaseOperations:
 
         # Specify the database name
         database_name = os.getenv("MONGO_DATABASE", "jobify-testing")
+        print(f"Connecting to database: {database_name}")
 
         # Initialize Beanie with all your document models
         await init_beanie(
@@ -61,6 +63,8 @@ class DatabaseOperations:
                 RefreshToken, 
                 ResetPasswordToken,
                 VerificationToken,
+                EmailTracking,
+                EmailPreferences,
                 LinkedMessages,
                 ResumeModel,
                 AiOptimzedResumeModel,
@@ -734,3 +738,114 @@ class DatabaseOperations:
 
     async def get_feedback(self):
         return await Feedback.find().to_list()
+        
+    async def create_email_tracking(self, user_id: str, email: str, email_type: str, reminder_count: int, unsubscribe_token: str) -> EmailTracking:
+        """Create a new email tracking record."""
+        tracking = EmailTracking(
+            user_id=user_id,
+            email=email,
+            email_type=email_type,
+            sent_at=datetime.utcnow(),
+            reminder_count=reminder_count,
+            unsubscribe_token=unsubscribe_token
+        )
+        await tracking.save()
+        return tracking
+
+    async def get_last_reminder(self, user_id: str) -> Optional[EmailTracking]:
+        """Get the last reminder sent to a user."""
+        return await EmailTracking.find_one(
+            {
+                "user_id": user_id,
+                "email_type": "reminder"
+            },
+            sort=[("sent_at", -1)]
+        )
+    
+    async def get_last_onboarding_reminder(self, user_id: str) -> Optional[EmailTracking]:
+        """Get the last onboarding reminder sent to a user."""
+        return await EmailTracking.find_one(
+            {
+                "user_id": user_id,
+                "email_type": "onboarding"
+            },
+            sort=[("sent_at", -1)]
+        )
+
+    async def get_email_preferences(self, user_id: str) -> Optional[EmailPreferences]:
+        """Get user's email preferences."""
+        return await EmailPreferences.find_one({"user_id": user_id})
+
+    async def get_email_preferences_by_token(self, token: str) -> Optional[EmailPreferences]:
+        """Get email preferences by unsubscribe token."""
+        return await EmailPreferences.find_one({"unsubscribe_token": token})
+
+    async def create_email_preferences(self, user_id: str, email: str, unsubscribe_token: str) -> EmailPreferences:
+        """Create new email preferences for a user."""
+        prefs = EmailPreferences(
+            user_id=user_id,
+            email=email,
+            unsubscribe_token=unsubscribe_token,
+            updated_at=datetime.utcnow()
+        )
+        await prefs.save()
+        return prefs
+
+    async def update_email_preferences(self, prefs: EmailPreferences, email_type: str) -> EmailPreferences:
+        """Update user's email preferences."""
+        if email_type not in prefs.unsubscribed_from:
+            prefs.unsubscribed_from.append(email_type)
+            prefs.updated_at = datetime.utcnow()
+            await prefs.save()
+        return prefs
+
+    async def get_incomplete_users(self) -> List[User]:
+        """Get users who haven't completed their profile setup."""
+        now = datetime.utcnow()
+        return await User.find(
+            {
+                "is_verified": False,
+                "createdAt": {"$lt": now - timedelta(days=2)}
+            }
+        ).to_list()
+    
+    async def get_verified_not_onboarded_users(self) -> List[User]:
+        """Get users who have been verified but not onboarded"""
+        now = datetime.utcnow()
+        return await User.find(
+            {
+                "is_verified": True,
+                "is_onboarded": False,
+                "createdAt": {"$lt": now - timedelta(days=2)}
+            }
+        ).to_list()
+    
+    async def get_resumes_with_preferences(self) -> List[ResumeModel]:
+        """Get all resumes that have job preferences set."""
+        return await ResumeModel.find(
+            {
+                "jobPreferences": {"$exists": True, "$ne": []}
+            }
+        ).to_list()
+    
+    async def get_matching_jobs(self, job_type: str, location: str, limit: int = 5) -> List[JobModel]:
+        """Get jobs matching the given type and location."""
+        # Create a regex pattern for case-insensitive location matching
+        location_pattern = {"$regex": location, "$options": "i"}
+        job_type_pattern = {"$regex": job_type, "$options": "i"}
+        
+        # Find jobs matching either location or job type, ordered by most recent
+        matching_jobs = await JobModel.find(
+            {
+                "$or": [
+                    {"location": location_pattern},
+                    {"job_type": job_type_pattern}
+                ]
+            }
+        ).sort([("createdAt", -1)]).limit(limit).to_list()
+        
+        return matching_jobs
+    
+    async def get_user_by_id(self, user_id: str) -> Optional[User]:
+        """Get a user by their ID."""
+        return await User.find_one({"_id": user_id})

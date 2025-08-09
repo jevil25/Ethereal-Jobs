@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reset Your Ethereal Jobs Password</title>
+    <title>Your Job Recommendations</title>
     <!--[if !mso]><!-->
     <link href='https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap' rel='stylesheet'>
     <!--<![endif]-->
@@ -11,7 +11,7 @@
 <body style="font-family: 'Inter', Arial, sans-serif; background-color: #f0f4f8; margin: 0; padding: 0; line-height: 1.6; color: #1a2744; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;">
     <!-- Preheader text for email clients -->
     <div style="display: none; max-height: 0px; overflow: hidden;">
-        Reset your Ethereal Jobs password to regain access to your account
+        Check out these personalized job recommendations based on your profile.
     </div>
     
     <!-- Main container with better spacing -->
@@ -20,41 +20,40 @@
             <!-- Header section -->
             <div style="background: #4D7CFE; background: linear-gradient(135deg, #4D7CFE 0%, #6B52FE 100%); color: white; text-align: center; padding: 30px 20px; position: relative;">
                 <img src="https://etherealjobs.com/logo.png" alt="Ethereal Jobs Logo" style="display: block; max-width: 150px; margin: 0 auto 15px; position: relative; z-index: 1;">
-                <div style="display: inline-block; background-color: rgba(255,255,255,0.2); color: white; padding: 5px 10px; border-radius: 20px; font-size: 12px; margin-top: 10px; position: relative; z-index: 1;">AI-Powered Job Search</div>
-                <h1 style="margin: 15px 0 0; font-size: 24px; font-weight: 700; position: relative; z-index: 1;">Password Reset Request</h1>
+                <div style="display: inline-block; background-color: rgba(255,255,255,0.2); color: white; padding: 5px 10px; border-radius: 20px; font-size: 12px; margin-top: 10px; position: relative; z-index: 1;">Job Recommendations</div>
+                <h1 style="margin: 15px 0 0; font-size: 24px; font-weight: 700; position: relative; z-index: 1;">Your Personalized Job Matches</h1>
             </div>
             
             <!-- Email body with better spacing -->
             <div style="padding: 40px 30px; text-align: left;">
                 <h2 style="margin-top: 0; color: #1a2744; font-size: 20px; font-weight: 600;">Hello ${name},</h2>
                 
-                <p style="margin: 16px 0; font-size: 16px; color: #1a2744;">We noticed a request to reset the password for your Ethereal Jobs account. If this was you, click the button below to create a new password:</p>
+                <p style="margin: 16px 0; font-size: 16px; color: #1a2744;">Based on your profile and preferences, we've found some exciting job opportunities that might be perfect for you:</p>
                 
-                <!-- Bulletproof button -->
-                <div style="text-align: center; margin: 30px 0;">
-                    <!--[if mso]>
-                    <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${reset_link}" style="height:45px;v-text-anchor:middle;width:200px;" arcsize="50%" stroke="f" fillcolor="#4D7CFE">
-                        <w:anchorlock/>
-                        <center>
-                    <![endif]-->
-                    <a href="${reset_link}" style="text-decoration: none; display: inline-block; background: linear-gradient(135deg, #4D7CFE 0%, #6B52FE 100%); color: white; padding: 14px 30px; border-radius: 50px; margin: 0; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; font-size: 14px; box-shadow: 0 10px 20px rgba(77,124,254,0.3); mso-padding-alt: 0; text-underline-color: #4D7CFE;">
-                        Reset My Password
-                    </a>
-                    <!--[if mso]>
-                        </center>
-                    </v:roundrect>
-                    <![endif]-->
+                <div style="background-color: #f8fafc; border-radius: 12px; padding: 20px; margin: 20px 0;">
+                    ${jobs_html}
                 </div>
+
+                <p style="margin: 20px 0; font-size: 16px; color: #1a2744;">Visit <a href="https://etherealjobs.com" style="color: #4D7CFE; text-decoration: none; font-weight: 600;">Ethereal Jobs</a> to explore more opportunities and update your job preferences.</p>
                 
-                <p style="margin: 16px 0; font-size: 16px; color: #1a2744;">If you didn't make this request, please ignore this email or contact our support team immediately.</p>
-                
-                <p style="margin: 16px 0; font-size: 16px; color: #1a2744; font-weight: 600;">This password reset link will expire in 1 hour.</p>
+                <!-- Extra tips section -->
+                <div style="background-color: #f8fafc; border-radius: 12px; padding: 20px; margin: 20px 0;">
+                    <h3 style="margin-top: 0; color: #4D7CFE; font-size: 18px;">Pro Tips for Job Success:</h3>
+                    <ul style="margin: 15px 0; padding-left: 20px; color: #1a2744;">
+                        <li style="margin: 12px 0;">📝 Keep your profile updated to receive the most relevant matches</li>
+                        <li style="margin: 12px 0;">⚡ Apply early - the first 24-48 hours are crucial</li>
+                        <li style="margin: 12px 0;">🎯 Use our AI tools to optimize your application for each role</li>
+                    </ul>
+                </div>
             </div>
             
             <!-- Footer with improved alignment -->
             <div style="background-color: #f0f4f8; text-align: center; padding: 20px; font-size: 12px; color: #6b7280;">
                 <p style="margin: 5px 0;">© 2025 Ethereal Jobs • AI-Powered Job Search & Networking</p>
                 <p style="margin: 5px 0;">Your Dream Job Is One Connection Away</p>
+                <p style="margin: 10px 0;">
+                    <a href="${unsubscribe_link}" style="color: #6b7280; text-decoration: underline;">Unsubscribe from job recommendations</a>
+                </p>
             </div>
         </div>
     </div>
