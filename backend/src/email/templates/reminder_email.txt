@@ -1,0 +1,19 @@
+Hello {{name}},
+
+We noticed you haven't completed your profile setup. Here's what you're missing out on:
+
+• AI-powered resume optimization
+• Smart job matching based on your skills
+• ATS-friendly resume formatting
+
+This link will be valid for 7 days.
+
+Complete your profile here: {{verification_link}}
+
+If you need any assistance, our support team is here to help you get started.
+
+--
+© 2025 Ethereal Jobs • AI-Powered Job Search & Networking
+Your Dream Job Is One Connection Away
+
+To unsubscribe from reminders: {{unsubscribe_link}}

@@ -8,12 +8,15 @@ from src.routes.ai_router import app as ai_router
 from src.routes.admin_router import app as admin_router
 from dotenv import load_dotenv
 import os
+from src.email.scheduler import setup_scheduler
 
 load_dotenv()
 frontend_url = os.getenv("FRONTEND_URL")
 
 # Initialize FastAPI app
 app = FastAPI()
+
+setup_scheduler(app)
 
 # Configure CORS
 app.add_middleware(

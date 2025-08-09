@@ -16,6 +16,7 @@ load_dotenv()
 class EmailTemplates(enum.Enum):
     PASSWORD_RESET = "reset-password.html"
     EMAIL_VERIFICATION = "email-verification.html"
+    REMINDER = "reminder_email.html"
 
 class ResetPasswordEmail(BaseModel):
     reset_link: str
@@ -26,11 +27,18 @@ class EmailVerificationEmail(BaseModel):
     verification_link: str
     name: str
     subject: str = "Ethereal Jobs - Email Verification"
+
+class ReminderEmail(BaseModel):
+    name: str
+    verification_link: str
+    unsubscribe_link: str
+    subject: str
     
+from typing import Union
 
 class EmailService(BaseModel):
     template_name: EmailTemplates
-    template_data: ResetPasswordEmail | EmailVerificationEmail
+    template_data: Union[ResetPasswordEmail, EmailVerificationEmail, ReminderEmail]
     recipient: str
 
 class EmailConfig:
@@ -180,3 +188,21 @@ def send_password_reset_email(email:str, token: str, name: str):
     )
     email_sender = EmailSender()
     email_sender.send_email_resend(email_service)
+
+def send_reminder_email(email: str, name: str, verification_token: str, unsubscribe_token: str, subject: str) -> bool:
+    frontend_url = os.getenv("FRONTEND_URL")
+    verification_link = f"{frontend_url}/verify-email?token={verification_token}"
+    unsubscribe_link = f"{frontend_url}/unsubscribe?token={unsubscribe_token}&type=reminder"
+    
+    email_service = EmailService(
+        recipient=email,
+        template_name=EmailTemplates.REMINDER,
+        template_data=ReminderEmail(
+            name=name,
+            verification_link=verification_link,
+            unsubscribe_link=unsubscribe_link,
+            subject=subject
+        )
+    )
+    email_sender = EmailSender()
+    return email_sender.send_email_resend(email_service)
