@@ -1,15 +1,19 @@
 from fastapi import APIRouter, HTTPException
-from src.db.model.email_model import EmailPreferences
+from src.db.email_model import EmailPreferences
 from datetime import datetime
 
 router = APIRouter()
 
-@router.get("/unsubscribe")
+@router.post("/unsubscribe/{token}")
 async def unsubscribe_email(token: str, type: str):
     # Find preferences by token
     prefs = await EmailPreferences.find_one({"unsubscribe_token": token})
     if not prefs:
-        raise HTTPException(status_code=404, detail="Invalid unsubscribe link")
+        return {
+            "message": "Invalid unsubscribe link",
+            "is_valid": False,
+            "is_expired": False
+        }
     
     # Add email type to unsubscribed list if not already there
     if type not in prefs.unsubscribed_from:
@@ -18,6 +22,7 @@ async def unsubscribe_email(token: str, type: str):
         await prefs.save()
     
     return {
-        "message": f"Successfully unsubscribed from {type} emails",
-        "status": "success"
+        "message": "Successfully unsubscribed from emails",
+        "is_valid": True,
+        "is_expired": False
     }

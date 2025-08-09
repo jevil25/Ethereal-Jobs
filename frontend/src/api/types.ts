@@ -158,6 +158,17 @@ interface verifyEmailResponse {
   email?: string;
 }
 
+export interface UnsubscribeEmailsRequest {
+  token: string;
+  type: string;
+}
+
+export interface UnsubscribeEmailsResponse {
+  message: string;
+  is_valid: boolean;
+  is_expired: boolean;
+}
+
 interface PersonalInfo {
   headline: string;
   location: string;

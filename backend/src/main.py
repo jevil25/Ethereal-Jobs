@@ -6,6 +6,7 @@ from src.routes.jobs_router import app as jobs_router
 from src.routes.resume_router import app as resume_router
 from src.routes.ai_router import app as ai_router
 from src.routes.admin_router import app as admin_router
+from src.routes.email_router import router as email_router
 from dotenv import load_dotenv
 import os
 from src.email.scheduler import setup_scheduler
@@ -44,3 +45,4 @@ app.include_router(jobs_router)
 app.include_router(resume_router)
 app.include_router(ai_router)
 app.include_router(admin_router)
+app.include_router(email_router, prefix="/user")

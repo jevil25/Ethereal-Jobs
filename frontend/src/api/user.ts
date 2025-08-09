@@ -14,6 +14,8 @@ import {
   sendVerificationEmailResponse,
   verifyEmailRequest,
   verifyEmailResponse,
+  UnsubscribeEmailsRequest,
+  UnsubscribeEmailsResponse,
 } from "./types";
 import { constructServerUrlFromPath } from "../utils/helper";
 import axios from "axios";
@@ -179,7 +181,22 @@ export const verifyEmail = async (
     );
     return response.data as verifyEmailResponse;
   } catch (error) {
-    showToast("Error verifying email. Please try again.", "error");
+    console.error("Email verification error:", error);
+    return null;
+  }
+};
+
+
+export const unsubscribeFromEmails = async (
+  params: UnsubscribeEmailsRequest
+): Promise<UnsubscribeEmailsResponse | null> => {
+  try {
+    const response = await axios.post(
+      constructServerUrlFromPath(`/user/unsubscribe/${params.token}?type=${params.type}`),
+    );
+    return response.data as UnsubscribeEmailsResponse;
+  } catch (error) {
+    showToast("Error unsubscribing from emails. Please try again.", "error");
     return null;
   }
 };

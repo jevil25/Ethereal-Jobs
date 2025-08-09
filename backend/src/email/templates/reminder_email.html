@@ -26,7 +26,7 @@
             
             <!-- Email body with better spacing -->
             <div style="padding: 40px 30px; text-align: left;">
-                <h2 style="margin-top: 0; color: #1a2744; font-size: 20px; font-weight: 600;">Hello {{name}},</h2>
+                <h2 style="margin-top: 0; color: #1a2744; font-size: 20px; font-weight: 600;">Hello ${name},</h2>
                 
                 <p style="margin: 16px 0; font-size: 16px; color: #1a2744;">We noticed you haven't completed your profile setup. Here's what you're missing out on:</p>
                 
@@ -41,11 +41,11 @@
                 <!-- Bulletproof button -->
                 <div style="text-align: center; margin: 30px 0;">
                     <!--[if mso]>
-                    <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="{{verification_link}}" style="height:45px;v-text-anchor:middle;width:200px;" arcsize="50%" stroke="f" fillcolor="#4D7CFE">
+                    <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${verification_link}" style="height:45px;v-text-anchor:middle;width:200px;" arcsize="50%" stroke="f" fillcolor="#4D7CFE">
                         <w:anchorlock/>
                         <center>
                     <![endif]-->
-                    <a href="{{verification_link}}" style="text-decoration: none; display: inline-block; background: linear-gradient(135deg, #4D7CFE 0%, #6B52FE 100%); color: white; padding: 14px 30px; border-radius: 50px; margin: 0; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; font-size: 14px; box-shadow: 0 10px 20px rgba(77,124,254,0.3); mso-padding-alt: 0; text-underline-color: #4D7CFE;">
+                    <a href="${verification_link}" style="text-decoration: none; display: inline-block; background: linear-gradient(135deg, #4D7CFE 0%, #6B52FE 100%); color: white; padding: 14px 30px; border-radius: 50px; margin: 0; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; font-size: 14px; box-shadow: 0 10px 20px rgba(77,124,254,0.3); mso-padding-alt: 0; text-underline-color: #4D7CFE;">
                         Complete My Profile
                     </a>
                     <!--[if mso]>
@@ -62,7 +62,7 @@
                 <p style="margin: 5px 0;">© 2025 Ethereal Jobs • AI-Powered Job Search & Networking</p>
                 <p style="margin: 5px 0;">Your Dream Job Is One Connection Away</p>
                 <p style="margin: 10px 0;">
-                    <a href="{{unsubscribe_link}}" style="color: #6b7280; text-decoration: underline;">Unsubscribe from reminders</a>
+                    <a href="${unsubscribe_link}" style="color: #6b7280; text-decoration: underline;">Unsubscribe from reminders</a>
                 </p>
             </div>
         </div>
