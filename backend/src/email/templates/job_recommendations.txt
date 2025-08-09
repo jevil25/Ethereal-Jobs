@@ -1,0 +1,21 @@
+Hello ${name},
+
+YOUR PERSONALIZED JOB MATCHES
+----------------------------
+
+Based on your profile and preferences, we've found some exciting job opportunities that might be perfect for you:
+
+${jobs_text}
+
+Visit https://etherealjobs.com to explore more opportunities and update your job preferences.
+
+PRO TIPS FOR JOB SUCCESS:
+------------------------
+• Keep your profile updated to receive the most relevant matches
+• Apply early - the first 24-48 hours are crucial
+• Use our AI tools to optimize your application for each role
+
+Your Dream Job Is One Connection Away
+© 2025 Ethereal Jobs • AI-Powered Job Search & Networking
+
+To unsubscribe from job recommendations: ${unsubscribe_link}

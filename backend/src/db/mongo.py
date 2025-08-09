@@ -820,4 +820,32 @@ class DatabaseOperations:
             }
         ).to_list()
     
-
+    async def get_resumes_with_preferences(self) -> List[ResumeModel]:
+        """Get all resumes that have job preferences set."""
+        return await ResumeModel.find(
+            {
+                "jobPreferences": {"$exists": True, "$ne": []}
+            }
+        ).to_list()
+    
+    async def get_matching_jobs(self, job_type: str, location: str, limit: int = 5) -> List[JobModel]:
+        """Get jobs matching the given type and location."""
+        # Create a regex pattern for case-insensitive location matching
+        location_pattern = {"$regex": location, "$options": "i"}
+        job_type_pattern = {"$regex": job_type, "$options": "i"}
+        
+        # Find jobs matching either location or job type, ordered by most recent
+        matching_jobs = await JobModel.find(
+            {
+                "$or": [
+                    {"location": location_pattern},
+                    {"job_type": job_type_pattern}
+                ]
+            }
+        ).sort([("createdAt", -1)]).limit(limit).to_list()
+        
+        return matching_jobs
+    
+    async def get_user_by_id(self, user_id: str) -> Optional[User]:
+        """Get a user by their ID."""
+        return await User.find_one({"_id": user_id})

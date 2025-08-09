@@ -10,6 +10,7 @@ from email.utils import formatdate
 from dotenv import load_dotenv
 from pydantic import BaseModel
 import resend
+from typing import Union
 
 load_dotenv()
 
@@ -18,6 +19,7 @@ class EmailTemplates(enum.Enum):
     EMAIL_VERIFICATION = "email-verification.html"
     REMINDER = "reminder_email.html"
     ONBOARDING_REMINDER = "onboarding_reminder.html"
+    JOB_RECOMMENDATIONS = "job_recommendations.html"
 
 class ResetPasswordEmail(BaseModel):
     reset_link: str
@@ -40,12 +42,16 @@ class OnboardingReminderEmail(BaseModel):
     complete_profile_link: str
     unsubscribe_link: str
     subject: str
-    
-from typing import Union
+class JobRecommendationsEmail(BaseModel):
+    name: str
+    jobs_html: str
+    jobs_text: str
+    unsubscribe_link: str
+    subject: str
 
 class EmailService(BaseModel):
     template_name: EmailTemplates
-    template_data: Union[ResetPasswordEmail, EmailVerificationEmail, ReminderEmail, OnboardingReminderEmail]
+    template_data: Union[ResetPasswordEmail, EmailVerificationEmail, ReminderEmail, OnboardingReminderEmail, JobRecommendationsEmail]
     recipient: str
 
 class EmailConfig:

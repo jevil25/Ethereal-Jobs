@@ -169,3 +169,4 @@ xlrd==1.2.0
 XlsxWriter==3.2.2
 zopfli==0.2.3.post1
 geoip2==4.8.0
+pycountry==24.6.1
