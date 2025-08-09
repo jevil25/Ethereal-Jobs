@@ -17,6 +17,7 @@ class EmailTemplates(enum.Enum):
     PASSWORD_RESET = "reset-password.html"
     EMAIL_VERIFICATION = "email-verification.html"
     REMINDER = "reminder_email.html"
+    ONBOARDING_REMINDER = "onboarding_reminder.html"
 
 class ResetPasswordEmail(BaseModel):
     reset_link: str
@@ -33,12 +34,18 @@ class ReminderEmail(BaseModel):
     verification_link: str
     unsubscribe_link: str
     subject: str
+
+class OnboardingReminderEmail(BaseModel):
+    name: str
+    complete_profile_link: str
+    unsubscribe_link: str
+    subject: str
     
 from typing import Union
 
 class EmailService(BaseModel):
     template_name: EmailTemplates
-    template_data: Union[ResetPasswordEmail, EmailVerificationEmail, ReminderEmail]
+    template_data: Union[ResetPasswordEmail, EmailVerificationEmail, ReminderEmail, OnboardingReminderEmail]
     recipient: str
 
 class EmailConfig:
@@ -193,7 +200,6 @@ def send_reminder_email(email: str, name: str, verification_token: str, unsubscr
     frontend_url = os.getenv("FRONTEND_URL")
     verification_link = f"{frontend_url}/verify-email?token={verification_token}"
     unsubscribe_link = f"{frontend_url}/unsubscribe?token={unsubscribe_token}&type=reminder"
-    
     email_service = EmailService(
         recipient=email,
         template_name=EmailTemplates.REMINDER,
@@ -206,3 +212,23 @@ def send_reminder_email(email: str, name: str, verification_token: str, unsubscr
     )
     email_sender = EmailSender()
     return email_sender.send_email_resend(email_service)
+
+
+def send_onboarding_reminder_email(email: str, name: str, unsubscribe_token: str, subject: str) -> bool:
+    frontend_url = os.getenv("FRONTEND_URL")
+    complete_profile_link = f"{frontend_url}/onboarding"
+    unsubscribe_link = f"{frontend_url}/unsubscribe?token={unsubscribe_token}&type=onboarding"
+    
+    email_service = EmailService(
+        recipient=email,
+        template_name=EmailTemplates.ONBOARDING_REMINDER,
+        template_data=OnboardingReminderEmail(
+            name=name,
+            complete_profile_link=complete_profile_link,
+            unsubscribe_link=unsubscribe_link,
+            subject=subject
+        )
+    )
+    email_sender = EmailSender()
+    return email_sender.send_email_resend(email_service)
+    

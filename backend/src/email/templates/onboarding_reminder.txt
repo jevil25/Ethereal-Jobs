@@ -1,4 +1,4 @@
-Hello {{name}},
+Hello ${name},
 
 We noticed you haven't completed your profile setup. Here's what you're missing out on:
 
@@ -11,9 +11,7 @@ Exclusive Features Awaiting You:
 
 Complete your profile now to unlock these powerful features and increase your chances of landing your dream job.
 
-This link will be valid for 7 days.
-
-Complete your profile here: {{verification_link}}
+Complete your profile here: ${complete_profile_link}
 
 If you need any assistance, our support team is here to help you get started.
 
@@ -21,4 +19,4 @@ If you need any assistance, our support team is here to help you get started.
 © 2025 Ethereal Jobs • AI-Powered Job Search & Networking
 Your Dream Job Is One Connection Away
 
-To unsubscribe from reminders: {{unsubscribe_link}}
+To unsubscribe from reminders: ${unsubscribe_link}

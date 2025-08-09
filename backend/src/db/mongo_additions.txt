@@ -1,0 +1,24 @@
+    async def get_verified_not_onboarded_users(self) -> List[User]:
+        """Get users who are verified but not onboarded"""
+        pipeline = [
+            {
+                "$match": {
+                    "is_verified": True,
+                    "is_onboarded": False
+                }
+            }
+        ]
+        return await User.aggregate(pipeline).to_list(None)
+
+    async def update_onboarding_reminder_status(self, email: str, reminder_count: int, reminder_time: datetime) -> bool:
+        """Update the onboarding reminder status for a user"""
+        update_result = await User.find_one_and_update(
+            {"email": email},
+            {
+                "$set": {
+                    "onboarding_reminder_count": reminder_count,
+                    "last_onboarding_reminder": reminder_time
+                }
+            }
+        )
+        return bool(update_result)

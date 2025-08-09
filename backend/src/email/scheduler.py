@@ -9,7 +9,7 @@ def setup_scheduler(app: FastAPI):
     # Run at 9 AM every day
     scheduler.add_job(
         check_and_send_reminders,
-        CronTrigger(hour=9, minute=0, timezone='Asia/Kolkata'),
+        CronTrigger(hour=21, minute=13, timezone='Asia/Kolkata'),
         id="reminder_emails",
         name="Send reminder emails",
         replace_existing=True

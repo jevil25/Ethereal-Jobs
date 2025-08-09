@@ -761,6 +761,16 @@ class DatabaseOperations:
             },
             sort=[("sent_at", -1)]
         )
+    
+    async def get_last_onboarding_reminder(self, user_id: str) -> Optional[EmailTracking]:
+        """Get the last onboarding reminder sent to a user."""
+        return await EmailTracking.find_one(
+            {
+                "user_id": user_id,
+                "email_type": "onboarding"
+            },
+            sort=[("sent_at", -1)]
+        )
 
     async def get_email_preferences(self, user_id: str) -> Optional[EmailPreferences]:
         """Get user's email preferences."""
@@ -798,3 +808,16 @@ class DatabaseOperations:
                 "createdAt": {"$lt": now - timedelta(days=2)}
             }
         ).to_list()
+    
+    async def get_verified_not_onboarded_users(self) -> List[User]:
+        """Get users who have been verified but not onboarded"""
+        now = datetime.utcnow()
+        return await User.find(
+            {
+                "is_verified": True,
+                "is_onboarded": False,
+                "createdAt": {"$lt": now - timedelta(days=2)}
+            }
+        ).to_list()
+    
+
