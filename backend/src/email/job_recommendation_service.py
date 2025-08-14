@@ -1,8 +1,9 @@
+from src.utils.helpers import serialize_dates
 from src.db.mongo import DatabaseOperations
 from src.email.email_sender import EmailService, EmailTemplates, EmailSender, JobRecommendationsEmail
 from typing import List, Tuple, Dict
 from models.job import Job
-from src.db.model import JobModel
+from src.db.model import JobModel, JobQuery
 from src.api.jobs import get_jobs_api_response, validate_indeed_country
 from jobspy import JobType
 import json
@@ -187,11 +188,49 @@ async def send_job_recommendations():
                         is_remote=False,
                         distance=25
                     )
-                    
+                    print(f"Scraped {len(scraped_jobs)} jobs for {user.name} in {job_location} ({job_type})")
+                    query_params = JobQuery(
+                        city=city.lower(),
+                        country_code=country_code.lower(),
+                        country=country.lower(),
+                        job_title=resume.personalInfo.headline if hasattr(resume.personalInfo, 'headline') else "",
+                        results_wanted=15,
+                        job_type=job_type,
+                        is_remote=False,
+                        distance=25
+                    )
+                    serialized_jobs = serialize_dates(scraped_jobs)
+                    job_models = [JobModel(
+                        company=job.get("company") if job.get("company") else "",
+                        id=job.get("id") if job.get("id") else "",
+                        title=job.get("title") if job.get("title") else "",
+                        location=job.get("location") if job.get("location") else "",
+                        date_posted=job.get("date_posted") if job.get("date_posted") else "",
+                        query=query_params,
+                        description=job.get("description") if job.get("description") else "",
+                        url=job.get("job_url_direct") if job.get("job_url_direct") else job.get("job_url", ""),
+                        salary=job.get("salary") if job.get("salary") else "",
+                        company_logo=job.get("company_logo") if job.get("company_logo") else "",
+                        min_amount=str(job.get("min_amount")) if job.get("min_amount") else "",
+                        max_amount=str(job.get("max_amount")) if job.get("max_amount") else "",
+                        company_url=job.get("company_url") if job.get("company_url") else "",
+                        company_description=job.get("company_description") if job.get("company_description") else "",
+                        company_num_employees=job.get("company_num_employees") if job.get("company_num_employees") else "",
+                        company_revenue=job.get("company_revenue") if job.get("company_revenue") else "",
+                        company_industry=job.get("company_industry") if job.get("company_industry") else "",
+                        company_addresses=job.get("company_addresses") if job.get("company_addresses") else "",
+                        company_url_direct=job.get("company_url_direct") if job.get("company_url_direct") else "",
+                        job_level=job.get("job_level") if job.get("job_level") else "",
+                        job_function=job.get("job_function") if job.get("job_function") else "",
+                        currency=job.get("currency") if job.get("currency") else "",
+                    ) for job in serialized_jobs]
+                    await db_ops.update_jobs(job_models, query_params)
+                                    
                     if job_type and scraped_jobs:
                         scraped_jobs = [job for job in scraped_jobs if job.get('job_type', '').lower() == job_type.lower()]
                     
                     if scraped_jobs:
+                        scraped_jobs.sort(key=lambda x: x.get('date_posted'), reverse=True)
                         matching_jobs = scraped_jobs[:5]
                 except Exception as e:
                     print(f"Error fetching jobs from job boards: {str(e)}")
@@ -253,7 +292,7 @@ def format_jobs_for_email(jobs: List[JobModel], frontend_url: str) -> Tuple[str,
     text = format_jobs_for_text(jobs, frontend_url)
     
     for job in jobs:
-        url = f"{frontend_url}/jobs/{job.id}"
+        url = f"{frontend_url}/job/{job.id}"
         html += f"""
         <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #e0e0e0; border-radius: 5px;">
             <h3 style="margin: 0; color: #2557a7;"><a href="{url}" style="text-decoration: none; color: inherit;">{job.title}</a></h3>

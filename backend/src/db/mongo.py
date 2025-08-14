@@ -842,7 +842,7 @@ class DatabaseOperations:
                     {"job_type": job_type_pattern}
                 ]
             }
-        ).sort([("createdAt", -1)]).limit(limit).to_list()
+        ).sort([("date_posted", -1)]).limit(limit).to_list()
         
         return matching_jobs
     
