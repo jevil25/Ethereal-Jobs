@@ -12,6 +12,11 @@ This is a **hobby project** built to learn and explore:
 - **Google APIs** - Integrating external search and services
 - Full-stack development with React and Python
 
+## 📹 Demo Video
+
+Check out this YouTube video to see how to use the website:
+[![Ethereal Jobs Demo](https://img.youtube.com/vi/g2TCqZsH1N8/0.jpg)](https://youtu.be/g2TCqZsH1N8)
+
 ## ⚠️ Current Status
 
 **This project is currently not working and the backend is not hosted.** While the codebase is functional, the live demo link will not work. The project is in active development and we welcome contributions to help get it running!
