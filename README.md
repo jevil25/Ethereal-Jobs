@@ -2,6 +2,8 @@
 
 A full-stack job recommendation platform that matches job opportunities with user profiles and resumes.
 
+![Ethereal Jobs Landing Page](./landing_page.png)
+
 ## About
 
 This is a **hobby project** built to learn and explore:
